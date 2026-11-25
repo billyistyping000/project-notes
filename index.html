@@ -7,7 +7,7 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#17364a">
-  <meta name="description" content="專案與記事。可離線使用，並把備份同步到自己的 OneDrive。不需要安裝。">
+  <meta name="description" content="專案工作台與記事。可離線使用，並把備份同步到自己的 OneDrive。不需要安裝。">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -311,8 +311,9 @@
       .banner { margin-top: 8px; padding: 12px; }
       .block { margin-top: 18px; }
       .home-page { display: flex; flex-direction: column; }
-      .home-page .home-lists { order: 1; }
+      .home-page .ask-box { order: 1; }
       .home-page .stats { order: 2; }
+      .home-page .home-lists { order: 3; }
       .home-lists > .block:first-child { margin-top: 8px; }
     }
     @media (max-width: 380px) {
@@ -356,6 +357,64 @@
     @media (prefers-contrast: more) {
       .card-link, .date-badge, .btn, .stat { border-width: 3px; }
     }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+    .chip {
+      display: inline-flex; align-items: center; min-height: 28px;
+      padding: 1px 9px; border-radius: 999px; border: 2px solid var(--navy);
+      font-weight: 800; font-size: 14px; background: #f4f6f8; color: var(--navy);
+    }
+    .chip-mod { background: var(--info-bg); border-color: var(--info); color: var(--info); }
+    .chip-ni { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+    .chip-warn { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+    .chip-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+    .chip-ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+    .situation-line { margin: 8px 0 0; font-weight: 800; font-size: 17px; overflow-wrap: anywhere; }
+    .wb-card .dates { margin-top: 8px; }
+    .date-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .date-pill {
+      display: inline-flex; flex-direction: column; gap: 0; min-height: 52px;
+      padding: 6px 10px; border-radius: 10px; border: 2px solid currentColor;
+      font-weight: 800; background: #f4f6f8; color: var(--ink); min-width: 7.5em;
+    }
+    .date-pill b { font-size: 15px; }
+    .date-pill span { font-size: 16px; }
+    .date-pill.date-badge--overdue { background: var(--danger-bg); color: var(--danger); }
+    .date-pill.date-badge--soon { background: var(--warn-bg); color: var(--warn); }
+    .date-pill.date-badge--ok { background: var(--ok-bg); color: var(--ok); }
+    .date-pill.date-badge--info { background: var(--info-bg); color: var(--info); }
+    .date-pill.date-badge--neutral { background: var(--neutral-bg); color: var(--navy); }
+    .ask-box {
+      background: white; border: 2px solid var(--navy); border-radius: 14px;
+      padding: 14px; margin: 12px 0 4px; box-shadow: var(--shadow);
+    }
+    .ask-box h2 { margin: 0 0 6px; font-size: 22px; }
+    .answer-box {
+      white-space: pre-wrap; word-break: break-word; margin: 10px 0 0;
+      padding: 12px; border-radius: 10px; background: #f4f7fb; border: 2px solid var(--navy);
+      font-size: 16px; line-height: 1.5; font-weight: 700; min-height: 88px;
+    }
+    .ms-row, .file-row { gap: 8px; }
+    .ms-row {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: end;
+      background: #f4f6f8; border: 2px solid var(--line); border-radius: 12px;
+      padding: 10px; margin-top: 8px;
+    }
+    .ms-row .field { flex: 1 1 140px; margin: 0; }
+    .ms-row .field-check { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; min-height: 48px; font-weight: 800; }
+    .doc-type {
+      font-weight: 800; font-size: 14px; border: 2px solid var(--navy);
+      border-radius: 999px; padding: 1px 8px; background: white;
+    }
+    .file-meta { font-size: 15px; font-weight: 700; color: var(--ink-2); }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) {
+      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+      .dates.dates-3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (min-width: 700px) {
+      .stats.stats-4 { grid-template-columns: repeat(4, 1fr); }
+    }
     .noscript {
       margin: 16px; padding: 16px; background: var(--danger-bg); color: var(--danger);
       border: 2px solid var(--danger); border-radius: 14px; font-weight: 800;
@@ -387,7 +446,7 @@
     <aside class="sidebar">
       <div class="brand">專案記事<small id="sync-status">未連結 OneDrive，只存在這台瀏覽器</small></div>
       <div class="side-today" id="today-label"></div>
-      <a class="nav-link" href="#/home" data-nav="home">總覽</a>
+      <a class="nav-link" href="#/home" data-nav="home">工作台</a>
       <a class="nav-link" href="#/projects" data-nav="projects"><span>專案</span><span class="nav-count" data-overdue-count hidden></span></a>
       <a class="nav-link" href="#/notes" data-nav="notes">記事</a>
       <a class="nav-link" href="#/settings" data-nav="settings">設定</a>
@@ -415,7 +474,7 @@
         </div>
       </div>
       <div id="demo-banner" class="banner" hidden>
-        <p>這是示範資料，用來展示開始日、結束日、剩餘天數和逾期。你可以修改，或清除後建立自己的專案。</p>
+        <p>這是示範資料，用來展示升降機／自動梯專案的開工、期限、機房和現代化範圍。內容是虛構例子，不是真實合約。你可以修改，或清除後建立自己的專案。</p>
         <div class="row">
           <button type="button" class="btn btn-secondary" data-action="dismiss-demo">知道了</button>
           <button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>
@@ -427,7 +486,7 @@
   <nav id="tabbar" class="tabbar" aria-label="主要" hidden>
     <a href="#/home" data-nav="home">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M7 10.5V20h10v-9.5"/></svg>
-      <span>總覽</span>
+      <span>工作台</span>
     </a>
     <a href="#/projects" data-nav="projects">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
@@ -457,7 +516,7 @@
 
 var KEY = "ky-project-notes-v1";
 var MOCK_KEY = "ky-project-notes-mock-v1";
-var APP_VERSION = 1;
+var APP_VERSION = 2;
 var COLORS = ["#17364a", "#1d3f8f", "#084028", "#8a4b08", "#8f1d1d", "#3f3a6b", "#24556e", "#3d4a3e"];
 var WEEK = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 var STATUSES = [
@@ -469,22 +528,56 @@ var STATUSES = [
 ];
 var STATUS_ORDER = { active: 0, planning: 1, paused: 2, done: 3, cancelled: 4 };
 var KIND = { overdue: 1, soon: 1, ok: 1, info: 1, neutral: 1, none: 1 };
-var DUE_LABELS = { all: "全部期限", overdue: "已逾期", soon: "七天內", nodate: "未設結束日", notstarted: "尚未開始" };
+var DUE_LABELS = { all: "全部期限", overdue: "已逾期", soon: "七天內", waiting: "等候開工", nodate: "未設結束日", notstarted: "尚未開始" };
 var SORT_LABELS = { end: "結束日", start: "開始日", status: "狀態", name: "名稱" };
+
+var PROJECT_KINDS = [
+  { id: "", label: "未填" },
+  { id: "ni", label: "新裝" },
+  { id: "mod", label: "現代化" },
+  { id: "other", label: "其他" }
+];
+var MOD_SCOPES = [
+  { id: "", label: "未填" },
+  { id: "full", label: "全改" },
+  { id: "partial", label: "部分改" }
+];
+var MACHINE_ROOMS = [
+  { id: "", label: "未填" },
+  { id: "with", label: "有機房" },
+  { id: "without", label: "無機房" }
+];
+var DOC_TYPES = [
+  { id: "contract", label: "合約" },
+  { id: "drawing", label: "圖則" },
+  { id: "correspondence", label: "往來文件" },
+  { id: "other", label: "其他" }
+];
+var MILESTONE_SUGGESTIONS = ["開工", "完工", "驗收"];
+
 var JSON_HELP = [
   "{",
-  '  "version": 1,',
+  '  "version": 2,',
   '  "source": "project-notes",',
   '  "exportedAt": "2026-11-25T00:00:00.000Z",',
   '  "projects": [',
   "    {",
   '      "id": "p_example",',
-  '      "name": "內部 API 遷移",',
+  '      "name": "晴灣閣升降機現代化",',
   '      "description": "說明",',
   '      "status": "active",',
+  '      "situation": "等候開工文件",',
+  '      "projectKind": "mod",',
+  '      "modScope": "partial",',
+  '      "machineRoom": "without",',
+  '      "retainItems": "轎廂裝潢",',
+  '      "workCommenced": "",',
+  '      "workCommencedStatus": "waiting",',
+  '      "workCommencedNote": "",',
   '      "startDate": "2026-10-15",',
   '      "endDate": "2027-01-15",',
-  '      "tags": ["後端"],',
+  '      "milestones": [{ "id": "m_example", "name": "驗收", "date": "2027-01-10", "done": false }],',
+  '      "tags": ["升降機"],',
   '      "color": "#17364a",',
   '      "createdAt": "2026-11-01T00:00:00.000Z",',
   '      "updatedAt": "2026-11-01T00:00:00.000Z"',
@@ -527,7 +620,11 @@ var ui = {
   syncTimer: null,
   syncBusy: false,
   skipCloudSave: false,
-  pendingCloudSave: false
+  pendingCloudSave: false,
+  askQuery: "",
+  askProjectId: "",
+  askEndpointId: "",
+  askAnswer: ""
 };
 
 function esc(s) {
@@ -657,6 +754,884 @@ function isDueSoon(p) {
 }
 function isNotStarted(p) { return !isClosed(p) && !!p.startDate && diffDays(p.startDate) > 0; }
 
+function projectKindLabel(id) {
+  var found = PROJECT_KINDS.filter(function (x) { return x.id === id; })[0];
+  return found ? found.label : "未填";
+}
+function modScopeLabel(id) {
+  var found = MOD_SCOPES.filter(function (x) { return x.id === id; })[0];
+  return found ? found.label : "未填";
+}
+function machineRoomLabel(id) {
+  var found = MACHINE_ROOMS.filter(function (x) { return x.id === id; })[0];
+  return found ? found.label : "未填";
+}
+function docTypeLabel(id) {
+  var found = DOC_TYPES.filter(function (x) { return x.id === id; })[0];
+  return found ? found.label : "其他";
+}
+function optionFromList(list, current) {
+  return list.map(function (x) {
+    return '<option value="' + esc(x.id) + '"' + (x.id === current ? " selected" : "") + ">" + esc(x.label) + "</option>";
+  }).join("");
+}
+function emptyMilestone() {
+  return { id: uid("m"), name: "", date: "", done: false };
+}
+function normalizeMilestones(raw) {
+  if (!Array.isArray(raw)) return [];
+  var out = [];
+  raw.slice(0, 30).forEach(function (m) {
+    if (!m || typeof m !== "object") return;
+    out.push({
+      id: ensureId(m.id, "m"),
+      name: String(m.name || "").trim().slice(0, 40),
+      date: isDate(m.date) ? m.date : "",
+      done: !!m.done
+    });
+  });
+  return out;
+}
+function defaultProjectExtras() {
+  return {
+    projectKind: "",
+    modScope: "",
+    machineRoom: "",
+    retainItems: "",
+    situation: "",
+    workCommenced: "",
+    workCommencedStatus: "",
+    workCommencedNote: "",
+    milestones: []
+  };
+}
+function applyProjectExtras(p) {
+  if (!p || typeof p !== "object") return p;
+  var kinds = { ni: 1, mod: 1, other: 1 };
+  p.projectKind = kinds[p.projectKind] ? p.projectKind : "";
+  p.modScope = p.projectKind === "mod" && (p.modScope === "full" || p.modScope === "partial") ? p.modScope : "";
+  p.machineRoom = p.machineRoom === "with" || p.machineRoom === "without" ? p.machineRoom : "";
+  p.retainItems = String(p.retainItems || "").slice(0, 2000);
+  p.situation = String(p.situation || "").slice(0, 800);
+  p.workCommenced = isDate(p.workCommenced) ? p.workCommenced : "";
+  p.workCommencedStatus = p.workCommencedStatus === "done" || p.workCommencedStatus === "waiting" ? p.workCommencedStatus : "";
+  p.workCommencedNote = String(p.workCommencedNote || "").slice(0, 500);
+  p.milestones = normalizeMilestones(p.milestones);
+  return p;
+}
+function commenceStatus(p) {
+  if (!p) return "";
+  if (p.workCommencedStatus === "done" || p.workCommencedStatus === "waiting") return p.workCommencedStatus;
+  if (p.workCommenced) return diffDays(p.workCommenced) > 0 ? "waiting" : "done";
+  return isClosed(p) ? "" : "waiting";
+}
+function commenceInfo(p) {
+  if (isClosed(p)) {
+    if (p.workCommenced) return { kind: "neutral", sub: "已完結 · 開工 " + formatLong(p.workCommenced) };
+    if (commenceStatus(p) === "done") return { kind: "neutral", sub: "已完結（已開工）" };
+    return { kind: "neutral", sub: "已完結" };
+  }
+  var st = commenceStatus(p);
+  if (st === "done") {
+    if (!p.workCommenced) return { kind: "ok", sub: "已開工（未填日期）" };
+    var d0 = diffDays(p.workCommenced);
+    if (d0 > 0) return { kind: "info", sub: "已標已開工，日期在 " + d0 + " 天後" };
+    if (d0 === 0) return { kind: "ok", sub: "今天開工" };
+    return { kind: "ok", sub: "已開工" };
+  }
+  if (!p.workCommenced) return { kind: "info", sub: "等候開工" };
+  var d = diffDays(p.workCommenced);
+  if (d < 0) return { kind: "overdue", sub: "開工已過 " + (-d) + " 天，仍在等候" };
+  if (d === 0) return { kind: "soon", sub: "今天原定開工，仍在等候" };
+  if (d <= 7) return { kind: "soon", sub: "等候開工，還有 " + d + " 天" };
+  return { kind: "info", sub: "等候開工，還有 " + d + " 天" };
+}
+function isWaitingCommence(p) {
+  return !isClosed(p) && commenceStatus(p) === "waiting";
+}
+function milestoneInfo(m, p) {
+  if (!m) return { kind: "none", sub: "未設日期" };
+  if (m.done || isClosed(p)) {
+    if (!m.date) return { kind: "neutral", sub: m.done ? "已完成" : "已完結" };
+    return { kind: "neutral", sub: m.done ? "已完成" : "已完結" };
+  }
+  if (!m.date) return { kind: "none", sub: "未設日期" };
+  var d = diffDays(m.date);
+  if (d < 0) return { kind: "overdue", sub: "逾期 " + (-d) + " 天" };
+  if (d === 0) return { kind: "soon", sub: "今天到期" };
+  if (d <= 7) return { kind: "soon", sub: "剩餘 " + d + " 天" };
+  return { kind: "ok", sub: "剩餘 " + d + " 天" };
+}
+function collectProjectDates(p) {
+  var list = [];
+  if (!p) return list;
+  if (p.startDate) list.push({ key: "start", name: "開始", date: p.startDate, info: startInfo(p), done: !isNotStarted(p) });
+  if (p.endDate) list.push({ key: "end", name: "結束", date: p.endDate, info: endInfo(p), done: isClosed(p) });
+  list.push({ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: commenceStatus(p) === "done" || isClosed(p) });
+  (p.milestones || []).forEach(function (m) {
+    list.push({ key: "ms:" + m.id, name: m.name || "未命名日期", date: m.date || "", info: milestoneInfo(m, p), done: !!m.done || isClosed(p) });
+  });
+  return list;
+}
+function openDateItems(p) {
+  if (isClosed(p)) return [];
+  return collectProjectDates(p).filter(function (item) {
+    return item.date && !item.done && (item.key === "end" || item.key === "commence" || item.key.indexOf("ms:") === 0);
+  });
+}
+function overdueDateItems(p) {
+  return openDateItems(p).filter(function (item) { return diffDays(item.date) < 0; });
+}
+function soonDateItems(p) {
+  return openDateItems(p).filter(function (item) {
+    var d = diffDays(item.date);
+    return d >= 0 && d <= 7;
+  });
+}
+function hasOverdueDates(p) { return overdueDateItems(p).length > 0; }
+function hasSoonDates(p) { return soonDateItems(p).length > 0; }
+function chipsHTML(p) {
+  var bits = [];
+  if (p.projectKind) {
+    var cls = p.projectKind === "mod" ? "chip-mod" : p.projectKind === "ni" ? "chip-ni" : "chip";
+    bits.push('<span class="chip ' + cls + '">' + esc(projectKindLabel(p.projectKind)) + "</span>");
+  }
+  if (p.projectKind === "mod" && p.modScope) {
+    bits.push('<span class="chip">' + esc(modScopeLabel(p.modScope)) + "</span>");
+  }
+  if (p.machineRoom) bits.push('<span class="chip">' + esc(machineRoomLabel(p.machineRoom)) + "</span>");
+  if (isWaitingCommence(p)) bits.push('<span class="chip chip-warn">等候開工</span>');
+  else if (commenceStatus(p) === "done") bits.push('<span class="chip chip-ok">已開工</span>');
+  if (p.retainItems) bits.push('<span class="chip">保留：' + esc(excerpt(p.retainItems, 24)) + "</span>");
+  if (!bits.length) return "";
+  return '<div class="chips">' + bits.join("") + "</div>";
+}
+function datePillsHTML(p) {
+  var items = collectProjectDates(p).filter(function (item) {
+    return item.key === "end" || item.key === "commence" || (item.key.indexOf("ms:") === 0 && (item.date || !item.done));
+  });
+  if (!items.length) return "";
+  return '<div class="date-pills">' + items.map(function (item) {
+    var kind = KIND[item.info.kind] ? item.info.kind : "none";
+    var when = item.date ? formatLong(item.date) : "未設日期";
+    return '<div class="date-pill date-badge--' + kind + '"><b>' + esc(item.name) + "</b><span>" + esc(item.info.sub) + "</span><span>" + esc(when) + "</span></div>";
+  }).join("") + "</div>";
+}
+function projectSearchHay(p) {
+  var bits = [
+    p.name, p.description, p.situation, p.retainItems, p.workCommencedNote,
+    (p.tags || []).join(" "), p.startDate, p.endDate, p.workCommenced,
+    statusLabel(p.status), projectKindLabel(p.projectKind), modScopeLabel(p.modScope),
+    machineRoomLabel(p.machineRoom), commenceStatus(p) === "waiting" ? "等候開工 work commenced" : "已開工"
+  ];
+  (p.milestones || []).forEach(function (m) { bits.push(m.name, m.date); });
+  return bits.join(" ");
+}
+
+function workbenchCard(p) {
+  var overdueN = overdueDateItems(p).length;
+  var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
+  return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    chipsHTML(p) + sit + datePillsHTML(p) +
+    (overdueN ? '<p class="due-line due-overdue">有 ' + overdueN + " 個日期已過</p>" : "") +
+    "</a>";
+}
+function riskCard(p, items) {
+  var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
+  var focus = (items || []).map(function (item) {
+    var kind = KIND[item.info.kind] ? item.info.kind : "none";
+    return '<div class="date-pill date-badge--' + kind + '"><b>' + esc(item.name) + "</b><span>" + esc(item.info.sub) + "</span><span>" + esc(item.date ? formatLong(item.date) + " · " + weekday(item.date) : "未設日期") + "</span></div>";
+  }).join("");
+  return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    chipsHTML(p) + sit + (focus ? '<div class="date-pills">' + focus + "</div>" : datePillsHTML(p)) +
+    "</a>";
+}
+function sectionWorkbench(title, list, emptyText, limit, mapper) {
+  var shown = typeof limit === "number" ? list.slice(0, limit) : list;
+  var more = "";
+  if (typeof limit === "number" && list.length > limit) {
+    more = '<p class="more"><a class="btn btn-secondary" href="#/projects">查看全部 ' + list.length + " 個</a></p>";
+  }
+  var card = mapper || workbenchCard;
+  var body = shown.length ? '<div class="stack">' + shown.map(card).join("") + "</div>" + more : '<p class="empty">' + esc(emptyText) + "</p>";
+  return '<section class="block"><div class="section-head"><h2>' + esc(title) + '</h2><span class="count-pill">' + list.length + "</span></div>" + body + "</section>";
+}
+function askBoxHTML(opts) {
+  opts = opts || {};
+  var projectId = opts.projectId || ui.askProjectId || "";
+  var question = opts.question != null ? opts.question : (ui.askQuery || "");
+  var answer = opts.answer != null ? opts.answer : (ui.askAnswer || "");
+  var locked = !!opts.locked;
+  var title = locked ? "問呢單" : "即時解答";
+  var sel = "";
+  if (!locked) {
+    sel = '<label class="field"><span>針對專案</span><select id="ask-project">' +
+      '<option value=""' + (projectId ? "" : " selected") + ">全部專案（自動尋找）</option>" +
+      data.projects.slice().sort(function (a, b) { return displayName(a).localeCompare(displayName(b), "zh-Hant"); }).map(function (p) {
+        return '<option value="' + esc(p.id) + '"' + (p.id === projectId ? " selected" : "") + ">" + esc(displayName(p)) + "</option>";
+      }).join("") +
+      "</select></label>";
+  } else {
+    sel = '<input type="hidden" id="ask-project" value="' + esc(projectId) + '">';
+  }
+  var epOpts = data.endpoints.map(function (ep) {
+    return '<option value="' + esc(ep.id) + '"' + (ep.id === (ui.askEndpointId || "") ? " selected" : "") + ">" + esc(ep.name || ep.url || "未命名端點") + "</option>";
+  }).join("");
+  var epField = data.endpoints.length
+    ? '<label class="field"><span>外部 API（只在你按下時才送出）</span><select id="ask-endpoint"><option value="">自動選第一個可用端點</option>' + epOpts + "</select></label>"
+    : '<p class="hint">尚未設定外部 API。到「設定 → API 端點」自行填網址和金鑰後，才可以用「問外部 API」。不會預設連到任何廠商。</p>';
+  return '<section class="ask-box" id="ask-box">' +
+    "<h2>" + title + "</h2>" +
+    '<p class="hint">突擊被問開工、機房、全改／部分改、保留項目或合約重點時，先按「即時解答」。答案來自這台裝置上的欄位、記事和可讀附件，可一鍵複製。不會自動送到外面。</p>' +
+    sel +
+    '<label class="field"><span>問題（可留空，直接整理現況）</span><textarea id="ask-q" maxlength="2000" placeholder="例如：呢單係全改定部分改？開工未？有冇機房？保留咗啲咩？">' + esc(question) + "</textarea></label>" +
+    '<div class="row"><button type="button" class="btn" data-action="ask-local">即時解答</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="ask-copy">複製答案</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="ask-api">問外部 API</button></div>' +
+    epField +
+    '<pre class="answer-box" id="ask-answer">' + esc(answer || "按「即時解答」後，這裡會出現可複製的短回覆。") + "</pre></section>";
+}
+function inflateBytes(u8) {
+  if (typeof DecompressionStream === "undefined" || typeof Blob === "undefined" || !Blob.prototype.stream) {
+    return Promise.resolve(null);
+  }
+  function attempt(fmt) {
+    try {
+      var ds = new DecompressionStream(fmt);
+      return new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer().then(function (ab) {
+        return new Uint8Array(ab);
+      }).catch(function () { return null; });
+    } catch (e) { return Promise.resolve(null); }
+  }
+  return attempt("deflate").then(function (out) { return out || attempt("deflate-raw"); });
+}
+function bytesToBinaryString(u8) {
+  var out = "";
+  var step = 0x8000;
+  for (var i = 0; i < u8.length; i += step) {
+    out += String.fromCharCode.apply(null, u8.subarray(i, Math.min(i + step, u8.length)));
+  }
+  return out;
+}
+function pdfLiteralStrings(decoded) {
+  var text = decoded;
+  var out = [];
+  var i = 0;
+  while (i < text.length) {
+    var ch = text.charAt(i);
+    if (ch === "(") {
+      var depth = 1;
+      var buf = "";
+      i++;
+      while (i < text.length && depth > 0) {
+        var c = text.charAt(i);
+        if (c === "\\" && i + 1 < text.length) {
+          var n = text.charAt(i + 1);
+          if (n === "n") buf += "\n";
+          else if (n === "r") buf += "\n";
+          else if (n === "t") buf += "\t";
+          else buf += n;
+          i += 2;
+          continue;
+        }
+        if (c === "(") depth++;
+        else if (c === ")") { depth--; if (depth === 0) break; }
+        if (depth) buf += c;
+        i++;
+      }
+      if (buf.replace(/\s+/g, "").length >= 2) out.push(buf);
+    } else if (ch === "<" && text.charAt(i + 1) !== "<") {
+      var end = text.indexOf(">", i + 1);
+      if (end > i) {
+        var hex = text.slice(i + 1, end).replace(/\s+/g, "");
+        if (hex.length >= 4 && hex.length % 2 === 0 && /^[0-9A-Fa-f]+$/.test(hex)) {
+          var raw = "";
+          var hi = 0;
+          if (hex.length >= 4 && hex.slice(0, 4).toLowerCase() === "feff") hi = 4;
+          if ((hex.length - hi) % 4 === 0 && hex.length - hi >= 4) {
+            for (var h = hi; h < hex.length; h += 4) {
+              var code = parseInt(hex.slice(h, h + 4), 16);
+              if (code && code !== 0) raw += String.fromCharCode(code);
+            }
+          }
+          if (raw.replace(/\s+/g, "").length >= 2) out.push(raw);
+        }
+        i = end;
+      }
+    }
+    i++;
+  }
+  return out.join(" ").replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, " ").replace(/\s+/g, " ").trim();
+}
+function extractPdfText(buffer) {
+  var u8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  if (u8.length > 8 * 1024 * 1024) u8 = u8.subarray(0, 8 * 1024 * 1024);
+  var latin = bytesToBinaryString(u8);
+  if (latin.indexOf("%PDF") !== 0 && latin.indexOf("%PDF") === -1) {
+    return Promise.resolve({ text: "", status: "unreadable", reason: "這不是可識別的 PDF。" });
+  }
+  var parts = [];
+  var re = /stream\r?\n?([\s\S]*?)endstream/g;
+  var match;
+  var jobs = [];
+  while ((match = re.exec(latin))) {
+    if (jobs.length >= 80) break;
+    var start = match.index;
+    var head = latin.slice(Math.max(0, start - 500), start);
+    var body = match[1] || "";
+    if (body.charAt(0) === "\r") body = body.slice(1);
+    if (body.charAt(0) === "\n") body = body.slice(1);
+    if (body.slice(-1) === "\n") body = body.slice(0, -1);
+    if (body.slice(-1) === "\r") body = body.slice(0, -1);
+    var bytes = new Uint8Array(body.length);
+    for (var i = 0; i < body.length; i++) bytes[i] = body.charCodeAt(i) & 0xff;
+    jobs.push({ flate: /\/FlateDecode/.test(head), bytes: bytes, raw: body });
+  }
+  var chain = Promise.resolve();
+  jobs.forEach(function (job) {
+    chain = chain.then(function () {
+      if (job.flate) {
+        return inflateBytes(job.bytes).then(function (out) {
+          var src = out ? bytesToBinaryString(out) : "";
+          var got = pdfLiteralStrings(src);
+          if (got) parts.push(got);
+        });
+      }
+      var plain = pdfLiteralStrings(job.raw);
+      if (plain) parts.push(plain);
+    });
+  });
+  return chain.then(function () {
+    var direct = pdfLiteralStrings(latin);
+    if (direct && direct.length > 40) parts.push(direct);
+    var text = parts.join("\n").replace(/\s+/g, " ").trim().slice(0, 20000);
+    if (text.length >= 20) return { text: text, status: "ok", reason: "" };
+    return { text: "", status: "unreadable", reason: "這份 PDF 不能在裝置上抽出文字（可能是掃描件、加密或較複雜的編碼）。檔案或連結仍會保留，只是即時解答讀不到內容。" };
+  });
+}
+function looksLikeTextMime(name, mime) {
+  var m = String(mime || "").toLowerCase();
+  var n = String(name || "").toLowerCase();
+  if (m.indexOf("text/") === 0 || m === "application/json" || m === "application/xml" || m === "image/svg+xml") return true;
+  return /\.(txt|md|csv|json|html?|xml|log|rtf)$/i.test(n);
+}
+function looksLikePdf(name, mime) {
+  var m = String(mime || "").toLowerCase();
+  var n = String(name || "").toLowerCase();
+  return m === "application/pdf" || /\.pdf$/i.test(n);
+}
+function extractReadableText(blob, name, mime) {
+  if (!blob) return Promise.resolve({ text: "", status: "none", reason: "沒有檔案內容，只記下了名稱或連結。" });
+  if (looksLikePdf(name, mime)) {
+    return blob.arrayBuffer ? blob.arrayBuffer().then(extractPdfText).catch(function () {
+      return { text: "", status: "unreadable", reason: "無法讀取這份 PDF。" };
+    }) : Promise.resolve({ text: "", status: "unreadable", reason: "這個瀏覽器不能讀取 PDF 內容。" });
+  }
+  if (looksLikeTextMime(name, mime)) {
+    return (blob.text ? blob.text() : new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || "")); };
+      reader.onerror = function () { reject(reader.error || new Error("讀不到檔案")); };
+      reader.readAsText(blob);
+    })).then(function (text) {
+      text = String(text || "").replace(/\u0000/g, "").trim().slice(0, 20000);
+      if (!text) return { text: "", status: "unreadable", reason: "這個文字檔是空的。" };
+      return { text: text, status: "ok", reason: "" };
+    }).catch(function (e) {
+      return { text: "", status: "unreadable", reason: "讀不到文字：" + (e && e.message ? e.message : "未知錯誤") };
+    });
+  }
+  return Promise.resolve({
+    text: "",
+    status: "unreadable",
+    reason: "這個檔案格式不能在裝置上抽出文字（例如掃描 PDF、圖片或 Word）。檔案或連結仍會保留。若要給即時解答使用，可另存純文字或可選取文字的 PDF。"
+  });
+}
+function fileKindOf(rec) {
+  if (rec && rec.kind) return rec.kind;
+  if (rec && rec.blob) return "embedded";
+  if (rec && rec.fileHandle) return "handle";
+  if (rec && rec.linkLabel) return "link";
+  return "embedded";
+}
+function gatherReadableDocuments(ownerType, ownerId) {
+  return listFiles(ownerType, ownerId).then(function (files) {
+    var list = files || [];
+    var out = [];
+    var chain = Promise.resolve();
+    list.forEach(function (f) {
+      chain = chain.then(function () {
+        if (f.textCache && f.textStatus === "ok") {
+          out.push(f);
+          return;
+        }
+        var blobP = Promise.resolve(f.blob || null);
+        if (!f.blob && f.fileHandle && f.fileHandle.getFile) {
+          blobP = ensureHandlePermission(f.fileHandle, "read").then(function (ok) {
+            if (!ok) return null;
+            return f.fileHandle.getFile();
+          }).catch(function () { return null; });
+        }
+        return blobP.then(function (blob) {
+          return extractReadableText(blob, f.name, f.mime).then(function (got) {
+            f.textCache = got.text || "";
+            f.textStatus = got.status;
+            f.textReason = got.reason || "";
+            f.textCacheAt = nowISO();
+            out.push(f);
+            return putFile(f).catch(function () {});
+          });
+        });
+      });
+    });
+    return chain.then(function () { return out; });
+  });
+}
+function formatDocBrief(files) {
+  if (!files || !files.length) return "沒有附件。";
+  return files.map(function (f) {
+    var line = "「" + (f.name || "未命名") + "」（" + docTypeLabel(f.docType) + "）";
+    if (f.textStatus === "ok" && f.textCache) line += "，已在裝置上讀到部分文字。";
+    else if (f.linkLabel) line += "，只記下位置：" + f.linkLabel + "。尚未抽出文字。";
+    else if (f.textReason) line += "，" + f.textReason;
+    else line += "，未抽出文字。";
+    return line;
+  }).join("\n");
+}
+function structuredFacts(p) {
+  var lines = [];
+  lines.push(displayName(p));
+  lines.push("狀態：" + statusLabel(p.status));
+  if (p.situation) lines.push("目前情況：" + p.situation);
+  var kind = p.projectKind ? projectKindLabel(p.projectKind) : "未填項目類型";
+  if (p.projectKind === "mod") kind += "／" + (p.modScope ? modScopeLabel(p.modScope) : "未填全改或部分改");
+  lines.push("類型：" + kind);
+  lines.push("機房：" + (p.machineRoom ? machineRoomLabel(p.machineRoom) : "未填"));
+  lines.push("保留項目：" + (p.retainItems ? p.retainItems : "未填"));
+  var cInfo = commenceInfo(p);
+  var cDate = p.workCommenced ? formatLong(p.workCommenced) + "（" + weekday(p.workCommenced) + "）" : "未填日期";
+  lines.push("開工：" + cInfo.sub + " · " + cDate + (p.workCommencedNote ? "。" + p.workCommencedNote : ""));
+  if (p.startDate) lines.push("開始日：" + formatLong(p.startDate) + " · " + startInfo(p).sub);
+  else lines.push("開始日：未設");
+  if (p.endDate) lines.push("結束日：" + formatLong(p.endDate) + " · " + endInfo(p).sub);
+  else lines.push("結束日：未設");
+  (p.milestones || []).forEach(function (m) {
+    var info = milestoneInfo(m, p);
+    lines.push((m.name || "日期") + "：" + (m.date ? formatLong(m.date) + " · " : "未設日期 · ") + info.sub + (m.done ? "（已完成）" : ""));
+  });
+  return lines.join("\n");
+}
+function pickProjectsForQuestion(question, explicitId) {
+  if (explicitId) {
+    var one = findProject(explicitId);
+    return one ? [one] : [];
+  }
+  var q = String(question || "").trim().toLowerCase();
+  if (!q) return data.projects.filter(function (p) { return !isClosed(p); });
+  var scored = data.projects.map(function (p) {
+    var hay = projectSearchHay(p).toLowerCase();
+    var score = 0;
+    var name = displayName(p).toLowerCase();
+    if (q.indexOf(name) >= 0 || name.indexOf(q) >= 0) score += 8;
+    String(question || "").split(/[\s,，。？?、]+/).forEach(function (tok) {
+      if (tok.length >= 2 && hay.indexOf(tok.toLowerCase()) >= 0) score += 2;
+    });
+    return { p: p, score: score };
+  }).filter(function (x) { return x.score > 0; }).sort(function (a, b) { return b.score - a.score; });
+  if (scored.length) return scored.slice(0, 5).map(function (x) { return x.p; });
+  return data.projects.filter(function (p) { return !isClosed(p); }).slice(0, 8);
+}
+function buildLocalAnswer(projects, question, docsByProject) {
+  if (!projects.length) return "找不到對應專案。請先選一個專案，或在工作台新增。";
+  var q = String(question || "").trim();
+  var blocks = projects.map(function (p) {
+    var notes = data.notes.filter(function (n) { return n.projectId === p.id; })
+      .sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); })
+      .slice(0, 6);
+    var files = (docsByProject && docsByProject[p.id]) || [];
+    var lines = [structuredFacts(p)];
+    if (notes.length) {
+      lines.push("相關記事：");
+      notes.forEach(function (n) {
+        lines.push("· " + displayNoteTitle(n) + (n.body ? "：" + excerpt(n.body, 180) : ""));
+      });
+    } else {
+      lines.push("相關記事：沒有。");
+    }
+    lines.push("文件：" + formatDocBrief(files));
+    var contractBits = [];
+    files.forEach(function (f) {
+      if (f.docType === "contract" || /合約|contract/i.test(f.name || "")) {
+        if (f.textCache) contractBits.push("（" + (f.name || "合約") + "）" + excerpt(f.textCache, 400));
+      } else if (q && f.textCache && f.textCache.toLowerCase().indexOf(q.toLowerCase()) >= 0) {
+        contractBits.push("（" + (f.name || "附件") + "）" + excerpt(f.textCache, 400));
+      } else if (f.textCache && (f.docType === "correspondence" || f.docType === "drawing")) {
+        contractBits.push("（" + (f.name || "附件") + "）" + excerpt(f.textCache, 220));
+      }
+    });
+    if (contractBits.length) {
+      lines.push("從可讀附件抽出的重點：");
+      lines.push(contractBits.join("\n"));
+    }
+    return lines.join("\n");
+  });
+  var head = q ? "問題：" + q + "\n\n" : "";
+  var foot = projects.length > 1 ? "\n\n以上是 " + projects.length + " 個可能相關的專案。若不是你要的那一單，請在上面指定專案再問。" : "";
+  var intro = "以下根據本機欄位、記事和可讀附件整理，可直接複製作回覆。未填的項目已標明。這不是對外契約的正式解釋。\n\n";
+  return (head + intro + blocks.join("\n\n————\n\n") + foot).slice(0, 8000);
+}
+function paintAskAnswer(text) {
+  ui.askAnswer = String(text || "");
+  var el = document.getElementById("ask-answer");
+  if (el) el.textContent = ui.askAnswer;
+}
+function readAskForm() {
+  var qEl = document.getElementById("ask-q");
+  var pEl = document.getElementById("ask-project");
+  var eEl = document.getElementById("ask-endpoint");
+  if (qEl) ui.askQuery = qEl.value;
+  if (pEl) ui.askProjectId = pEl.value;
+  if (eEl) ui.askEndpointId = eEl.value;
+  return { question: ui.askQuery || "", projectId: ui.askProjectId || "", endpointId: ui.askEndpointId || "" };
+}
+function collectDocsForProjects(projects) {
+  var map = {};
+  var chain = Promise.resolve();
+  projects.forEach(function (p) {
+    chain = chain.then(function () {
+      return gatherReadableDocuments("project", p.id).then(function (files) { map[p.id] = files; });
+    });
+  });
+  return chain.then(function () { return map; });
+}
+function runLocalAsk() {
+  var form = readAskForm();
+  var projects = pickProjectsForQuestion(form.question, form.projectId);
+  paintAskAnswer("正在整理本機資料…");
+  return collectDocsForProjects(projects).then(function (docs) {
+    var text = buildLocalAnswer(projects, form.question, docs);
+    paintAskAnswer(text);
+    toast("已用本機資料整理回覆。");
+    return text;
+  }).catch(function (err) {
+    var msg = "整理失敗：" + (err && err.message ? err.message : "未知錯誤");
+    paintAskAnswer(msg);
+    throw err;
+  });
+}
+function chooseAskEndpoint(id) {
+  if (id && findEndpoint(id)) return findEndpoint(id);
+  var usable = data.endpoints.filter(function (ep) {
+    return String(ep.url || "").trim() && String(ep.url || "").trim() !== "local://fail";
+  });
+  return usable[0] || data.endpoints[0] || null;
+}
+function parseAskResponse(res) {
+  if (!res) return "沒有回應。";
+  var json = res.json;
+  if (json && typeof json === "object" && !Array.isArray(json)) {
+    if (typeof json.answer === "string" && json.answer.trim()) return json.answer.trim();
+    if (typeof json.reply === "string" && json.reply.trim()) return json.reply.trim();
+    if (typeof json.text === "string" && json.text.trim()) return json.text.trim();
+    if (typeof json.output === "string" && json.output.trim()) return json.output.trim();
+    if (json.choices && json.choices[0] && json.choices[0].message && typeof json.choices[0].message.content === "string") {
+      return json.choices[0].message.content.trim();
+    }
+  }
+  var detail = String(res.detail || "").trim();
+  var nl = detail.indexOf("\n");
+  var body = nl >= 0 ? detail.slice(nl + 1).trim() : detail;
+  if (body && body !== "（沒有回應內容）") return body;
+  return res.ok ? "端點有回應，但沒有可顯示的文字。" : (detail || "問外部 API 失敗。");
+}
+function askPayload(projects, question, docsByProject, localAnswer) {
+  return {
+    source: "project-notes",
+    op: "ask",
+    question: question || "",
+    exportedAt: nowISO(),
+    localAnswer: localAnswer || "",
+    projects: projects.map(function (p) {
+      var files = ((docsByProject && docsByProject[p.id]) || []).map(function (f) {
+        return {
+          name: f.name || "",
+          docType: f.docType || "other",
+          text: f.textStatus === "ok" ? String(f.textCache || "").slice(0, 12000) : "",
+          textStatus: f.textStatus || "",
+          note: f.textReason || f.linkLabel || ""
+        };
+      });
+      var notes = data.notes.filter(function (n) { return n.projectId === p.id; }).map(function (n) {
+        return { title: n.title, body: String(n.body || "").slice(0, 8000) };
+      });
+      return {
+        id: p.id,
+        name: p.name,
+        status: p.status,
+        situation: p.situation,
+        projectKind: p.projectKind,
+        modScope: p.modScope,
+        machineRoom: p.machineRoom,
+        retainItems: p.retainItems,
+        workCommenced: p.workCommenced,
+        workCommencedStatus: commenceStatus(p),
+        workCommencedNote: p.workCommencedNote,
+        startDate: p.startDate,
+        endDate: p.endDate,
+        description: p.description,
+        milestones: p.milestones || [],
+        notes: notes,
+        documents: files
+      };
+    })
+  };
+}
+function runApiAsk() {
+  var form = readAskForm();
+  var ep = chooseAskEndpoint(form.endpointId);
+  if (!ep) {
+    toast("尚未設定 API 端點。請先到設定加入你自己的網址。");
+    paintAskAnswer("尚未設定 API 端點。請到「設定 → API 端點」填寫你自己的網址和金鑰，再按「問外部 API」。這個工具不會預設連到任何廠商，也不會把合約檔上傳到公開網站。");
+    return Promise.resolve();
+  }
+  var projects = pickProjectsForQuestion(form.question, form.projectId);
+  paintAskAnswer("先整理本機資料，再送到「" + (ep.name || ep.url) + "」…");
+  return collectDocsForProjects(projects).then(function (docs) {
+    var local = buildLocalAnswer(projects, form.question, docs);
+    var payload = askPayload(projects, form.question, docs, local);
+    return requestEndpoint(ep, "ask", payload).then(function (res) {
+      var remote = parseAskResponse(res);
+      var text;
+      if (res.ok) {
+        text = remote + "\n\n——\n以上來自你指定的端點「" + (ep.name || ep.url) + "」。以下是本機整理，方便對照：\n\n" + local;
+        toast("已取得外部 API 回覆。");
+      } else {
+        text = "外部 API 未能作答。\n" + redactSecrets(remote, ep) + "\n\n以下改用本機整理：\n\n" + local;
+        toast("外部 API 失敗，已改顯示本機整理。");
+      }
+      paintAskAnswer(text.slice(0, 12000));
+    });
+  });
+}
+function copyAskAnswer() {
+  var text = ui.askAnswer || (document.getElementById("ask-answer") && document.getElementById("ask-answer").textContent) || "";
+  text = String(text).trim();
+  if (!text || text.indexOf("按「即時解答」") === 0) {
+    toast("還沒有可複製的答案。請先按「即時解答」。");
+    return Promise.resolve();
+  }
+  function fallback() {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "readonly");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    ta.remove();
+    toast(ok ? "已複製答案。" : "複製失敗，請手動選取答案再複製。");
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(function () { toast("已複製答案。"); }).catch(fallback);
+  }
+  fallback();
+  return Promise.resolve();
+}
+
+function milestoneEditorHTML(p) {
+  var rows = (p.milestones || []).map(function (m) {
+    return '<div class="ms-row" data-ms-id="' + esc(m.id) + '">' +
+      '<label class="field"><span>名稱</span><input type="text" maxlength="40" data-ms-field="name" value="' + esc(m.name) + '" placeholder="例如：驗收"></label>' +
+      '<label class="field"><span>日期</span><input type="date" data-ms-field="date" value="' + esc(m.date) + '"></label>' +
+      '<label class="field-check"><input type="checkbox" data-ms-field="done"' + (m.done ? " checked" : "") + ">已完成</label>" +
+      '<button type="button" class="btn btn-danger" data-action="remove-milestone" data-id="' + esc(m.id) + '">移除</button></div>';
+  }).join("");
+  if (!rows) rows = '<p class="hint">還沒有其他期限。開始日、結束日和開工已在上面。這裡可加完工、驗收或自訂日期。</p>';
+  var suggestions = MILESTONE_SUGGESTIONS.map(function (name) {
+    return '<button type="button" class="btn btn-secondary" data-action="add-milestone" data-name="' + esc(name) + '">＋ ' + esc(name) + "</button>";
+  }).join("");
+  return '<section class="block"><h2>其他期限</h2><p class="hint">除了開始、結束和開工，你可以為這一單加上完工、驗收或其他日期。已完成或已取消的專案不會標成逾期。</p>' +
+    '<div id="milestone-list">' + rows + "</div>" +
+    '<div class="row" style="margin-top:8px">' + suggestions +
+    '<button type="button" class="btn btn-secondary" data-action="add-milestone">＋ 自訂日期</button></div></section>';
+}
+function canUseFilePicker() {
+  return typeof window !== "undefined" && typeof window.showOpenFilePicker === "function";
+}
+function filesBlockFor(ownerType) {
+  var isProject = ownerType === "project";
+  var typeField = isProject
+    ? '<label class="field"><span>文件類型</span><select id="doc-type">' + optionFromList(DOC_TYPES, "contract") + "</select></label>"
+    : "";
+  var hint = isProject
+    ? "合約、圖則或往來文件可以存入這台瀏覽器，或只記下 OneDrive／資料夾位置。檔案不會上傳到公開網站。匯出備份時，已存入的檔會一併帶走。"
+    : "檔案存在這台瀏覽器的資料庫，可稍後下載。匯出備份時可以一併帶走。";
+  var extra = isProject
+    ? '<button type="button" class="btn btn-secondary" data-action="remember-link">只記下檔名或路徑</button>' +
+      (canUseFilePicker() ? '<button type="button" class="btn btn-secondary" data-action="link-handle">連結本機或 OneDrive 檔案</button>' : "")
+    : "";
+  return '<section class="block"><h2>' + (isProject ? "合約與文件" : "附件") + "</h2><p class=\"hint\">" + hint + "</p>" +
+    typeField +
+    '<div class="drop" id="drop"><p class="hint">把檔案拖到這裡，或按下面的按鈕把檔案存入這台裝置。</p><div class="row"><button type="button" class="btn btn-secondary" data-action="pick-file">選擇檔案並存入</button>' + extra + "</div>" +
+    '<input id="file-input" type="file" multiple hidden></div><div id="files"><p class="hint">正在讀取文件…</p></div></section>';
+}
+function selectedDocType() {
+  var el = document.getElementById("doc-type");
+  var v = el ? el.value : "other";
+  return DOC_TYPES.some(function (t) { return t.id === v; }) ? v : "other";
+}
+function updateMilestoneFromElement(projectId, el) {
+  var row = el.closest("[data-ms-id]");
+  if (!row) return;
+  var p = findProject(projectId);
+  if (!p) return;
+  var ms = (p.milestones || []).filter(function (m) { return m.id === row.dataset.msId; })[0];
+  if (!ms) return;
+  var field = el.dataset.msField;
+  if (field === "name") ms.name = String(el.value || "").trim().slice(0, 40);
+  else if (field === "date") {
+    if (el.value && !isDate(el.value)) return;
+    ms.date = el.value || "";
+  } else if (field === "done") ms.done = !!el.checked;
+  else return;
+  touchEntity(p);
+  persistNow();
+  refreshProjectChrome(p);
+  paintBanners();
+}
+function addMilestone(projectId, name) {
+  var p = findProject(projectId);
+  if (!p) return;
+  p.milestones = normalizeMilestones(p.milestones);
+  var label = String(name || "").trim().slice(0, 40);
+  if (label) {
+    var exists = p.milestones.some(function (m) { return m.name === label; });
+    if (exists) { toast("已經有名為「" + label + "」的日期。"); return; }
+  }
+  var m = emptyMilestone();
+  m.name = label || "新日期";
+  p.milestones.push(m);
+  touchEntity(p);
+  persistNow();
+  render();
+}
+function removeMilestone(projectId, mid) {
+  var p = findProject(projectId);
+  if (!p) return;
+  p.milestones = (p.milestones || []).filter(function (m) { return m.id !== mid; });
+  touchEntity(p);
+  persistNow();
+  render();
+}
+function rememberFileLink(ownerType, ownerId) {
+  return chooseDialog({
+    title: "記下檔名或路徑",
+    body: "不會把檔案複製進這個工具，只在這一單記住名稱、類型和位置，方便你之後在 OneDrive 或公司共用資料夾打開。可填檔名、完整路徑或 OneDrive 連結。",
+    choices: [{ id: "cancel", label: "取消" }, { id: "ok", label: "繼續" }]
+  }).then(function (choice) {
+    if (choice !== "ok") return;
+    var name = window.prompt("檔名或簡稱（例如：升降機工程合約.pdf）", "");
+    if (name === null) return;
+    name = String(name || "").trim().slice(0, 200);
+    if (!name) { toast("未有檔名，沒有記下。"); return; }
+    var path = window.prompt("路徑或連結（可留空）", "");
+    if (path === null) return;
+    path = String(path || "").trim().slice(0, 2000);
+    return putFile({
+      id: uid("f"),
+      ownerType: ownerType,
+      ownerId: ownerId,
+      name: name,
+      mime: "application/octet-stream",
+      size: 0,
+      createdAt: nowISO(),
+      docType: selectedDocType(),
+      kind: "link",
+      linkLabel: path,
+      textCache: "",
+      textStatus: "none",
+      textReason: path ? "只記下位置，沒有把檔案存入這台瀏覽器。" : "只記下檔名。"
+    }).then(function () {
+      toast("已記下文件位置。檔案本身仍在你原來的資料夾。");
+      return loadFileList(ownerType, ownerId);
+    });
+  });
+}
+function linkFileHandle(ownerType, ownerId) {
+  if (!canUseFilePicker()) {
+    toast("這個瀏覽器不能直接連結本機檔案。請改用「選擇檔案並存入」，或只記下路徑。");
+    return Promise.resolve();
+  }
+  return window.showOpenFilePicker({ multiple: false }).then(function (handles) {
+    var handle = handles && handles[0];
+    if (!handle) return;
+    return handle.getFile().then(function (file) {
+      return extractReadableText(file, file.name, file.type).then(function (got) {
+        return putFile({
+          id: uid("f"),
+          ownerType: ownerType,
+          ownerId: ownerId,
+          name: file.name || "未命名檔案",
+          mime: file.type || "application/octet-stream",
+          size: file.size || 0,
+          createdAt: nowISO(),
+          docType: selectedDocType(),
+          kind: "handle",
+          fileHandle: handle,
+          linkLabel: handle.name || file.name || "",
+          textCache: got.text || "",
+          textStatus: got.status,
+          textReason: got.reason || "",
+          textCacheAt: nowISO()
+        }).then(function () {
+          toast(got.status === "ok" ? "已連結檔案，並在裝置上抽出文字供即時解答使用。" : "已連結檔案。" + (got.reason || "文字未能抽出，但仍可在這台電腦打開。"));
+          return loadFileList(ownerType, ownerId);
+        });
+      });
+    });
+  }).catch(function (err) {
+    if (err && err.name === "AbortError") return;
+    toast("未能連結檔案：" + (err && err.message ? err.message : "未知錯誤"));
+  });
+}
+function setFileDocType(id, docType) {
+  return getFile(id).then(function (rec) {
+    if (!rec) { toast("找不到文件。"); return; }
+    rec.docType = DOC_TYPES.some(function (t) { return t.id === docType; }) ? docType : "other";
+    return putFile(rec).then(function () {
+      var ent = currentEntity();
+      if (ent) return loadFileList(ent.type, ent.id);
+    });
+  });
+}
+function reopenLinkedFile(id) {
+  return getFile(id).then(function (rec) {
+    if (!rec) { toast("找不到文件。"); return; }
+    if (rec.blob) {
+      downloadBlob(rec.blob, rec.name || "attachment");
+      return;
+    }
+    if (rec.fileHandle && rec.fileHandle.getFile) {
+      return ensureHandlePermission(rec.fileHandle, "read").then(function (ok) {
+        if (!ok) { toast("沒有權限讀取這個已連結檔案。請再連結一次。"); return; }
+        return rec.fileHandle.getFile().then(function (file) {
+          downloadBlob(file, rec.name || file.name || "attachment");
+        });
+      });
+    }
+    if (rec.linkLabel) {
+      toast("這份文件只記下了位置，沒有存入瀏覽器。位置：" + rec.linkLabel);
+      return;
+    }
+    toast("沒有可下載的檔案內容。");
+  });
+}
+
+
 function cmpDateDir(a, b, dir) {
   if (!a && !b) return 0;
   if (!a) return 1;
@@ -713,7 +1688,7 @@ function defaultPrefs() {
 }
 function normalizeData(d) {
   if (!d || typeof d !== "object" || Array.isArray(d)) d = {};
-  d.version = 1;
+  d.version = 2;
   if (!Array.isArray(d.projects)) d.projects = [];
   if (!Array.isArray(d.notes)) d.notes = [];
   if (!Array.isArray(d.endpoints)) d.endpoints = [];
@@ -722,7 +1697,7 @@ function normalizeData(d) {
   if (d.prefs.sortDir !== "desc") d.prefs.sortDir = "asc";
   if (d.prefs.layout !== "timeline") d.prefs.layout = "cards";
   if (["end", "start", "status", "name"].indexOf(d.prefs.sort) < 0) d.prefs.sort = "end";
-  if (["all", "overdue", "soon", "nodate", "notstarted"].indexOf(d.prefs.due) < 0) d.prefs.due = "all";
+  if (["all", "overdue", "soon", "waiting", "nodate", "notstarted"].indexOf(d.prefs.due) < 0) d.prefs.due = "all";
   if (d.prefs.status !== "all" && !STATUSES.some(function (s) { return s.id === d.prefs.status; })) d.prefs.status = "all";
   if (["updated", "created", "title"].indexOf(d.prefs.noteSort) < 0) d.prefs.noteSort = "updated";
   d.projects.forEach(function (p) {
@@ -736,6 +1711,7 @@ function normalizeData(d) {
     if (!STATUSES.some(function (s) { return s.id === p.status; })) p.status = "planning";
     p.startDate = isDate(p.startDate) ? p.startDate : "";
     p.endDate = isDate(p.endDate) ? p.endDate : "";
+    applyProjectExtras(p);
     if (!isStamp(p.createdAt)) p.createdAt = nowISO();
     if (!isStamp(p.updatedAt)) p.updatedAt = p.createdAt;
   });
@@ -773,22 +1749,90 @@ function normalizeData(d) {
 }
 function hoursAgo(h) { return new Date(Date.now() - h * 3600 * 1000).toISOString(); }
 function buildDemo() {
+  function ms(name, date, done) { return { id: uid("m"), name: name, date: date, done: !!done }; }
   var projects = [
-    { id: uid("p"), name: "機房備援切換", description: "DNS 切換後要確認監控與復原步驟。上次停在 TTL。", status: "active", startDate: isoOffset(-24), endDate: isoOffset(-5), tags: ["維運", "備援"], color: "#8f1d1d", demo: true },
-    { id: uid("p"), name: "憑證到期更換", description: "內部入口憑證今天到期。更換後核對憑證鏈，再重新載入。", status: "active", startDate: isoOffset(-20), endDate: isoOffset(0), tags: ["憑證"], color: "#8a4b08", demo: true },
-    { id: uid("p"), name: "監控儀表板補齊", description: "補錯誤率、佇列延遲、磁碟。結束日前先交出錯誤率。", status: "active", startDate: isoOffset(-12), endDate: isoOffset(3), tags: ["觀測"], color: "#8a4b08", demo: true },
-    { id: uid("p"), name: "內部 API 遷移", description: "舊客戶端改走 v2。雙寫期間不要拆掉舊路由。", status: "active", startDate: isoOffset(-40), endDate: isoOffset(45), tags: ["後端"], color: "#17364a", demo: true },
-    { id: uid("p"), name: "機櫃盤點", description: "核對機櫃、序號與保固。開始日前先準備表格。", status: "planning", startDate: isoOffset(14), endDate: isoOffset(30), tags: ["盤點"], color: "#1d3f8f", demo: true },
-    { id: uid("p"), name: "上季部署回顧", description: "已完成。留作日期範例：已完成的專案不會再標成逾期。", status: "done", startDate: isoOffset(-90), endDate: isoOffset(-40), tags: ["回顧"], color: "#3d4a3e", demo: true }
+    {
+      id: uid("p"), name: "晴灣閣升降機現代化",
+      description: "示範單，並非真實合約或真實地盤。兩部客用升降機局部現代化。",
+      status: "active", startDate: isoOffset(-30), endDate: isoOffset(80),
+      tags: ["升降機", "現代化"], color: "#8a4b08", demo: true,
+      projectKind: "mod", modScope: "partial", machineRoom: "without",
+      retainItems: "轎廂裝潢、部分導軌",
+      situation: "等候業主簽回開工文件",
+      workCommenced: isoOffset(-3), workCommencedStatus: "waiting",
+      workCommencedNote: "原定上週開工，文件未齊。",
+      milestones: [ms("完工", isoOffset(60), false), ms("驗收", isoOffset(75), false)]
+    },
+    {
+      id: uid("p"), name: "市集廣場自動梯新裝",
+      description: "示範單。商場入口一對自動梯新裝。",
+      status: "active", startDate: isoOffset(-40), endDate: isoOffset(45),
+      tags: ["自動梯", "新裝"], color: "#17364a", demo: true,
+      projectKind: "ni", modScope: "", machineRoom: "with",
+      retainItems: "不適用（新裝）",
+      situation: "井道執修進行中",
+      workCommenced: isoOffset(-20), workCommencedStatus: "done",
+      workCommencedNote: "已在現場開工。",
+      milestones: [ms("完工", isoOffset(30), false), ms("驗收", isoOffset(40), false)]
+    },
+    {
+      id: uid("p"), name: "翠湖居升降機全改",
+      description: "示範單。三部升降機全改，無機房。",
+      status: "active", startDate: isoOffset(-90), endDate: isoOffset(20),
+      tags: ["升降機", "全改"], color: "#1d3f8f", demo: true,
+      projectKind: "mod", modScope: "full", machineRoom: "without",
+      retainItems: "無（全改）",
+      situation: "安裝完成，等待驗收排期",
+      workCommenced: isoOffset(-70), workCommencedStatus: "done",
+      workCommencedNote: "",
+      milestones: [ms("完工", isoOffset(-5), true), ms("驗收", isoOffset(3), false)]
+    },
+    {
+      id: uid("p"), name: "河畔商場自動梯局部改裝",
+      description: "示範單。部份梯級及欄板更換，尚未開工。",
+      status: "planning", startDate: isoOffset(14), endDate: isoOffset(70),
+      tags: ["自動梯"], color: "#24556e", demo: true,
+      projectKind: "mod", modScope: "partial", machineRoom: "with",
+      retainItems: "主結構、梳齒板",
+      situation: "開工日期未定，圖則已交",
+      workCommenced: "", workCommencedStatus: "waiting",
+      workCommencedNote: "待商場批核施工時段。",
+      milestones: [ms("開工", isoOffset(20), false), ms("完工", isoOffset(55), false)]
+    },
+    {
+      id: uid("p"), name: "舊翼貨運升降機更換",
+      description: "示範單。貨運梯更換，零件延誤。",
+      status: "active", startDate: isoOffset(-60), endDate: isoOffset(-4),
+      tags: ["升降機", "新裝"], color: "#8f1d1d", demo: true,
+      projectKind: "ni", modScope: "", machineRoom: "with",
+      retainItems: "井道結構",
+      situation: "主機零件未到貨，現場停工待料",
+      workCommenced: isoOffset(-35), workCommencedStatus: "done",
+      workCommencedNote: "已拆舊機，新機未到。",
+      milestones: [ms("完工", isoOffset(-6), false), ms("驗收", isoOffset(10), false)]
+    },
+    {
+      id: uid("p"), name: "海傍街商場自動梯翻新",
+      description: "示範單。已完成，用來展示已完成項目不會標成逾期。",
+      status: "done", startDate: isoOffset(-200), endDate: isoOffset(-40),
+      tags: ["自動梯"], color: "#3d4a3e", demo: true,
+      projectKind: "mod", modScope: "partial", machineRoom: "with",
+      retainItems: "梳齒板、部分欄板",
+      situation: "已驗收交付",
+      workCommenced: isoOffset(-180), workCommencedStatus: "done",
+      workCommencedNote: "",
+      milestones: [ms("驗收", isoOffset(-45), true)]
+    }
   ];
   projects.forEach(function (p, i) {
     p.createdAt = hoursAgo(80 - i);
     p.updatedAt = hoursAgo(20 - i);
   });
   var notes = [
-    { id: uid("n"), title: "DNS 與復原", body: "切換前先把 TTL 降到 60 秒。復原命令先寫在這裡，附件稍後補。", projectId: projects[0].id, demo: true, createdAt: hoursAgo(18), updatedAt: hoursAgo(6) },
-    { id: uid("n"), title: "儀表板缺口", body: "錯誤率圖還沒有。磁碟只做根目錄。結束日前先交出錯誤率。", projectId: projects[2].id, demo: true, createdAt: hoursAgo(10), updatedAt: hoursAgo(3) },
-    { id: uid("n"), title: "工作電腦用法", body: "這台電腦不能裝軟件。打開這個 HTML 就能用。每週把備份 JSON 存到自己的雲端硬碟或隨身碟。", projectId: "", demo: true, createdAt: hoursAgo(4), updatedAt: hoursAgo(1) }
+    { id: uid("n"), title: "開工卡點", body: "業主代表要先簽回開工通知。現場圍板物料已備。這是示範記事。", projectId: projects[0].id, demo: true, createdAt: hoursAgo(18), updatedAt: hoursAgo(6) },
+    { id: uid("n"), title: "合約摘記（示範，非真實合約）", body: "示範摘記，不是真實契約：保養期 12 個月；施工時間為星期一至六 09:00-18:00；保留轎廂裝潢。即時解答可引用這些要點。", projectId: projects[0].id, demo: true, createdAt: hoursAgo(16), updatedAt: hoursAgo(5) },
+    { id: uid("n"), title: "驗收準備", body: "要準備檢驗報告及施工照片。排期一出就通知管理處。", projectId: projects[2].id, demo: true, createdAt: hoursAgo(10), updatedAt: hoursAgo(3) },
+    { id: uid("n"), title: "工作電腦用法", body: "這台電腦不能裝軟件。打開這個 HTML 就能用。每週把備份 JSON 存到自己的雲端硬碟或隨身碟。合約檔請留在公司 OneDrive，不要放到公開網站。", projectId: "", demo: true, createdAt: hoursAgo(4), updatedAt: hoursAgo(1) }
   ];
   var endpoints = [{
     id: uid("e"), name: "內建模擬", url: "local://mock", headerName: "Authorization", apiKey: "",
@@ -796,10 +1840,11 @@ function buildDemo() {
   }];
   return { projects: projects, notes: notes, endpoints: endpoints };
 }
+
 function seed() {
   var demo = buildDemo();
   return normalizeData({
-    version: 1,
+    version: 2,
     demoBanner: true,
     lastExportAt: "",
     lastBackupName: "",
@@ -959,19 +2004,23 @@ function dateBadge(label, iso, info) {
     '<span class="date-remain">' + esc(info.sub) + "</span></div>";
 }
 function dateBadgesHTML(p) {
-  return '<div class="dates">' + dateBadge("開始", p.startDate, startInfo(p)) + dateBadge("結束", p.endDate, endInfo(p)) + "</div>";
+  var extra = dateBadge("開工", p.workCommenced, commenceInfo(p));
+  return '<div class="dates dates-3">' + dateBadge("開始", p.startDate, startInfo(p)) + dateBadge("結束", p.endDate, endInfo(p)) + extra + "</div>";
 }
+
 function tagsHTML(tags) {
   if (!tags || !tags.length) return "";
   return '<div class="tags">' + tags.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>";
 }
 function projectCard(p) {
+  var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
   return '<a class="card-link" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
-    dateBadgesHTML(p) +
+    chipsHTML(p) + sit + dateBadgesHTML(p) + datePillsHTML(p) +
     (p.description ? '<p class="desc">' + esc(excerpt(p.description, 140)) + "</p>" : "") +
     tagsHTML(p.tags) + "</a>";
 }
+
 function noteCard(n) {
   var p = findProject(n.projectId);
   var due;
@@ -1002,35 +2051,47 @@ function statButton(kind, label, count, cls) {
 }
 function homeHTML() {
   var projects = data.projects;
-  var overdue = projects.filter(isOverdue).sort(byEnd);
-  var today = projects.filter(isDueToday).sort(byEnd);
-  var soon = projects.filter(function (p) { return isDueSoon(p) && !isDueToday(p); }).sort(byEnd);
-  var notStarted = projects.filter(isNotStarted).sort(byEnd);
+  var overdueP = projects.filter(hasOverdueDates).sort(function (a, b) {
+    var ad = overdueDateItems(a)[0];
+    var bd = overdueDateItems(b)[0];
+    return cmpDateDir(ad && ad.date, bd && bd.date, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
+  });
+  var soonP = projects.filter(function (p) { return hasSoonDates(p) && !hasOverdueDates(p); }).sort(function (a, b) {
+    var ad = soonDateItems(a)[0];
+    var bd = soonDateItems(b)[0];
+    return cmpDateDir(ad && ad.date, bd && bd.date, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
+  });
+  var waiting = projects.filter(isWaitingCommence).sort(function (a, b) {
+    return cmpDateDir(a.workCommenced, b.workCommenced, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
+  });
   var shown = {};
-  overdue.concat(today, soon, notStarted).forEach(function (p) { shown[p.id] = true; });
+  overdueP.concat(soonP, waiting).forEach(function (p) { shown[p.id] = true; });
   var rest = projects.filter(function (p) { return !isClosed(p) && !shown[p.id]; }).sort(byEnd);
   var done = projects.filter(function (p) { return p.status === "done"; }).sort(function (a, b) { return cmpDateDir(a.endDate, b.endDate, -1); });
   var activeCount = projects.filter(function (p) { return p.status === "active"; }).length;
   var recent = data.notes.slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }).slice(0, 4);
   var notesBlock = recent.length ? '<div class="stack">' + recent.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有記事。</p>';
-  return '<div class="page home-page"><header class="page-head"><h1>總覽</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
-    '<p class="lead">今天 ' + esc(todayLong()) + "。日期直接標在每張專案卡上。</p>" +
-    '<div class="stats">' +
+  function riskMapper(listFn) {
+    return function (p) { return riskCard(p, listFn(p)); };
+  }
+  return '<div class="page home-page"><header class="page-head"><h1>工作台</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
+    '<p class="lead">今天 ' + esc(todayLong()) + "。這一頁用來應付突擊提問：每單做到邊、關鍵日期和機種情況都先睇到。</p>" +
+    askBoxHTML({ locked: false }) +
+    '<div class="stats stats-4">' +
     statButton("active", "進行中", activeCount, "") +
-    statButton("soon", "七天內", projects.filter(isDueSoon).length, "stat-warn") +
-    statButton("overdue", "已逾期", overdue.length, overdue.length ? "stat-danger" : "") +
-    statButton("notes", "記事", data.notes.length, "") +
+    statButton("soon", "本週到期", projects.filter(hasSoonDates).length, "stat-warn") +
+    statButton("overdue", "已逾期", overdueP.length, overdueP.length ? "stat-danger" : "") +
+    statButton("waiting", "等候開工", waiting.length, waiting.length ? "stat-warn" : "") +
     "</div>" +
     '<div class="home-lists">' +
-    sectionProjects("已逾期", overdue, "沒有逾期的專案。已完成和已取消不會算進逾期。") +
-    (today.length ? sectionProjects("今天到期", today, "") : "") +
-    sectionProjects("七天內到期", soon, "未來七天沒有其他到期的專案。") +
-    (notStarted.length ? sectionProjects("尚未開始", notStarted, "") : "") +
-    (rest.length ? sectionProjects("其他未完成", rest, "", 3) : "") +
-    (done.length ? sectionProjects("已完成", done, "", 2) : "") +
+    sectionWorkbench("已逾期（結束、開工或其他期限）", overdueP, "沒有逾期日期。已完成和已取消不會算進逾期。", null, riskMapper(overdueDateItems)) +
+    sectionWorkbench("本週到期", soonP, "未來七天沒有其他期限。", null, riskMapper(soonDateItems)) +
+    sectionWorkbench("等候開工", waiting, "沒有專案在等候開工。", null, riskMapper(function (p) { return [{ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: false }]; })) +
+    (rest.length ? sectionWorkbench("其他未完成", rest, "", 4) : "") +
+    (done.length ? sectionWorkbench("已完成", done, "", 2) : "") +
     '<section class="block"><div class="section-head"><h2>最近的記事</h2><a class="btn btn-secondary" href="#/notes">全部記事</a></div>' + notesBlock + "</section>" +
     '<section class="block"><div class="section-head"><h2>功能說明</h2><a class="btn btn-secondary" href="#/guide">開啟說明</a></div>' +
-    '<p class="hint">每個按鈕都有對應功能。說明頁列出全部功能、程式寫法，以及用 AI 做這類工具時的做法。</p></section></div></div>';
+    '<p class="hint">每個按鈕都有對應功能。說明頁列出新增的專案欄位、文件連結，以及如何自行接上外部 API 來問合約內容。</p></section></div></div>';
 }
 
 function dirLabel() {
@@ -1050,17 +2111,18 @@ function filteredProjects() {
   return data.projects.filter(function (p) {
     if (data.prefs.status !== "all" && p.status !== data.prefs.status) return false;
     var due = data.prefs.due;
-    if (due === "overdue" && !isOverdue(p)) return false;
-    if (due === "soon" && !isDueSoon(p)) return false;
+    if (due === "overdue" && !hasOverdueDates(p)) return false;
+    if (due === "soon" && !hasSoonDates(p)) return false;
     if (due === "nodate" && p.endDate) return false;
     if (due === "notstarted" && !isNotStarted(p)) return false;
+    if (due === "waiting" && !isWaitingCommence(p)) return false;
     if (q) {
-      var hay = [p.name, p.description, (p.tags || []).join(" "), p.startDate, p.endDate, statusLabel(p.status)].join(" ").toLowerCase();
-      if (hay.indexOf(q) < 0) return false;
+      if (projectSearchHay(p).toLowerCase().indexOf(q) < 0) return false;
     }
     return true;
   }).sort(compareProjects);
 }
+
 function groupKey(p) {
   if (data.prefs.sort === "status") return p.status || "";
   if (data.prefs.sort === "name") return "all";
@@ -1091,12 +2153,15 @@ function timelineHTML(items) {
   return html;
 }
 function timelineItem(p) {
+  var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
   return '<div class="tl-item"><a class="card-link tl-split" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     dateBadgesHTML(p) +
     '<div><div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    chipsHTML(p) + sit + datePillsHTML(p) +
     (p.description ? '<p class="desc">' + esc(excerpt(p.description, 180)) + "</p>" : "") +
     tagsHTML(p.tags) + "</div></a></div>";
 }
+
 function projectListInner(list) {
   if (!list.length) {
     var msg = data.projects.length ? "沒有符合的專案。可以按「重設篩選」。" : "還沒有專案。新增一個之後，開始日和結束日會以大字顯示。";
@@ -1116,11 +2181,11 @@ function optionList(pairs, current) {
 function projectsHTML() {
   var list = filteredProjects();
   var statusPairs = [["all", "全部狀態"]].concat(STATUSES.map(function (s) { return [s.id, s.label]; }));
-  var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
+  var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["waiting", "等候開工"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
   var sortPairs = [["end", "結束日"], ["start", "開始日"], ["status", "狀態"], ["name", "名稱"]];
   return '<div class="page"><header class="page-head"><h1>專案</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
     '<div class="toolbar">' +
-    '<label class="field grow"><span>搜尋</span><input id="q" type="search" value="' + esc(ui.query) + '" placeholder="名稱、說明、標籤、日期" autocomplete="off"></label>' +
+    '<label class="field grow"><span>搜尋</span><input id="q" type="search" value="' + esc(ui.query) + '" placeholder="名稱、情況、機房、保留項目、日期" autocomplete="off"></label>' +
     selectPref("狀態", "status", optionList(statusPairs, data.prefs.status)) +
     selectPref("期限", "due", optionList(duePairs, data.prefs.due)) +
     selectPref("排序", "sort", optionList(sortPairs, data.prefs.sort)) +
@@ -1194,35 +2259,53 @@ function stampsHTML(entity) {
   return '<div class="meta-grid"><div><span>建立</span><strong>' + esc(formatStamp(entity.createdAt)) + '</strong></div><div><span>更新</span><strong id="updated-stamp">' + esc(formatStamp(entity.updatedAt)) + "</strong></div></div>";
 }
 function filesBlock() {
-  return '<section class="block"><h2>附件</h2><p class="hint">檔案存在這台瀏覽器的資料庫，可稍後下載。匯出備份時可以一併帶走。</p>' +
-    '<div class="drop" id="drop"><p class="hint">把檔案拖到這裡，或按下面的按鈕。</p><div class="row"><button type="button" class="btn btn-secondary" data-action="pick-file">選擇檔案</button></div>' +
-    '<input id="file-input" type="file" multiple hidden></div><div id="files"><p class="hint">正在讀取附件…</p></div></section>';
+  var pageHint = "project";
+  return filesBlockFor(pageHint);
 }
+
 function projectEditor(p) {
   var af = ui.autofocus && ui.autofocusId === p.id ? " data-autofocus" : "";
   var warn = p.startDate && p.endDate && p.startDate > p.endDate ? "結束日早於開始日。" : "";
   var linked = data.notes.filter(function (n) { return n.projectId === p.id; }).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
   var linkedHTML = linked.length ? '<div class="stack">' + linked.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有連結到這個專案的記事。</p>';
+  var modHidden = p.projectKind === "mod" ? "" : " hidden";
   return '<div class="page narrow" data-entity="project" data-entity-id="' + esc(p.id) + '">' +
     '<a class="back" href="#/projects">← 返回專案</a>' +
     '<div class="accent-bar" id="accent-bar" style="background:' + safeColor(p.color) + '"></div>' +
     '<p class="kicker" style="font-weight:800;margin:0">專案</p>' +
     '<h1 id="editor-name-heading">' + esc(displayName(p)) + "</h1>" +
     '<p class="save-state" id="save-state">上次更新 ' + esc(formatStamp(p.updatedAt)) + " · 變更會自動存在這台裝置</p>" +
+    '<div id="live-chips">' + chipsHTML(p) + "</div>" +
     '<div id="live-dates">' + dateBadgesHTML(p) + "</div>" +
     '<p id="date-warn" class="error-text"' + (warn ? "" : " hidden") + ">" + esc(warn) + "</p>" +
-    '<label class="field"><span>名稱</span><input class="giant" type="text" data-bind="name" maxlength="200" value="' + esc(p.name) + '" placeholder="專案名稱"' + af + "></label>" +
+    '<label class="field"><span>名稱</span><input class="giant" type="text" data-bind="name" maxlength="200" value="' + esc(p.name) + '" placeholder="大廈或地盤名稱"' + af + "></label>" +
     '<label class="field"><span>狀態</span><select data-bind="status">' + statusOptions(p.status) + "</select></label>" +
+    '<label class="field"><span>目前情況／做到邊</span><input type="text" data-bind="situation" maxlength="800" value="' + esc(p.situation || "") + '" placeholder="例如：等候業主簽回開工文件"></label>' +
+    '<div class="grid-3">' +
+    '<label class="field"><span>項目類型</span><select data-bind="projectKind">' + optionFromList(PROJECT_KINDS, p.projectKind || "") + "</select></label>" +
+    '<label class="field" id="mod-scope-wrap"' + modHidden + "><span>現代化範圍</span><select data-bind=\"modScope\">" + optionFromList(MOD_SCOPES, p.modScope || "") + "</select></label>" +
+    '<label class="field"><span>機房</span><select data-bind="machineRoom">' + optionFromList(MACHINE_ROOMS, p.machineRoom || "") + "</select></label></div>" +
+    '<label class="field"><span>保留項目</span><textarea data-bind="retainItems" maxlength="2000" placeholder="例如：轎廂裝潢、部分導軌。沒有可填「無」。">' + esc(p.retainItems || "") + "</textarea></label>" +
     '<div class="grid-2"><label class="field"><span>開始日</span><input type="date" data-bind="startDate" value="' + esc(p.startDate) + '"></label>' +
     '<label class="field"><span>結束日</span><input type="date" data-bind="endDate" value="' + esc(p.endDate) + '"></label></div>' +
-    '<label class="field"><span>說明</span><textarea data-bind="description" maxlength="20000" placeholder="這個專案要完成什麼、卡在哪裡。">' + esc(p.description) + "</textarea></label>" +
-    '<label class="field"><span>標籤（以逗號分隔）</span><input type="text" data-bind="tags" value="' + esc(formatTags(p.tags)) + '" placeholder="例如：維運，後端" spellcheck="false"></label>' +
+    '<div class="grid-2"><label class="field"><span>開工日（Work commenced）</span><input type="date" data-bind="workCommenced" value="' + esc(p.workCommenced || "") + '"></label>' +
+    '<label class="field"><span>開工狀態</span><select data-bind="workCommencedStatus">' +
+    '<option value=""' + (!p.workCommencedStatus ? " selected" : "") + ">未填（依日期推斷）</option>" +
+    '<option value="waiting"' + (p.workCommencedStatus === "waiting" ? " selected" : "") + ">等候開工</option>" +
+    '<option value="done"' + (p.workCommencedStatus === "done" ? " selected" : "") + ">已開工</option>" +
+    "</select></label></div>" +
+    '<label class="field"><span>開工備註</span><input type="text" data-bind="workCommencedNote" maxlength="500" value="' + esc(p.workCommencedNote || "") + '" placeholder="例如：等候排期／已於現場開工"></label>' +
+    milestoneEditorHTML(p) +
+    '<label class="field"><span>說明</span><textarea data-bind="description" maxlength="20000" placeholder="較詳細的背景、卡點或下一步。">' + esc(p.description) + "</textarea></label>" +
+    '<label class="field"><span>標籤（以逗號分隔）</span><input type="text" data-bind="tags" value="' + esc(formatTags(p.tags)) + '" placeholder="例如：升降機，現代化" spellcheck="false"></label>' +
     '<div class="field"><span>顏色</span>' + colorSwatches(p.color) + "</div>" +
     stampsHTML(p) +
-    filesBlock() +
+    askBoxHTML({ locked: true, projectId: p.id, question: ui.askQuery || "", answer: ui.askAnswer || "" }) +
+    filesBlockFor("project") +
     '<section class="block"><div class="section-head"><h2>連結的記事</h2><button type="button" class="btn btn-secondary" data-action="note-for-project">＋ 寫一則記事</button></div>' + linkedHTML + "</section>" +
     '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-project">刪除這個專案</button></div></div>';
 }
+
 function noteProjectDatesHTML(n) {
   var p = findProject(n.projectId);
   if (!p && n.projectId) return '<p class="error-text">連結的專案已刪除。可以改選其他專案，或選「未連結專案」。</p>';
@@ -1241,9 +2324,10 @@ function noteEditor(n) {
     '<label class="field"><span>連結專案</span><select data-bind="projectId">' + projectOptions(n.projectId) + "</select></label>" +
     '<label class="field"><span>內文</span><textarea class="tall" data-bind="body" maxlength="100000" placeholder="寫下決定、下一步，或還沒整理的事實。">' + esc(n.body) + "</textarea></label>" +
     stampsHTML(n) +
-    filesBlock() +
+    filesBlockFor("note") +
     '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-note">刪除這則記事</button></div></div>';
 }
+
 function missingHTML(title, href, label) {
   return '<div class="page"><h1>' + esc(title) + '</h1><p>可能已經刪除。</p><a class="btn" href="' + href + '">' + esc(label) + "</a></div>";
 }
@@ -1270,7 +2354,7 @@ function endpointCard(ep) {
 }
 function guideHTML() {
   return '<div class="page narrow guide"><header class="page-head"><h1>說明</h1></header>' +
-    '<p class="lead">這是個人用的專案與記事工具。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
+    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並在被突擊提問時即時整理回覆。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
     '<section class="block"><h2>iPhone 打開沒有反應</h2>' +
     '<p>這通常不是按鈕沒有功能，而是 iPhone 在「檔案」或 OneDrive 的預覽裡打開 HTML 時，系統不會執行程式，所以按下去沒有反應。</p>' +
     '<ol><li>在「檔案」找到 <code>project-notes.html</code>。</li><li>點分享（方框加向上箭頭）。</li><li>選擇「用 Safari 開啟」。</li><li>之後可在 Safari 選分享 → 加入主畫面。</li></ol></section>' +
@@ -1285,10 +2369,10 @@ function guideHTML() {
     '<li><strong>離線</strong>：檔案已在裝置上就可以睇和改。要跨裝置看到最新內容，靠 OneDrive 同步那份 JSON，而不是靠一個公開網站保存你的紀錄。</li>' +
     '</ul></section>' +
 
-    '<section class="block"><h2>總覽與導覽</h2><dl>' +
-    '<dt>總覽、專案、記事、設定、說明</dt><dd>切換主要頁面。手機右上角也可以開啟說明。</dd>' +
+    '<section class="block"><h2>工作台與導覽</h2><dl>' +
+    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。工作台第一眼顯示每單情況和有風險的日期。手機右上角也可以開啟說明。</dd>' +
     '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。</dd>' +
-    '<dt>進行中、七天內、已逾期、記事（總覽數字）</dt><dd>帶你到對應列表或篩選結果。</dd>' +
+    '<dt>進行中、本週到期、已逾期、等候開工</dt><dd>帶你到對應列表或篩選結果。已逾期包括結束日和其他未完成期限；已完成或已取消不會算進去。</dd>' +
     '<dt>知道了</dt><dd>收起示範資料橫額，示範內容仍在。</dd>' +
     '<dt>清除示範資料</dt><dd>刪除尚未改過的示範專案、記事和端點。你改過的項目會留下。</dd>' +
     '<dt>前往備份／稍後</dt><dd>提醒你把資料存到 OneDrive。稍後只是先收起提示。</dd>' +
@@ -1302,6 +2386,25 @@ function guideHTML() {
     '<dt>為這個專案新增記事</dt><dd>開一則已連結該專案的記事，記事上會顯示該專案的日期。</dd>' +
     '<dt>選擇檔案／下載／刪除附件</dt><dd>附件存在這台瀏覽器，之後可以下載。匯出備份時可一併帶走。</dd>' +
     '<dt>刪除專案／刪除記事</dt><dd>刪除前會先確認。刪專案時會移除該專案附件，並解除記事連結，記事本身會保留。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>專案欄位（機種與日期）</h2><dl>' +
+    '<dt>目前情況／做到邊</dt><dd>短句顯示在工作台卡片上，方便被問到時先睇現況。</dd>' +
+    '<dt>項目類型</dt><dd>新裝、現代化或其他。可不填。</dd>' +
+    '<dt>現代化範圍</dt><dd>只有類型是現代化時才顯示：全改或部分改。</dd>' +
+    '<dt>機房</dt><dd>有機房或無機房。</dd>' +
+    '<dt>保留項目</dt><dd>自由填寫這一單保留了什麼。</dd>' +
+    '<dt>開工（Work commenced）</dt><dd>開工日、等候開工或已開工，以及短備註。等候中的專案會集中出現在工作台。</dd>' +
+    '<dt>其他期限</dt><dd>除開始、結束和開工外，可新增完工、驗收或自訂日期。完成的期限或已完結專案不會標成逾期。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>合約文件與即時解答</h2><dl>' +
+    '<dt>選擇檔案並存入</dt><dd>把合約、圖則或往來文件存進這台瀏覽器，可標類型。匯出備份時一併帶走。檔案不會上傳到公開網站。</dd>' +
+    '<dt>只記下檔名或路徑</dt><dd>檔案仍留在公司 OneDrive 或共用資料夾，這裡只記住名稱和位置。</dd>' +
+    '<dt>連結本機或 OneDrive 檔案</dt><dd>在支援的電腦瀏覽器（通常是 Chrome 或 Edge）可直接連結檔案，之後在這台電腦打開。連結不能寫進 JSON 備份，請另外保留原檔。</dd>' +
+    '<dt>即時解答／問呢單</dt><dd>用本機欄位、記事和可讀附件，整理一段可複製的短回覆，回答開工、機房、全改或部份改、保留項目和讀得到的合約重點。</dd>' +
+    '<dt>複製答案</dt><dd>把剛剛整理的回覆複製到剪貼簿。</dd>' +
+    '<dt>問外部 API</dt><dd>只有你按下時，才把問題、專案欄位、記事和已抽出的文字送到你在設定裡填的端點。不會把檔案二元內容或金鑰寫進請求本體。沒有端點時會說明做法。</dd>' +
     '</dl></section>' +
 
     '<section class="block"><h2>同步、備份與設定</h2><dl>' +
@@ -1322,6 +2425,7 @@ function guideHTML() {
     '<section class="block"><h2>API 端點</h2><dl>' +
     '<dt>加入端點／加入內建模擬</dt><dd>可不設。內建 <code>local://mock</code> 可離線練習拉取和推送；<code>local://fail</code> 用來查看錯誤狀態。</dd>' +
     '<dt>測試、拉取、推送</dt><dd>測試只檢查連線；拉取把遠端專案和記事合併或取代到本機；推送送出專案和記事，不含附件和金鑰。</dd>' +
+    '<dt>問外部 API</dt><dd>用同一個端點，以你選的 PUT 或 POST 送出提問。內建 <code>local://mock</code> 會在裝置上回一段模擬答案，方便先試流程。</dd>' +
     '<dt>清除金鑰／刪除端點</dt><dd>金鑰只存在這台裝置。刪除前會確認。</dd>' +
     '</dl></section>' +
 
@@ -1337,6 +2441,9 @@ function guideHTML() {
     '<li><strong>少傳敏感內容。</strong>有專案名稱、金鑰或附件時，只問寫法和結構，或先刪掉真實資料再貼程式。</li>' +
     '</ol>' +
     '<p>這個工具就是按上面的方法來寫：單一檔案、按鈕全部有對應功能、資料可離線保存，再用你自己的 OneDrive 做同步。</p>' +
+    '<h3>若要用主流 AI 解答合約問題</h3>' +
+    '<p>不要把合約放到公開網站。正確做法是：合約留在這台裝置或公司 OneDrive；這個工具只在本機抽出文字（純文字或可選取文字的 PDF）。然後到「設定 → API 端點」填寫<strong>你自己</strong>控制的網址，例如公司內部轉發服務，或你在自己伺服器上架的一小段程式，由它再轉去你有帳號的 AI。</p>' +
+    '<p>端點應接受 JSON（<code>op</code> 為 <code>ask</code>），內容包括問題、專案欄位、記事和已抽出的文件文字，並以 <code>{ "answer": "……" }</code> 或純文字回覆。金鑰只在你按下「問外部 API」時放到你指定的標頭。直接用 <code>file://</code> 打開時，瀏覽器通常會封鎖對外請求，請改在 https 開啟，或先用 <code>local://mock</code> 練習。</p>' +
     '</section></div>';
 }
 
@@ -1382,7 +2489,7 @@ function settingsHTML() {
     (data.endpoints.length ? data.endpoints.map(endpointCard).join("") : '<p class="empty">還沒有端點。</p>') +
     "</section>" +
     '<details><summary>同步與備份的 JSON 格式</summary>' +
-    '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。日期格式是 YYYY-MM-DD。</p>' +
+    '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。項目類型是 ni／mod／other，現代化範圍是 full／partial，機房是 with／without，開工狀態是 waiting／done。日期格式是 YYYY-MM-DD。</p>' +
     '<p class="hint">推送本體如下。檔案備份另外有 format 為 project-notes，並可含 endpoints 與 files（dataBase64）。</p>' +
     '<pre class="docs">' + esc(JSON_HELP) + "</pre></details>" +
     '<section class="block"><h2>示範資料</h2>' +
@@ -1424,8 +2531,9 @@ function titleFor(route) {
   if (route.name === "notes" || route.name === "note") return "記事";
   if (route.name === "settings") return "設定";
   if (route.name === "guide") return "說明";
-  return "總覽";
+  return "工作台";
 }
+
 function render() {
   var route = parseRoute();
   var key = routeKey(route);
@@ -1450,7 +2558,7 @@ function paintNav(route) {
   });
 }
 function paintCounts() {
-  var n = data.projects.filter(isOverdue).length;
+  var n = data.projects.filter(hasOverdueDates).length;
   document.querySelectorAll("[data-overdue-count]").forEach(function (el) {
     el.textContent = n ? String(n) : "";
     el.hidden = !n;
@@ -1518,6 +2626,10 @@ function markSaved() {
 function refreshProjectChrome(p) {
   var box = document.getElementById("live-dates");
   if (box) box.innerHTML = dateBadgesHTML(p);
+  var chips = document.getElementById("live-chips");
+  if (chips) chips.innerHTML = chipsHTML(p);
+  var wrap = document.getElementById("mod-scope-wrap");
+  if (wrap) wrap.hidden = p.projectKind !== "mod";
   var warn = document.getElementById("date-warn");
   if (warn) {
     var msg = p.startDate && p.endDate && p.startDate > p.endDate ? "結束日早於開始日。" : "";
@@ -1546,7 +2658,11 @@ function touchEntity(entity) {
   if (entity.demo) entity.demo = false;
 }
 function updateProjectField(id, field, el) {
-  var allowed = { name: 1, description: 1, status: 1, startDate: 1, endDate: 1, tags: 1 };
+  var allowed = {
+    name: 1, description: 1, status: 1, startDate: 1, endDate: 1, tags: 1,
+    situation: 1, projectKind: 1, modScope: 1, machineRoom: 1, retainItems: 1,
+    workCommenced: 1, workCommencedStatus: 1, workCommencedNote: 1
+  };
   if (!allowed[field]) return;
   var p = findProject(id);
   if (!p) return;
@@ -1554,11 +2670,24 @@ function updateProjectField(id, field, el) {
   else if (field === "status") {
     if (!STATUSES.some(function (s) { return s.id === el.value; })) return;
     p.status = el.value;
-  } else if (field === "startDate" || field === "endDate") {
+  } else if (field === "startDate" || field === "endDate" || field === "workCommenced") {
     if (el.value && !isDate(el.value)) return;
     p[field] = el.value;
   } else if (field === "name") p.name = String(el.value).slice(0, 200);
-  else p.description = String(el.value).slice(0, 20000);
+  else if (field === "situation") p.situation = String(el.value).slice(0, 800);
+  else if (field === "retainItems") p.retainItems = String(el.value).slice(0, 2000);
+  else if (field === "workCommencedNote") p.workCommencedNote = String(el.value).slice(0, 500);
+  else if (field === "projectKind") {
+    p.projectKind = el.value === "ni" || el.value === "mod" || el.value === "other" ? el.value : "";
+    if (p.projectKind !== "mod") p.modScope = "";
+  } else if (field === "modScope") {
+    p.modScope = el.value === "full" || el.value === "partial" ? el.value : "";
+  } else if (field === "machineRoom") {
+    p.machineRoom = el.value === "with" || el.value === "without" ? el.value : "";
+  } else if (field === "workCommencedStatus") {
+    p.workCommencedStatus = el.value === "done" || el.value === "waiting" ? el.value : "";
+  } else p.description = String(el.value).slice(0, 20000);
+  applyProjectExtras(p);
   touchEntity(p);
   persistNow();
   refreshProjectChrome(p);
@@ -1659,16 +2788,20 @@ function go(hash) {
   else render();
 }
 function createProject() {
+  var extras = defaultProjectExtras();
+  extras.workCommencedStatus = "waiting";
   var p = {
     id: uid("p"), name: "", description: "", status: "active",
     startDate: todayISO(), endDate: "", tags: [],
     color: COLORS[data.projects.length % COLORS.length],
     createdAt: nowISO(), updatedAt: nowISO(), demo: false
   };
+  Object.keys(extras).forEach(function (k) { p[k] = extras[k]; });
   data.projects.unshift(p);
   persistNow();
   return p;
 }
+
 function createNote(projectId) {
   var n = {
     id: uid("n"), title: "", body: "", projectId: projectId || "",
@@ -1699,11 +2832,22 @@ function createEndpoint(prefill) {
 }
 
 function fileRow(f) {
-  return '<div class="file-row"><div><strong>' + esc(f.name || "未命名檔案") + '</strong><div class="meta">' +
-    esc(formatSize(f.size || 0)) + " · " + esc(formatStamp(f.createdAt)) + "</div></div><div class=\"row\">" +
-    '<button type="button" class="btn btn-secondary" data-action="download-file" data-id="' + esc(f.id) + '">下載</button>' +
+  var typ = '<span class="doc-type">' + esc(docTypeLabel(f.docType)) + "</span> ";
+  var kind = fileKindOf(f);
+  var where = kind === "link" ? "只記下位置" : kind === "handle" ? "已連結本機檔案" : "已存入這台裝置";
+  var size = f.size ? formatSize(f.size) + " · " : "";
+  var read = f.textStatus === "ok" ? "可抽出文字" : f.textStatus === "unreadable" ? "未能抽出文字" : kind === "link" ? "沒有檔案副本" : "";
+  var typeSel = '<label class="field" style="flex:1 1 120px;margin:0"><span>類型</span><select data-action="set-doc-type" data-id="' + esc(f.id) + '">' + optionFromList(DOC_TYPES, f.docType || "other") + "</select></label>";
+  var openLabel = f.blob || f.fileHandle ? "下載／打開" : "查看位置";
+  return '<div class="file-row"><div>' + typ + "<strong>" + esc(f.name || "未命名檔案") + '</strong><div class="file-meta">' +
+    esc(where + (size ? " · " + size : " · ") + formatStamp(f.createdAt) + (read ? " · " + read : "")) +
+    (f.linkLabel ? "<br>" + esc(f.linkLabel) : "") +
+    (f.textReason && f.textStatus !== "ok" ? "<br>" + esc(f.textReason) : "") +
+    "</div></div><div class=\"row\">" + typeSel +
+    '<button type="button" class="btn btn-secondary" data-action="download-file" data-id="' + esc(f.id) + '">' + openLabel + "</button>" +
     '<button type="button" class="btn btn-danger" data-action="delete-file" data-id="' + esc(f.id) + '">移除</button></div></div>';
 }
+
 function loadFileList(ownerType, ownerId) {
   var token = ++fileLoadToken;
   var host = document.getElementById("files");
@@ -1732,13 +2876,27 @@ function addFiles(ownerType, ownerId, fileList) {
   files.forEach(function (file) {
     chain = chain.then(function () {
       if (file.size > 40 * 1024 * 1024) { skipped++; return; }
+      var fid = uid("f");
+      var docType = ownerType === "project" ? selectedDocType() : "other";
       return putFile({
-        id: uid("f"), ownerType: ownerType, ownerId: ownerId,
+        id: fid, ownerType: ownerType, ownerId: ownerId,
         name: file.name || "未命名檔案", mime: file.type || "application/octet-stream",
-        size: file.size, createdAt: nowISO(), blob: file
+        size: file.size, createdAt: nowISO(), blob: file,
+        docType: docType, kind: "embedded",
+        textCache: "", textStatus: "", textReason: ""
       }).then(function () {
         saved++;
         if (file.size > 8 * 1024 * 1024) toast("已存入較大的檔案。瀏覽器空間有限，請另外保管原檔。");
+        return extractReadableText(file, file.name, file.type).then(function (got) {
+          return getFile(fid).then(function (rec) {
+            if (!rec) return;
+            rec.textCache = got.text || "";
+            rec.textStatus = got.status;
+            rec.textReason = got.reason || "";
+            rec.textCacheAt = nowISO();
+            return putFile(rec);
+          });
+        }).catch(function () {});
       });
     });
   });
@@ -1782,15 +2940,20 @@ function publicProject(p) {
   return {
     id: p.id, name: p.name, description: p.description, status: p.status,
     startDate: p.startDate, endDate: p.endDate, tags: p.tags || [], color: safeColor(p.color),
+    projectKind: p.projectKind || "", modScope: p.modScope || "", machineRoom: p.machineRoom || "",
+    retainItems: p.retainItems || "", situation: p.situation || "",
+    workCommenced: p.workCommenced || "", workCommencedStatus: p.workCommencedStatus || "",
+    workCommencedNote: p.workCommencedNote || "", milestones: normalizeMilestones(p.milestones),
     createdAt: p.createdAt, updatedAt: p.updatedAt
   };
 }
+
 function publicNote(n) {
   return { id: n.id, title: n.title, body: n.body, projectId: n.projectId || "", createdAt: n.createdAt, updatedAt: n.updatedAt };
 }
 function syncPayload() {
   return {
-    version: 1,
+    version: 2,
     source: "project-notes",
     exportedAt: nowISO(),
     projects: data.projects.map(publicProject),
@@ -1799,7 +2962,7 @@ function syncPayload() {
 }
 function sanitizeProject(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-  return {
+  var p = {
     id: ensureId(raw.id, "p"),
     name: String(raw.name || "").slice(0, 200),
     description: String(raw.description || "").slice(0, 20000),
@@ -1808,11 +2971,22 @@ function sanitizeProject(raw) {
     endDate: isDate(raw.endDate) ? raw.endDate : "",
     tags: Array.isArray(raw.tags) ? raw.tags.map(function (t) { return String(t).trim(); }).filter(Boolean).slice(0, 12).map(function (t) { return t.slice(0, 24); }) : [],
     color: safeColor(raw.color),
+    projectKind: raw.projectKind,
+    modScope: raw.modScope,
+    machineRoom: raw.machineRoom,
+    retainItems: raw.retainItems,
+    situation: raw.situation,
+    workCommenced: raw.workCommenced,
+    workCommencedStatus: raw.workCommencedStatus,
+    workCommencedNote: raw.workCommencedNote,
+    milestones: raw.milestones,
     createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
     updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
     demo: false
   };
+  return applyProjectExtras(p);
 }
+
 function sanitizeNote(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   return {
@@ -1892,9 +3066,26 @@ function importFiles(files, mode) {
         try {
           if (!raw || (raw.ownerType !== "project" && raw.ownerType !== "note")) { skipped++; return; }
           var b64 = String(raw.dataBase64 || "");
-          if (!b64 || b64.length > 40000000) { skipped++; return; }
+          if (!b64) {
+            return putFile({
+              id: ensureId(raw.id, "f"),
+              ownerType: raw.ownerType,
+              ownerId: String(raw.ownerId || ""),
+              name: String(raw.name || "未命名檔案").slice(0, 200),
+              mime: String(raw.mime || "application/octet-stream").slice(0, 120),
+              size: Number(raw.size) || 0,
+              createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+              docType: DOC_TYPES.some(function (t) { return t.id === raw.docType; }) ? raw.docType : "other",
+              kind: "link",
+              linkLabel: String(raw.linkLabel || "").slice(0, 2000),
+              textCache: String(raw.textCache || "").slice(0, 20000),
+              textStatus: raw.textStatus === "ok" || raw.textStatus === "unreadable" || raw.textStatus === "none" ? raw.textStatus : "none",
+              textReason: String(raw.textReason || "只記下位置，備份不含檔案內容。").slice(0, 500)
+            }).then(function () { imported++; });
+          }
+          if (b64.length > 40000000) { skipped++; return; }
           var blob = b64ToBlob(b64, raw.mime || "application/octet-stream");
-          return putFile({
+          var rec = {
             id: ensureId(raw.id, "f"),
             ownerType: raw.ownerType,
             ownerId: String(raw.ownerId || ""),
@@ -1902,8 +3093,15 @@ function importFiles(files, mode) {
             mime: String(raw.mime || "application/octet-stream").slice(0, 120),
             size: blob.size,
             createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
-            blob: blob
-          }).then(function () { imported++; });
+            blob: blob,
+            docType: DOC_TYPES.some(function (t) { return t.id === raw.docType; }) ? raw.docType : "other",
+            kind: raw.kind === "link" || raw.kind === "handle" ? "embedded" : (raw.kind || "embedded"),
+            linkLabel: String(raw.linkLabel || "").slice(0, 2000),
+            textCache: String(raw.textCache || "").slice(0, 20000),
+            textStatus: raw.textStatus === "ok" || raw.textStatus === "unreadable" || raw.textStatus === "none" ? raw.textStatus : "",
+            textReason: String(raw.textReason || "").slice(0, 500)
+          };
+          return putFile(rec).then(function () { imported++; });
         } catch (e) { skipped++; }
       }).catch(function () { skipped++; });
     });
@@ -1950,7 +3148,7 @@ function readMock() {
 }
 function defaultMock() {
   return {
-    version: 1,
+    version: 2,
     source: "project-notes",
     exportedAt: nowISO(),
     projects: [{
@@ -1973,13 +3171,19 @@ function mockRequest(op, payload) {
     return { ok: true, status: 200, detail: "已從內建模擬取得 JSON。", json: body };
   }
   if (op === "push") {
-    var stored = { version: 1, source: "project-notes", exportedAt: payload.exportedAt, projects: payload.projects, notes: payload.notes };
+    var stored = { version: 2, source: "project-notes", exportedAt: payload.exportedAt, projects: payload.projects, notes: payload.notes };
     try { localStorage.setItem(MOCK_KEY, JSON.stringify(stored)); }
     catch (e) { return { ok: false, status: 0, detail: "內建模擬寫不進本地儲存。" }; }
     return { ok: true, status: 200, detail: "已推送到內建模擬。資料仍在這台瀏覽器，可用「拉取」取回。\n" + JSON.stringify({ ok: true, projects: stored.projects.length, notes: stored.notes.length }, null, 2), json: stored };
   }
+  if (op === "ask") {
+    var names = payload && payload.projects ? payload.projects.map(function (p) { return p.name || "未命名專案"; }).join("、") : "未指定專案";
+    var answer = "（內建模擬，請求沒有離開這台裝置）已收到你的提問。相關專案：" + names + "。正式作答請在設定接上你自己的 API 端點。本機整理如下：\n\n" + String(payload && payload.localAnswer || "沒有本機整理。");
+    return { ok: true, status: 200, detail: "成功。HTTP 200（內建模擬）\n" + JSON.stringify({ ok: true, answer: answer }, null, 2), json: { ok: true, answer: answer } };
+  }
   return { ok: false, status: 0, detail: "不支援的操作。" };
 }
+
 function httpRequest(ep, url, op, payload) {
   var headers = {};
   if (ep.apiKey) {
@@ -1989,13 +3193,14 @@ function httpRequest(ep, url, op, payload) {
     }
     headers[name] = ep.authStyle === "bearer" ? "Bearer " + ep.apiKey : ep.apiKey;
   }
-  var init = { method: op === "push" ? (ep.pushMethod === "POST" ? "POST" : "PUT") : "GET", headers: headers, credentials: "omit", cache: "no-store", redirect: "follow" };
-  if (op === "push") {
+  var isWrite = op === "push" || op === "ask";
+  var init = { method: isWrite ? (ep.pushMethod === "POST" ? "POST" : "PUT") : "GET", headers: headers, credentials: "omit", cache: "no-store", redirect: "follow" };
+  if (isWrite) {
     headers["Content-Type"] = "application/json";
     init.body = JSON.stringify(payload);
   }
   var ctrl = new AbortController();
-  var timer = setTimeout(function () { ctrl.abort(); }, 15000);
+  var timer = setTimeout(function () { ctrl.abort(); }, op === "ask" ? 30000 : 15000);
   init.signal = ctrl.signal;
   return fetch(url, init).then(function (res) {
     return res.text().then(function (text) {
@@ -2058,12 +3263,22 @@ function assertDateLogic() {
   if (!isNotStarted(future)) throw new Error("尚未開始不對");
   if (!isDueSoon(soon) || isDueSoon(later)) throw new Error("七天界限不對");
   if (isDate("2026-02-31")) throw new Error("無效日期不應通過");
+  var waitingP = { status: "active", workCommencedStatus: "waiting", workCommenced: "" };
+  if (!isWaitingCommence(waitingP)) throw new Error("等候開工不對");
+  var commencedP = { status: "active", workCommencedStatus: "done", workCommenced: isoOffset(-2) };
+  if (isWaitingCommence(commencedP)) throw new Error("已開工不應算等候");
+  var closedMs = { status: "done", endDate: isoOffset(-3), milestones: [{ id: "m1", name: "驗收", date: isoOffset(-3), done: false }] };
+  if (hasOverdueDates(closedMs) || isOverdue(closedMs)) throw new Error("已完成不應因期限逾期");
+  var openMs = { status: "active", endDate: isoOffset(20), milestones: [{ id: "m2", name: "完工", date: isoOffset(-2), done: false }] };
+  if (!hasOverdueDates(openMs) || isOverdue(openMs)) throw new Error("未完成的期限逾期應標出，但結束日未過則不是結束逾期");
+  var oldShape = applyProjectExtras({ name: "舊資料" });
+  if (oldShape.projectKind !== "" || !Array.isArray(oldShape.milestones)) throw new Error("舊專案遷移不對");
 }
 
 function runSelfCheck() {
   var results = [];
   function add(ok, name, detail) { results.push({ ok: ok, name: name, detail: detail }); }
-  try { assertDateLogic(); add(true, "日期計算", "逾期、今天到期、七天、已完成都正確"); }
+  try { assertDateLogic(); add(true, "日期計算", "逾期、今天到期、七天、開工、已完成都正確"); }
   catch (e) { add(false, "日期計算", e.message); }
   try {
     var k = KEY + ".selfcheck";
@@ -2093,7 +3308,15 @@ function runSelfCheck() {
         if (Object.prototype.hasOwnProperty.call(item, "apiKey")) throw new Error("同步不應含金鑰");
       });
       add(true, "同步 JSON", again.projects.length + " 個專案、" + again.notes.length + " 則記事，不含金鑰");
-    } catch (e) { add(false, "同步 JSON", e.message); }
+      var sample = applyProjectExtras({
+        name: "示範答覆專案", status: "active", projectKind: "mod", modScope: "partial",
+        machineRoom: "without", retainItems: "轎廂裝潢", situation: "等候開工",
+        workCommencedStatus: "waiting"
+      });
+      var ans = buildLocalAnswer([sample], "有冇機房？", {});
+      if (ans.indexOf("無機房") < 0 || ans.indexOf("部分改") < 0 || ans.indexOf("等候開工") < 0) throw new Error("本機解答缺少關鍵欄位");
+      add(true, "本機即時解答", "能根據機房、範圍和開工狀態整理回覆");
+    } catch (e) { add(false, "同步 JSON 或即時解答", e.message); }
     try {
       var res = mockRequest("test");
       if (!res.ok) throw new Error(res.detail);
@@ -2482,10 +3705,23 @@ function buildBackupPayload() {
     var out = [];
     var chain = Promise.resolve();
     (all || []).forEach(function (f) {
-      if (!f || f.id === "selfcheck" || !f.blob) return;
+      if (!f || f.id === "selfcheck") return;
+      if (!f.blob) {
+        out.push({
+          id: f.id, ownerType: f.ownerType, ownerId: f.ownerId, name: f.name, mime: f.mime, size: f.size || 0, createdAt: f.createdAt,
+          docType: f.docType || "other", kind: "link", linkLabel: f.linkLabel || "",
+          textCache: f.textCache || "", textStatus: f.textStatus || "none", textReason: f.textReason || ""
+        });
+        return;
+      }
       chain = chain.then(function () {
         return blobToBase64(f.blob).then(function (b64) {
-          out.push({ id: f.id, ownerType: f.ownerType, ownerId: f.ownerId, name: f.name, mime: f.mime, size: f.size, createdAt: f.createdAt, dataBase64: b64 });
+          out.push({
+            id: f.id, ownerType: f.ownerType, ownerId: f.ownerId, name: f.name, mime: f.mime, size: f.size, createdAt: f.createdAt,
+            docType: f.docType || "other", kind: "embedded", linkLabel: f.linkLabel || "",
+            textCache: f.textCache || "", textStatus: f.textStatus || "", textReason: f.textReason || "",
+            dataBase64: b64
+          });
         });
       });
     });
@@ -2494,7 +3730,7 @@ function buildBackupPayload() {
   return filePromise.then(function (files) {
     var payload = {
       format: "project-notes",
-      version: 1,
+      version: 2,
       exportedAt: nowISO(),
       projects: data.projects.map(publicProject),
       notes: data.notes.map(publicNote),
@@ -2741,6 +3977,7 @@ function runAction(action, btn) {
     else if (kind === "active") openProjectsFilter("all", "active");
     else if (kind === "soon") openProjectsFilter("soon", "all");
     else if (kind === "overdue") openProjectsFilter("overdue", "all");
+    else if (kind === "waiting") openProjectsFilter("waiting", "all");
     return;
   }
   if (action === "toggle-dir") {
@@ -2790,11 +4027,36 @@ function runAction(action, btn) {
     return;
   }
   if (action === "download-file") {
-    return getFile(btn.dataset.id).then(function (rec) {
-      if (!rec || !rec.blob) { toast("找不到附件。"); return; }
-      downloadBlob(rec.blob, rec.name || "attachment");
-    });
+    return reopenLinkedFile(btn.dataset.id);
   }
+  if (action === "remember-link") {
+    var entL = currentEntity();
+    if (!entL) return;
+    return rememberFileLink(entL.type, entL.id);
+  }
+  if (action === "link-handle") {
+    var entH = currentEntity();
+    if (!entH) return;
+    return linkFileHandle(entH.type, entH.id);
+  }
+  if (action === "set-doc-type") {
+    return setFileDocType(btn.dataset.id, btn.value || btn.dataset.type);
+  }
+  if (action === "add-milestone") {
+    var entM = currentEntity();
+    if (!entM || entM.type !== "project") return;
+    addMilestone(entM.id, btn.dataset.name || "");
+    return;
+  }
+  if (action === "remove-milestone") {
+    var entR = currentEntity();
+    if (!entR || entR.type !== "project") return;
+    removeMilestone(entR.id, btn.dataset.id);
+    return;
+  }
+  if (action === "ask-local") return runLocalAsk();
+  if (action === "ask-api") return runApiAsk();
+  if (action === "ask-copy") return copyAskAnswer();
   if (action === "delete-file") {
     return chooseDialog({
       title: "移除附件",
@@ -2992,7 +4254,13 @@ function bindGlobal() {
     if (!t) return;
     if (t.id === "q") { ui.query = t.value; paintProjects(); return; }
     if (t.id === "nq") { ui.noteQuery = t.value; paintNotes(); return; }
+    if (t.id === "ask-q") { ui.askQuery = t.value; return; }
     if (t.dataset && t.dataset.secret) t.dataset.dirty = "1";
+    if (t.dataset && t.dataset.msField) {
+      var msPage = t.closest("[data-entity='project']");
+      if (msPage) updateMilestoneFromElement(msPage.dataset.entityId, t);
+      return;
+    }
     if (t.dataset && t.dataset.bind) applyBindFromElement(t);
   });
   document.body.addEventListener("change", function (e) {
@@ -3005,7 +4273,18 @@ function bindGlobal() {
       paintNotes();
       return;
     }
+    if (t.id === "ask-project") { ui.askProjectId = t.value; return; }
+    if (t.id === "ask-endpoint") { ui.askEndpointId = t.value; return; }
+    if (t.dataset.action === "set-doc-type") {
+      setFileDocType(t.dataset.id, t.value);
+      return;
+    }
     if (t.dataset.secret) t.dataset.dirty = "1";
+    if (t.dataset.msField) {
+      var msPage2 = t.closest("[data-entity='project']");
+      if (msPage2) updateMilestoneFromElement(msPage2.dataset.entityId, t);
+      return;
+    }
     if (t.dataset.bind) applyBindFromElement(t);
   });
   document.addEventListener("keydown", function (e) {
