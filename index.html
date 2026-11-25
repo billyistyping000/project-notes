@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" translate="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#17364a">
+  <meta name="description" content="專案與記事。可離線使用，並把備份同步到自己的 OneDrive。不需要安裝。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="專案記事">
+  <title>專案記事</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317364a'/%3E%3Crect x='8' y='7' width='16' height='18' rx='2' fill='white'/%3E%3Crect x='8' y='7' width='16' height='5' fill='%238f1d1d'/%3E%3Cpath stroke='%2317364a' stroke-width='1.6' d='M12 17h8M12 21h5'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      --bg: #e6ebf1;
+      --surface: #ffffff;
+      --ink: #121820;
+      --ink-2: #1a2836;
+      --navy: #17364a;
+      --line: #b7c3d0;
+      --focus: #0b6e4f;
+      --danger: #6f1212;
+      --danger-bg: #f8d0d0;
+      --warn: #6a3b00;
+      --warn-bg: #fde4b8;
+      --ok: #084028;
+      --ok-bg: #d3f0e1;
+      --info: #102a66;
+      --info-bg: #d9e4fb;
+      --neutral-bg: #e7edf3;
+      --shadow: 0 1px 2px rgba(18, 24, 32, .06);
+      --safe-b: env(safe-area-inset-bottom);
+      --safe-t: env(safe-area-inset-top);
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang TC", "Noto Sans TC", "Noto Sans CJK TC", "Microsoft JhengHei", "Heiti TC", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.5;
+      color-scheme: light;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    a { color: var(--navy); }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .skip {
+      position: absolute; left: 8px; top: 8px; background: white; padding: 8px 12px;
+      border: 2px solid var(--navy); z-index: 30; transform: translateY(-140%);
+    }
+    .skip:focus { transform: none; }
+    .app { min-height: 100vh; background: var(--bg); }
+    .sidebar {
+      display: none;
+      background: var(--navy);
+      color: white;
+      padding: 22px 16px 24px;
+    }
+    .brand { font-size: 28px; font-weight: 800; line-height: 1.2; }
+    .brand small { display: block; margin-top: 6px; font-size: 15px; font-weight: 700; color: #e7eef3; }
+    .brand small[data-state="synced"] { color: #d3f0e1; }
+    .brand small[data-state="error"], .sync-chip[data-state="error"] { color: #f8d0d0; }
+    .brand small[data-state="saving"], .sync-chip[data-state="saving"] { color: #fde4b8; }
+    .brand small[data-state="offline"], .sync-chip[data-state="offline"] { color: #fde4b8; }
+    .brand small[data-state="synced"] + .nothing, .sync-chip[data-state="synced"] { color: #d3f0e1; }
+    .sync-chip { display: block; margin-top: 2px; font-size: 12px; font-weight: 700; line-height: 1.3; max-width: 58vw; opacity: .95; }
+    .mobile-top-title { display: flex; flex-direction: column; min-width: 0; }
+    .mobile-top-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .help-link {
+      color: white; text-decoration: none; font-weight: 800; font-size: 13px;
+      border: 2px solid rgba(255,255,255,.45); border-radius: 999px; padding: 2px 10px;
+    }
+    .help-link[aria-current="page"] { background: white; color: var(--navy); border-color: white; }
+    .guide h2 { font-size: 22px; margin: 1.5em 0 .45em; }
+    .guide h3 { font-size: 17px; margin: 1.1em 0 .3em; }
+    .guide .block h2 { margin-top: 0; }
+    .guide dt { font-weight: 800; margin-top: .7em; }
+    .guide dd { margin: .15em 0 .55em; }
+    .guide ol, .guide ul { padding-left: 1.3em; }
+    .guide li { margin: .35em 0; }
+    .side-today { margin: 16px 0 18px; font-weight: 800; font-size: 17px; line-height: 1.4; white-space: pre-line; color: white; }
+    .nav-link {
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 48px; padding: 8px 12px; border-radius: 10px;
+      color: white; text-decoration: none; font-weight: 800; font-size: 18px; margin-bottom: 6px;
+    }
+    .nav-link[aria-current="page"] { background: white; color: var(--navy); }
+    .nav-count {
+      background: var(--danger-bg); color: var(--danger); border-radius: 999px;
+      min-width: 28px; text-align: center; font-weight: 800; padding: 2px 8px; font-size: 16px;
+    }
+    .mobile-top {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: calc(10px + var(--safe-t)) 16px 10px;
+      background: var(--navy); color: white; position: sticky; top: 0; z-index: 6;
+    }
+    .mobile-top strong { font-size: 20px; }
+    .mobile-top span { font-size: 15px; font-weight: 800; text-align: right; }
+    .column { min-width: 0; }
+    main { padding: 8px 16px 28px; }
+    .page { max-width: 1080px; margin: 0 auto; }
+    .narrow { max-width: 760px; }
+    .banner {
+      max-width: 1080px; margin: 12px auto 0; background: #fff7e8; color: #4a2f00;
+      border: 2px solid #8a4b08; border-radius: 14px; padding: 14px;
+    }
+    .banner p { margin: 0 0 10px; font-weight: 700; }
+    .banner-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+    .page-head, .section-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+    h1 { font-size: 34px; line-height: 1.2; margin: 12px 0 8px; }
+    h2 { font-size: 24px; line-height: 1.25; margin: 0; }
+    h3 { font-size: 22px; line-height: 1.3; margin: 0; }
+    .lead { margin: 0 0 8px; font-size: 18px; font-weight: 650; }
+    .block { margin-top: 26px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .stat {
+      background: white; border: 2px solid var(--navy); border-radius: 14px;
+      padding: 12px 14px; text-align: left; min-height: 104px; box-shadow: var(--shadow);
+    }
+    .stat b { display: block; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; font-weight: 800; }
+    .stat span { display: block; margin-top: 6px; font-size: 18px; font-weight: 800; }
+    .stat-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+    .stat-warn { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+    .count-pill {
+      font-weight: 800; background: white; border: 2px solid var(--navy);
+      border-radius: 999px; min-width: 36px; text-align: center; padding: 2px 10px;
+    }
+    .stack { display: flex; flex-direction: column; gap: 12px; }
+    .cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .card-link {
+      display: block; background: white; border: 2px solid var(--line);
+      border-left: 8px solid var(--accent, var(--navy)); border-radius: 14px;
+      padding: 14px; text-decoration: none; color: inherit; box-shadow: var(--shadow);
+    }
+    .card-link:hover { border-top-color: var(--navy); border-right-color: var(--navy); border-bottom-color: var(--navy); }
+    .flag-head { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .flag-head h3 { flex: 1; }
+    .status-chip {
+      display: inline-flex; align-items: center; flex: none; min-height: 32px;
+      padding: 2px 10px; border-radius: 999px; border: 2px solid var(--navy);
+      font-weight: 800; font-size: 15px; background: white; color: var(--navy);
+    }
+    .status-active { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+    .status-planning { background: var(--info-bg); border-color: var(--info); color: var(--info); }
+    .status-paused { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+    .status-done { background: var(--neutral-bg); border-color: var(--navy); color: var(--navy); }
+    .status-cancelled, .status-unknown { background: #f4f6f8; border-color: #3c4a5a; color: var(--ink); }
+    .dates { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .date-badge {
+      border: 2px solid currentColor; border-radius: 12px; padding: 10px 10px 12px;
+      min-height: 132px; display: flex; flex-direction: column; justify-content: center;
+    }
+    .date-kicker { font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+    .date-day {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 48px; font-weight: 800; line-height: .95; letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums; margin: 2px 0;
+    }
+    .date-day--empty { font-family: inherit; font-size: 28px; letter-spacing: 0; line-height: 1.15; }
+    .date-full { font-size: 16px; font-weight: 800; }
+    .date-remain { font-size: 20px; font-weight: 800; margin-top: 4px; }
+    .date-badge--overdue { background: var(--danger-bg); color: var(--danger); }
+    .date-badge--soon { background: var(--warn-bg); color: var(--warn); }
+    .date-badge--ok { background: var(--ok-bg); color: var(--ok); }
+    .date-badge--info { background: var(--info-bg); color: var(--info); }
+    .date-badge--neutral { background: var(--neutral-bg); color: var(--navy); }
+    .date-badge--none { background: #f4f6f8; color: var(--ink); border-color: #3c4a5a; }
+    .desc { margin: 10px 0 0; overflow-wrap: anywhere; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .tag { border: 2px solid var(--navy); border-radius: 999px; padding: 2px 10px; font-size: 15px; font-weight: 800; background: white; }
+    .due-line { font-size: 18px; font-weight: 800; margin: 8px 0; }
+    .due-overdue { color: var(--danger); }
+    .due-soon { color: var(--warn); }
+    .due-ok { color: var(--ok); }
+    .due-info, .due-neutral { color: var(--navy); }
+    .due-none { color: var(--ink); }
+    .meta { margin: 8px 0 0; font-size: 16px; font-weight: 800; color: var(--ink-2); }
+    .empty {
+      background: white; border: 2px dashed #5c6b7c; border-radius: 14px;
+      padding: 16px; font-weight: 800; margin: 0;
+    }
+    .more { margin: 12px 0 0; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 8px 0; }
+    .field { flex: 1 1 160px; min-width: 140px; }
+    .field.grow { flex-basis: 100%; }
+    .field span, .check { font-weight: 800; }
+    .field > span { display: block; margin-bottom: 6px; }
+    input[type="text"], input[type="url"], input[type="password"], input[type="date"],
+    input[type="search"], select, textarea {
+      width: 100%; min-height: 48px; font-size: 17px; padding: 10px 12px;
+      border: 2px solid #5c6b7c; border-radius: 10px; background: white; color: var(--ink);
+    }
+    textarea { min-height: 140px; resize: vertical; line-height: 1.5; overflow-wrap: anywhere; }
+    textarea.tall { min-height: 240px; }
+    ::placeholder { color: #3c4a5a; opacity: 1; }
+    .giant { font-size: 26px; font-weight: 800; min-height: 60px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; text-align: center;
+      text-decoration: none; min-height: 48px; padding: 10px 16px; font-size: 17px; font-weight: 800;
+      border-radius: 12px; border: 2px solid var(--navy); background: var(--navy); color: white;
+    }
+    a.btn { color: white; }
+    .btn-secondary { background: white; color: var(--navy); }
+    a.btn.btn-secondary { color: var(--navy); }
+    .btn-danger { background: white; color: var(--danger); border-color: var(--danger); }
+    a.btn.btn-danger { color: var(--danger); }
+    .btn-block { width: 100%; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .seg { display: flex; border: 2px solid var(--navy); border-radius: 12px; overflow: hidden; min-height: 48px; }
+    .seg button { flex: 1; min-height: 48px; border: 0; background: white; color: var(--navy); font-weight: 800; border-radius: 0; }
+    .seg button[aria-pressed="true"] { background: var(--navy); color: white; }
+    .summary { font-weight: 800; margin: 4px 0 12px; }
+    .month-label {
+      font-size: 20px; font-weight: 800; padding: 8px 0; position: sticky; top: 64px;
+      background: var(--bg); z-index: 2;
+    }
+    .tl-item { margin-bottom: 12px; }
+    .back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 800; text-decoration: none; }
+    .save-state { font-weight: 800; margin: 0 0 10px; }
+    .accent-bar { height: 8px; border-radius: 999px; margin: 4px 0 12px; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+    .meta-grid div { background: white; border: 2px solid var(--navy); border-radius: 12px; padding: 10px; }
+    .meta-grid span { display: block; font-size: 16px; font-weight: 800; }
+    .meta-grid strong { display: block; font-size: 18px; font-weight: 800; }
+    .error-text { color: var(--danger); font-weight: 800; }
+    .hint { font-weight: 700; }
+    .colors { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch { width: 44px; height: 44px; border-radius: 10px; border: 3px solid white; box-shadow: 0 0 0 2px #5c6b7c; padding: 0; }
+    .swatch.on { box-shadow: 0 0 0 3px var(--ink); }
+    .drop { border: 2px dashed var(--navy); border-radius: 14px; padding: 14px; background: white; }
+    .drop.drag { background: var(--info-bg); }
+    .file-row {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
+      background: white; border: 2px solid var(--line); border-radius: 12px; padding: 10px; margin-top: 8px;
+    }
+    .file-row .row { width: 100%; }
+    .file-row .row .btn { flex: 1; }
+    .check { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; }
+    .check input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--navy); flex: none; }
+    .endpoint { background: white; border: 2px solid var(--line); border-radius: 14px; padding: 14px; margin-top: 12px; }
+    .result, pre.docs {
+      white-space: pre-wrap; word-break: break-word; margin: 8px 0 0;
+      padding: 12px; border-radius: 10px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 15px; line-height: 1.45;
+    }
+    .result { background: #121820; color: #f4f7fb; min-height: 72px; border: 3px solid #121820; }
+    .result-ok { border-color: #8fd4b0; }
+    .result-bad { border-color: #f0a0a0; }
+    pre.docs { background: white; color: var(--ink); border: 2px solid var(--navy); overflow: auto; }
+    details { background: white; border: 2px solid var(--line); border-radius: 14px; padding: 8px 14px 14px; margin-top: 14px; }
+    summary { font-weight: 800; font-size: 18px; cursor: pointer; min-height: 48px; display: flex; align-items: center; }
+    .danger-zone { margin-top: 28px; padding-top: 16px; border-top: 2px solid #e1c1c1; }
+    .check-results { list-style: none; padding: 0; margin: 8px 0 0; }
+    .check-results li { padding: 10px 12px; border-radius: 10px; font-weight: 800; margin: 8px 0; }
+    .pass { background: var(--ok-bg); color: var(--ok); }
+    .fail { background: var(--danger-bg); color: var(--danger); }
+    .tabbar {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+      background: white; border-top: 2px solid var(--navy); padding-bottom: var(--safe-b);
+    }
+    .tabbar a {
+      position: relative; flex: 1; min-height: 62px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px; text-decoration: none;
+      color: var(--navy); font-weight: 800; font-size: 15px; touch-action: manipulation;
+    }
+    .tabbar a[aria-current="page"] { background: var(--navy); color: white; }
+    .hint-list { margin: 8px 0 12px; padding-left: 1.3em; color: var(--ink); line-height: 1.55; }
+    .hint-list li { margin: 0.35em 0; }
+    .tabbar .nav-count {
+      position: absolute; top: 4px; margin-left: 28px; background: var(--danger); color: white;
+      min-width: 22px; height: 22px; line-height: 22px; padding: 0 5px; font-size: 13px;
+    }
+    .column { padding-bottom: calc(74px + var(--safe-b)); }
+    #toast {
+      position: fixed; left: 50%; top: 16px; transform: translateX(-50%) translateY(-8px);
+      max-width: min(520px, 92vw); background: #121820; color: white; padding: 12px 16px;
+      border-radius: 14px; font-weight: 800; opacity: 0; pointer-events: none; z-index: 60;
+      text-align: center; transition: opacity .2s ease, transform .2s ease;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .dialog-back {
+      position: fixed; inset: 0; background: rgba(18, 24, 32, .52); z-index: 40;
+      display: flex; align-items: flex-end; justify-content: center; padding: 16px;
+    }
+    .dialog {
+      background: white; color: var(--ink); width: min(480px, 100%);
+      border-radius: 16px; padding: 20px; border: 2px solid var(--navy);
+    }
+    .dialog h2 { font-size: 24px; margin: 0 0 8px; }
+    .dialog p { margin: 0 0 16px; font-weight: 700; white-space: pre-wrap; }
+    .dialog-actions { display: flex; flex-direction: column; gap: 8px; }
+    .dialog-actions .btn { width: 100%; }
+    body.dialog-open { overflow: hidden; }
+    @media (max-width: 860px) {
+      h1 { font-size: 30px; margin: 8px 0 4px; }
+      .lead { margin: 0 0 8px; }
+      .stat { min-height: 0; padding: 10px 12px; }
+      .stat b { font-size: 34px; }
+      .banner { margin-top: 8px; padding: 12px; }
+      .block { margin-top: 18px; }
+      .home-page { display: flex; flex-direction: column; }
+      .home-page .home-lists { order: 1; }
+      .home-page .stats { order: 2; }
+      .home-lists > .block:first-child { margin-top: 8px; }
+    }
+    @media (max-width: 380px) {
+      .dates { grid-template-columns: 1fr; }
+      .date-day { font-size: 44px; }
+      h1 { font-size: 30px; }
+    }
+    @media (min-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .date-day { font-size: 52px; }
+      .file-row .row { width: auto; }
+    }
+    @media (min-width: 800px) {
+      .field.grow { flex-basis: 240px; flex-grow: 2; }
+      main { padding: 12px 28px 40px; }
+      .banner { margin-left: 28px; margin-right: 28px; }
+    }
+    @media (min-width: 861px) {
+      .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+      .sidebar { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow: auto; }
+      .mobile-top { display: none; }
+      .tabbar { display: none; }
+      .column { padding-bottom: 0; }
+      .month-label { top: 0; }
+      #toast { top: 18px; }
+    }
+    @media (max-width: 860px) {
+      #toast { top: calc(62px + var(--safe-t)); }
+    }
+    @media (min-width: 1100px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      .tl-split { display: grid; grid-template-columns: 460px 1fr; gap: 16px; align-items: center; }
+    }
+    @media (min-width: 700px) {
+      .stats { grid-template-columns: repeat(4, 1fr); }
+      .dialog-back { align-items: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+    @media (prefers-contrast: more) {
+      .card-link, .date-badge, .btn, .stat { border-width: 3px; }
+    }
+    .noscript {
+      margin: 16px; padding: 16px; background: var(--danger-bg); color: var(--danger);
+      border: 2px solid var(--danger); border-radius: 14px; font-weight: 800;
+    }
+    .boot-help {
+      max-width: 640px; margin: 0 auto; padding: calc(20px + var(--safe-t)) 20px 40px;
+    }
+    .boot-help h1 { font-size: 28px; margin: 0 0 12px; }
+    .boot-help p, .boot-help li { font-size: 18px; line-height: 1.55; }
+    .boot-help ol { padding-left: 1.3em; }
+    .boot-help code { font-weight: 800; }
+  </style>
+</head>
+<body>
+  <div id="boot-help" class="boot-help">
+    <h1>專案記事</h1>
+    <p><strong>如果這段文字沒有在一秒內消失，代表這個畫面沒有執行程式，按鈕不會有反應。</strong></p>
+    <p>iPhone 或 iPad 不要在「檔案」或 OneDrive 的預覽畫面打開。請改用 Safari：</p>
+    <ol>
+      <li>在「檔案」App 找到 <code>project-notes.html</code> 或「專案記事.html」。</li>
+      <li>點分享（方框加向上箭頭）。</li>
+      <li>選擇「用 Safari 開啟」。</li>
+      <li>需要時再在 Safari 選分享 → 加入主畫面。</li>
+    </ol>
+    <p>公司電腦請用 Chrome 或 Edge 打開檔案，不要只用預覽窗。</p>
+  </div>
+  <a class="skip" href="#main">跳到內容</a>
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <div class="brand">專案記事<small id="sync-status">未連結 OneDrive，只存在這台瀏覽器</small></div>
+      <div class="side-today" id="today-label"></div>
+      <a class="nav-link" href="#/home" data-nav="home">總覽</a>
+      <a class="nav-link" href="#/projects" data-nav="projects"><span>專案</span><span class="nav-count" data-overdue-count hidden></span></a>
+      <a class="nav-link" href="#/notes" data-nav="notes">記事</a>
+      <a class="nav-link" href="#/settings" data-nav="settings">設定</a>
+      <a class="nav-link" href="#/guide" data-nav="guide">說明</a>
+    </aside>
+    <div class="column">
+      <header class="mobile-top">
+        <div class="mobile-top-title">
+          <strong>專案記事</strong>
+          <span id="sync-status-mobile" class="sync-chip">未連結 OneDrive</span>
+        </div>
+        <div class="mobile-top-actions">
+          <a class="help-link" href="#/guide" data-nav="guide">說明</a>
+          <span id="today-label-mobile"></span>
+        </div>
+      </header>
+      <div id="storage-warn" class="banner banner-danger" hidden>
+        <p id="storage-warn-text">這個瀏覽器現在不能寫入本地儲存。重新整理後資料會消失，請立刻匯出備份。</p>
+      </div>
+      <div id="export-banner" class="banner" hidden>
+        <p id="export-banner-text"></p>
+        <div class="row">
+          <a class="btn" href="#/settings">前往備份</a>
+          <button type="button" class="btn btn-secondary" data-action="dismiss-export-hint">稍後</button>
+        </div>
+      </div>
+      <div id="demo-banner" class="banner" hidden>
+        <p>這是示範資料，用來展示開始日、結束日、剩餘天數和逾期。你可以修改，或清除後建立自己的專案。</p>
+        <div class="row">
+          <button type="button" class="btn btn-secondary" data-action="dismiss-demo">知道了</button>
+          <button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>
+        </div>
+      </div>
+      <main id="main"></main>
+    </div>
+  </div>
+  <nav id="tabbar" class="tabbar" aria-label="主要" hidden>
+    <a href="#/home" data-nav="home">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M7 10.5V20h10v-9.5"/></svg>
+      <span>總覽</span>
+    </a>
+    <a href="#/projects" data-nav="projects">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+      <span>專案</span>
+      <span class="nav-count" data-overdue-count hidden></span>
+    </a>
+    <a href="#/notes" data-nav="notes">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h9l5 5v13H6V3z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>
+      <span>記事</span>
+    </a>
+    <a href="#/settings" data-nav="settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>
+      <span>設定</span>
+    </a>
+  </nav>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="dialog" class="dialog-back" hidden>
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-body">
+      <h2 id="dialog-title"></h2>
+      <p id="dialog-body"></p>
+      <div id="dialog-actions" class="dialog-actions"></div>
+    </div>
+  </div>
+  <noscript><p class="noscript">需要啟用 JavaScript。程式都在這個檔案裡，開啟時不會連到外面。</p></noscript>
+  <script>
+"use strict";
+
+var KEY = "ky-project-notes-v1";
+var MOCK_KEY = "ky-project-notes-mock-v1";
+var APP_VERSION = 1;
+var COLORS = ["#17364a", "#1d3f8f", "#084028", "#8a4b08", "#8f1d1d", "#3f3a6b", "#24556e", "#3d4a3e"];
+var WEEK = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+var STATUSES = [
+  { id: "planning", label: "規劃中" },
+  { id: "active", label: "進行中" },
+  { id: "paused", label: "暫停" },
+  { id: "done", label: "已完成" },
+  { id: "cancelled", label: "已取消" }
+];
+var STATUS_ORDER = { active: 0, planning: 1, paused: 2, done: 3, cancelled: 4 };
+var KIND = { overdue: 1, soon: 1, ok: 1, info: 1, neutral: 1, none: 1 };
+var DUE_LABELS = { all: "全部期限", overdue: "已逾期", soon: "七天內", nodate: "未設結束日", notstarted: "尚未開始" };
+var SORT_LABELS = { end: "結束日", start: "開始日", status: "狀態", name: "名稱" };
+var JSON_HELP = [
+  "{",
+  '  "version": 1,',
+  '  "source": "project-notes",',
+  '  "exportedAt": "2026-11-25T00:00:00.000Z",',
+  '  "projects": [',
+  "    {",
+  '      "id": "p_example",',
+  '      "name": "內部 API 遷移",',
+  '      "description": "說明",',
+  '      "status": "active",',
+  '      "startDate": "2026-10-15",',
+  '      "endDate": "2027-01-15",',
+  '      "tags": ["後端"],',
+  '      "color": "#17364a",',
+  '      "createdAt": "2026-11-01T00:00:00.000Z",',
+  '      "updatedAt": "2026-11-01T00:00:00.000Z"',
+  "    }",
+  "  ],",
+  '  "notes": [',
+  "    {",
+  '      "id": "n_example",',
+  '      "title": "標題",',
+  '      "body": "內文",',
+  '      "projectId": "p_example",',
+  '      "createdAt": "2026-11-01T00:00:00.000Z",',
+  '      "updatedAt": "2026-11-01T00:00:00.000Z"',
+  "    }",
+  "  ]",
+  "}"
+].join("\n");
+
+var data = null;
+var memoryOnly = false;
+var dbPromise = null;
+var dialogResolve = null;
+var lastFocus = null;
+var toastTimer = null;
+var fileLoadToken = 0;
+var ui = {
+  query: "",
+  noteQuery: "",
+  autofocus: false,
+  autofocusId: "",
+  lastRouteKey: "",
+  shownDay: "",
+  dismissExportHint: false,
+  apiResults: {},
+  toastOnStart: "",
+  corruptLocked: false,
+  ready: false,
+  syncState: "local",
+  syncText: "未連結 OneDrive，只存在這台瀏覽器",
+  syncTimer: null,
+  syncBusy: false,
+  skipCloudSave: false,
+  pendingCloudSave: false
+};
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function uid(prefix) {
+  var rnd = "";
+  try {
+    if (window.crypto && crypto.randomUUID) rnd = crypto.randomUUID();
+  } catch (e) { rnd = ""; }
+  if (!rnd) rnd = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  return prefix + "_" + String(rnd).replace(/[^A-Za-z0-9_-]/g, "");
+}
+function nowISO() { return new Date().toISOString(); }
+function todayDate() {
+  var n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+function toISODate(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function todayISO() { return toISODate(todayDate()); }
+function isoOffset(days) {
+  var d = todayDate();
+  d.setDate(d.getDate() + days);
+  return toISODate(d);
+}
+function parseISODate(s) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+  if (!m) return null;
+  var d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  if (toISODate(d) !== s) return null;
+  return d;
+}
+function isDate(s) { return !!parseISODate(s); }
+function isStamp(s) { return typeof s === "string" && s && !Number.isNaN(Date.parse(s)); }
+function diffDays(iso) {
+  var t = parseISODate(iso);
+  if (!t) return null;
+  return Math.round((t.getTime() - todayDate().getTime()) / 86400000);
+}
+function formatLong(iso) {
+  var d = parseISODate(iso);
+  if (!d) return "未設定";
+  return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
+}
+function weekday(iso) {
+  var d = parseISODate(iso);
+  return d ? WEEK[d.getDay()] : "";
+}
+function todayLong() {
+  var d = todayDate();
+  return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " + WEEK[d.getDay()];
+}
+function todayShort() {
+  var d = todayDate();
+  return d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate() + " " + WEEK[d.getDay()];
+}
+function todaySide() {
+  var d = todayDate();
+  return "今天\n" + d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日\n" + WEEK[d.getDay()];
+}
+function formatStamp(iso) {
+  var d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "未知";
+  return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
+    String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+}
+function formatSize(n) {
+  n = Number(n) || 0;
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+  return (n / 1024 / 1024).toFixed(1) + " MB";
+}
+function excerpt(s, n) {
+  var t = String(s || "").replace(/\s+/g, " ").trim();
+  if (t.length <= n) return t;
+  return t.slice(0, n) + "…";
+}
+function safeColor(c) { return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : "#17364a"; }
+function statusLabel(id) {
+  for (var i = 0; i < STATUSES.length; i++) if (STATUSES[i].id === id) return STATUSES[i].label;
+  return "未設定";
+}
+function statusClass(id) {
+  return STATUSES.some(function (s) { return s.id === id; }) ? id : "unknown";
+}
+function displayName(p) { return String(p.name || "").trim() || "未命名專案"; }
+function displayNoteTitle(n) { return String(n.title || "").trim() || "未命名記事"; }
+function parseTags(s) {
+  return String(s || "").split(/[,，]/).map(function (t) { return t.trim(); }).filter(Boolean).slice(0, 12).map(function (t) { return t.slice(0, 24); });
+}
+function formatTags(tags) { return (tags || []).join("，"); }
+function ensureId(id, prefix) {
+  var s = String(id || "").trim();
+  if (/^[A-Za-z0-9_-]{1,80}$/.test(s)) return s;
+  return uid(prefix);
+}
+
+function endInfo(p) {
+  if (!p.endDate) return { kind: "none", sub: "未設結束日" };
+  if (p.status === "done") return { kind: "neutral", sub: "已完成" };
+  if (p.status === "cancelled") return { kind: "neutral", sub: "已取消" };
+  var d = diffDays(p.endDate);
+  if (d < 0) return { kind: "overdue", sub: "逾期 " + (-d) + " 天" };
+  if (d === 0) return { kind: "soon", sub: "今天到期" };
+  if (d <= 7) return { kind: "soon", sub: "剩餘 " + d + " 天" };
+  return { kind: "ok", sub: "剩餘 " + d + " 天" };
+}
+function startInfo(p) {
+  if (!p.startDate) return { kind: "none", sub: "未設開始日" };
+  var closed = p.status === "done" || p.status === "cancelled";
+  var d = diffDays(p.startDate);
+  if (!closed && d > 0) return { kind: "info", sub: d + " 天後開始" };
+  if (!closed && d === 0) return { kind: "soon", sub: "今天開始" };
+  return { kind: "neutral", sub: "已開始" };
+}
+function isClosed(p) { return p.status === "done" || p.status === "cancelled"; }
+function isOverdue(p) { return !isClosed(p) && !!p.endDate && diffDays(p.endDate) < 0; }
+function isDueToday(p) { return !isClosed(p) && !!p.endDate && diffDays(p.endDate) === 0; }
+function isDueSoon(p) {
+  if (isClosed(p) || !p.endDate) return false;
+  var d = diffDays(p.endDate);
+  return d >= 0 && d <= 7;
+}
+function isNotStarted(p) { return !isClosed(p) && !!p.startDate && diffDays(p.startDate) > 0; }
+
+function cmpDateDir(a, b, dir) {
+  if (!a && !b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  if (a === b) return 0;
+  return (a < b ? -1 : 1) * dir;
+}
+function compareProjects(a, b) {
+  var dir = data.prefs.sortDir === "desc" ? -1 : 1;
+  var key = data.prefs.sort || "end";
+  var c = 0;
+  if (key === "name") c = displayName(a).localeCompare(displayName(b), "zh-Hant") * dir;
+  else if (key === "status") c = ((STATUS_ORDER[a.status] == null ? 9 : STATUS_ORDER[a.status]) - (STATUS_ORDER[b.status] == null ? 9 : STATUS_ORDER[b.status])) * dir;
+  else if (key === "start") c = cmpDateDir(a.startDate, b.startDate, dir);
+  else c = cmpDateDir(a.endDate, b.endDate, dir);
+  if (c === 0 && key !== "name") c = displayName(a).localeCompare(displayName(b), "zh-Hant");
+  return c;
+}
+function byEnd(a, b) {
+  return cmpDateDir(a.endDate, b.endDate, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
+}
+
+function storageAvailable() {
+  try {
+    var k = KEY + ".probe";
+    localStorage.setItem(k, "1");
+    var ok = localStorage.getItem(k) === "1";
+    localStorage.removeItem(k);
+    return ok;
+  } catch (e) { return false; }
+}
+function persistNow() {
+  if (memoryOnly) return false;
+  var next = JSON.stringify(data);
+  try {
+    var prev = localStorage.getItem(KEY);
+    if (prev && prev !== next) {
+      try { localStorage.setItem(KEY + ".bak", prev); } catch (e1) {}
+    }
+    localStorage.setItem(KEY, next);
+    if (ui.ready && !ui.skipCloudSave) scheduleCloudSave();
+    return true;
+  } catch (e) {
+    if (!memoryOnly) {
+      memoryOnly = true;
+      toast("寫不進瀏覽器儲存空間。這次的修改只留在目前分頁，請立刻匯出備份。");
+    }
+    paintBanners();
+    return false;
+  }
+}
+function defaultPrefs() {
+  return { sort: "end", sortDir: "asc", status: "all", due: "all", layout: "cards", noteProject: "all", noteSort: "updated" };
+}
+function normalizeData(d) {
+  if (!d || typeof d !== "object" || Array.isArray(d)) d = {};
+  d.version = 1;
+  if (!Array.isArray(d.projects)) d.projects = [];
+  if (!Array.isArray(d.notes)) d.notes = [];
+  if (!Array.isArray(d.endpoints)) d.endpoints = [];
+  d.prefs = Object.assign(defaultPrefs(), d.prefs && typeof d.prefs === "object" ? d.prefs : {});
+  if (typeof d.demoBanner !== "boolean") d.demoBanner = false;
+  if (d.prefs.sortDir !== "desc") d.prefs.sortDir = "asc";
+  if (d.prefs.layout !== "timeline") d.prefs.layout = "cards";
+  if (["end", "start", "status", "name"].indexOf(d.prefs.sort) < 0) d.prefs.sort = "end";
+  if (["all", "overdue", "soon", "nodate", "notstarted"].indexOf(d.prefs.due) < 0) d.prefs.due = "all";
+  if (d.prefs.status !== "all" && !STATUSES.some(function (s) { return s.id === d.prefs.status; })) d.prefs.status = "all";
+  if (["updated", "created", "title"].indexOf(d.prefs.noteSort) < 0) d.prefs.noteSort = "updated";
+  d.projects.forEach(function (p) {
+    if (!p || typeof p !== "object") return;
+    p.id = ensureId(p.id, "p");
+    p.name = String(p.name || "").slice(0, 200);
+    p.description = String(p.description || "").slice(0, 20000);
+    if (!Array.isArray(p.tags)) p.tags = [];
+    p.tags = p.tags.map(function (t) { return String(t).trim(); }).filter(Boolean).slice(0, 12);
+    p.color = safeColor(p.color);
+    if (!STATUSES.some(function (s) { return s.id === p.status; })) p.status = "planning";
+    p.startDate = isDate(p.startDate) ? p.startDate : "";
+    p.endDate = isDate(p.endDate) ? p.endDate : "";
+    if (!isStamp(p.createdAt)) p.createdAt = nowISO();
+    if (!isStamp(p.updatedAt)) p.updatedAt = p.createdAt;
+  });
+  d.projects = d.projects.filter(function (p) { return p && typeof p === "object"; });
+  d.notes.forEach(function (n) {
+    if (!n || typeof n !== "object") return;
+    n.id = ensureId(n.id, "n");
+    n.title = String(n.title || "").slice(0, 200);
+    n.body = String(n.body || "").slice(0, 100000);
+    n.projectId = n.projectId ? String(n.projectId) : "";
+    if (!isStamp(n.createdAt)) n.createdAt = nowISO();
+    if (!isStamp(n.updatedAt)) n.updatedAt = n.createdAt;
+  });
+  d.notes = d.notes.filter(function (n) { return n && typeof n === "object"; });
+  d.endpoints.forEach(function (e) {
+    if (!e || typeof e !== "object") return;
+    e.id = ensureId(e.id, "e");
+    e.name = String(e.name || "").slice(0, 80);
+    e.url = String(e.url || "").slice(0, 2000);
+    e.headerName = /^[A-Za-z0-9-]{1,64}$/.test(String(e.headerName || "")) ? String(e.headerName) : "Authorization";
+    e.apiKey = String(e.apiKey || "");
+    e.authStyle = e.authStyle === "bearer" ? "bearer" : "raw";
+    e.pushMethod = e.pushMethod === "POST" ? "POST" : "PUT";
+    if (!isStamp(e.createdAt)) e.createdAt = nowISO();
+    if (!isStamp(e.updatedAt)) e.updatedAt = e.createdAt;
+  });
+  d.endpoints = d.endpoints.filter(function (e) { return e && typeof e === "object"; });
+  if (d.prefs.noteProject !== "all" && d.prefs.noteProject !== "none" && !d.projects.some(function (p) { return p.id === d.prefs.noteProject; })) {
+    d.prefs.noteProject = "all";
+  }
+  d.lastExportAt = isStamp(d.lastExportAt) ? d.lastExportAt : "";
+  d.lastBackupName = typeof d.lastBackupName === "string" ? d.lastBackupName.slice(0, 200) : "";
+  d.lastSyncedHash = typeof d.lastSyncedHash === "string" ? d.lastSyncedHash.slice(0, 64) : "";
+  return d;
+}
+function hoursAgo(h) { return new Date(Date.now() - h * 3600 * 1000).toISOString(); }
+function buildDemo() {
+  var projects = [
+    { id: uid("p"), name: "機房備援切換", description: "DNS 切換後要確認監控與復原步驟。上次停在 TTL。", status: "active", startDate: isoOffset(-24), endDate: isoOffset(-5), tags: ["維運", "備援"], color: "#8f1d1d", demo: true },
+    { id: uid("p"), name: "憑證到期更換", description: "內部入口憑證今天到期。更換後核對憑證鏈，再重新載入。", status: "active", startDate: isoOffset(-20), endDate: isoOffset(0), tags: ["憑證"], color: "#8a4b08", demo: true },
+    { id: uid("p"), name: "監控儀表板補齊", description: "補錯誤率、佇列延遲、磁碟。結束日前先交出錯誤率。", status: "active", startDate: isoOffset(-12), endDate: isoOffset(3), tags: ["觀測"], color: "#8a4b08", demo: true },
+    { id: uid("p"), name: "內部 API 遷移", description: "舊客戶端改走 v2。雙寫期間不要拆掉舊路由。", status: "active", startDate: isoOffset(-40), endDate: isoOffset(45), tags: ["後端"], color: "#17364a", demo: true },
+    { id: uid("p"), name: "機櫃盤點", description: "核對機櫃、序號與保固。開始日前先準備表格。", status: "planning", startDate: isoOffset(14), endDate: isoOffset(30), tags: ["盤點"], color: "#1d3f8f", demo: true },
+    { id: uid("p"), name: "上季部署回顧", description: "已完成。留作日期範例：已完成的專案不會再標成逾期。", status: "done", startDate: isoOffset(-90), endDate: isoOffset(-40), tags: ["回顧"], color: "#3d4a3e", demo: true }
+  ];
+  projects.forEach(function (p, i) {
+    p.createdAt = hoursAgo(80 - i);
+    p.updatedAt = hoursAgo(20 - i);
+  });
+  var notes = [
+    { id: uid("n"), title: "DNS 與復原", body: "切換前先把 TTL 降到 60 秒。復原命令先寫在這裡，附件稍後補。", projectId: projects[0].id, demo: true, createdAt: hoursAgo(18), updatedAt: hoursAgo(6) },
+    { id: uid("n"), title: "儀表板缺口", body: "錯誤率圖還沒有。磁碟只做根目錄。結束日前先交出錯誤率。", projectId: projects[2].id, demo: true, createdAt: hoursAgo(10), updatedAt: hoursAgo(3) },
+    { id: uid("n"), title: "工作電腦用法", body: "這台電腦不能裝軟件。打開這個 HTML 就能用。每週把備份 JSON 存到自己的雲端硬碟或隨身碟。", projectId: "", demo: true, createdAt: hoursAgo(4), updatedAt: hoursAgo(1) }
+  ];
+  var endpoints = [{
+    id: uid("e"), name: "內建模擬", url: "local://mock", headerName: "Authorization", apiKey: "",
+    authStyle: "raw", pushMethod: "PUT", demo: true, createdAt: nowISO(), updatedAt: nowISO()
+  }];
+  return { projects: projects, notes: notes, endpoints: endpoints };
+}
+function seed() {
+  var demo = buildDemo();
+  return normalizeData({
+    version: 1,
+    demoBanner: true,
+    lastExportAt: "",
+    lastBackupName: "",
+    lastSyncedHash: "",
+    projects: demo.projects,
+    notes: demo.notes,
+    endpoints: demo.endpoints,
+    prefs: defaultPrefs()
+  });
+}
+function load() {
+  memoryOnly = !storageAvailable();
+  if (memoryOnly) {
+    data = seed();
+    ui.corruptLocked = false;
+    return;
+  }
+  var raw = null;
+  try { raw = localStorage.getItem(KEY); } catch (e) { raw = null; memoryOnly = true; data = seed(); return; }
+  if (!raw) { data = seed(); persistNow(); return; }
+  try {
+    var parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || !Array.isArray(parsed.projects)) throw new Error("shape");
+    data = normalizeData(parsed);
+    persistNow();
+  } catch (e) {
+    var copied = false;
+    try {
+      localStorage.setItem(KEY + ".corrupt", raw);
+      copied = localStorage.getItem(KEY + ".corrupt") === raw;
+    } catch (e2) { copied = false; }
+    data = seed();
+    if (copied) {
+      persistNow();
+      ui.toastOnStart = "原本的資料不是有效格式，已另存原始內容，並先載入示範資料。可在設定下載那份原始內容。";
+    } else {
+      memoryOnly = true;
+      ui.corruptLocked = true;
+    }
+  }
+}
+
+function getDb() {
+  if (!window.indexedDB) return Promise.reject(new Error("這個瀏覽器沒有附件資料庫"));
+  if (!dbPromise) {
+    dbPromise = new Promise(function (resolve, reject) {
+      var req = indexedDB.open("ky-project-notes", 2);
+      req.onupgradeneeded = function () {
+        var db = req.result;
+        if (!db.objectStoreNames.contains("files")) {
+          var store = db.createObjectStore("files", { keyPath: "id" });
+          store.createIndex("byOwner", ["ownerType", "ownerId"], { unique: false });
+        }
+        if (!db.objectStoreNames.contains("meta")) {
+          db.createObjectStore("meta", { keyPath: "id" });
+        }
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error || new Error("無法開啟附件資料庫")); };
+    }).catch(function (err) { dbPromise = null; throw err; });
+  }
+  return dbPromise;
+}
+function metaReq(mode, fn) {
+  return getDb().then(function (db) {
+    if (!db.objectStoreNames.contains("meta")) return Promise.reject(new Error("這個瀏覽器還沒有設定資料庫"));
+    return new Promise(function (resolve, reject) {
+      var tx = db.transaction("meta", mode);
+      var store = tx.objectStore("meta");
+      var result;
+      try { result = fn(store, tx); } catch (e) { reject(e); return; }
+      if (result && typeof result.onsuccess !== "undefined" && mode === "readonly") {
+        result.onsuccess = function () { resolve(result.result); };
+        result.onerror = function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          reject(result.error || new Error("讀取設定失敗"));
+        };
+        return;
+      }
+      tx.oncomplete = function () { resolve(result); };
+      tx.onerror = function () { reject(tx.error || new Error("寫入設定失敗")); };
+      tx.onabort = function () { reject(tx.error || new Error("寫入設定中止")); };
+    });
+  });
+}
+function getMeta(id) {
+  return metaReq("readonly", function (store) { return store.get(id); });
+}
+function putMeta(rec) {
+  return metaReq("readwrite", function (store) { store.put(rec); });
+}
+function deleteMeta(id) {
+  return metaReq("readwrite", function (store) { store.delete(id); });
+}
+function idbReq(mode, fn) {
+  return getDb().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      var tx = db.transaction("files", mode);
+      var store = tx.objectStore("files");
+      var result;
+      try { result = fn(store, tx); } catch (e) { reject(e); return; }
+      if (result && typeof result.onsuccess !== "undefined" && mode === "readonly") {
+        result.onsuccess = function () { resolve(result.result); };
+        result.onerror = function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          reject(result.error || new Error("讀取附件失敗"));
+        };
+        return;
+      }
+      tx.oncomplete = function () { resolve(result); };
+      tx.onerror = function () { reject(tx.error || new Error("附件寫入失敗")); };
+      tx.onabort = function () { reject(tx.error || new Error("附件寫入中止")); };
+    });
+  });
+}
+function putFile(rec) {
+  return idbReq("readwrite", function (store) { store.put(rec); });
+}
+function getFile(id) {
+  return idbReq("readonly", function (store) { return store.get(id); });
+}
+function deleteFile(id) {
+  return idbReq("readwrite", function (store) { store.delete(id); });
+}
+function listFiles(ownerType, ownerId) {
+  return idbReq("readonly", function (store) { return store.index("byOwner").getAll([ownerType, ownerId]); });
+}
+function listAllFiles() {
+  return idbReq("readonly", function (store) { return store.getAll(); });
+}
+function clearAllFiles() {
+  return idbReq("readwrite", function (store) { store.clear(); });
+}
+function deleteFilesFor(ownerType, ownerId) {
+  return listFiles(ownerType, ownerId).then(function (files) {
+    return idbReq("readwrite", function (store) {
+      (files || []).forEach(function (f) { store.delete(f.id); });
+    });
+  });
+}
+
+function findProject(id) { return data.projects.find(function (p) { return p.id === id; }) || null; }
+function findNote(id) { return data.notes.find(function (n) { return n.id === id; }) || null; }
+function findEndpoint(id) { return data.endpoints.find(function (e) { return e.id === id; }) || null; }
+
+function dateBadge(label, iso, info) {
+  var kind = KIND[info.kind] ? info.kind : "none";
+  var parsed = iso ? parseISODate(iso) : null;
+  var day = parsed ? String(parsed.getDate()) : "未設定";
+  var dayClass = parsed ? "date-day" : "date-day date-day--empty";
+  var full = parsed ? formatLong(iso) + " · " + weekday(iso) : "沒有填日期";
+  var aria = parsed ? (label + " " + formatLong(iso) + " " + weekday(iso) + "，" + info.sub) : (label + "未設定，" + info.sub);
+  return '<div class="date-badge date-badge--' + kind + '" aria-label="' + esc(aria) + '">' +
+    '<span class="date-kicker">' + esc(label) + "</span>" +
+    '<span class="' + dayClass + '">' + esc(day) + "</span>" +
+    '<span class="date-full">' + esc(full) + "</span>" +
+    '<span class="date-remain">' + esc(info.sub) + "</span></div>";
+}
+function dateBadgesHTML(p) {
+  return '<div class="dates">' + dateBadge("開始", p.startDate, startInfo(p)) + dateBadge("結束", p.endDate, endInfo(p)) + "</div>";
+}
+function tagsHTML(tags) {
+  if (!tags || !tags.length) return "";
+  return '<div class="tags">' + tags.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>";
+}
+function projectCard(p) {
+  return '<a class="card-link" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    dateBadgesHTML(p) +
+    (p.description ? '<p class="desc">' + esc(excerpt(p.description, 140)) + "</p>" : "") +
+    tagsHTML(p.tags) + "</a>";
+}
+function noteCard(n) {
+  var p = findProject(n.projectId);
+  var due;
+  if (p) {
+    var info = endInfo(p);
+    var kind = KIND[info.kind] ? info.kind : "none";
+    due = '<p class="due-line due-' + kind + '">' + esc(info.sub) + (p.endDate ? " · 結束 " + esc(formatLong(p.endDate)) : "") + " · " + esc(displayName(p)) + "</p>";
+  } else if (n.projectId) {
+    due = '<p class="due-line due-none">專案已刪除</p>';
+  } else {
+    due = '<p class="due-line due-neutral">未連結專案</p>';
+  }
+  return '<a class="card-link note-card" href="#/n/' + esc(n.id) + '"><h3>' + esc(displayNoteTitle(n)) + "</h3>" + due +
+    (n.body ? '<p class="desc">' + esc(excerpt(n.body, 160)) + "</p>" : "") +
+    '<p class="meta">更新 ' + esc(formatStamp(n.updatedAt)) + "</p></a>";
+}
+function sectionProjects(title, list, emptyText, limit) {
+  var shown = typeof limit === "number" ? list.slice(0, limit) : list;
+  var more = "";
+  if (typeof limit === "number" && list.length > limit) {
+    more = '<p class="more"><a class="btn btn-secondary" href="#/projects">查看全部 ' + list.length + " 個</a></p>";
+  }
+  var body = shown.length ? '<div class="stack">' + shown.map(projectCard).join("") + "</div>" + more : '<p class="empty">' + esc(emptyText) + "</p>";
+  return '<section class="block"><div class="section-head"><h2>' + esc(title) + '</h2><span class="count-pill">' + list.length + "</span></div>" + body + "</section>";
+}
+function statButton(kind, label, count, cls) {
+  return '<button type="button" class="stat ' + cls + '" data-action="stat" data-kind="' + kind + '"><b>' + count + "</b><span>" + esc(label) + "</span></button>";
+}
+function homeHTML() {
+  var projects = data.projects;
+  var overdue = projects.filter(isOverdue).sort(byEnd);
+  var today = projects.filter(isDueToday).sort(byEnd);
+  var soon = projects.filter(function (p) { return isDueSoon(p) && !isDueToday(p); }).sort(byEnd);
+  var notStarted = projects.filter(isNotStarted).sort(byEnd);
+  var shown = {};
+  overdue.concat(today, soon, notStarted).forEach(function (p) { shown[p.id] = true; });
+  var rest = projects.filter(function (p) { return !isClosed(p) && !shown[p.id]; }).sort(byEnd);
+  var done = projects.filter(function (p) { return p.status === "done"; }).sort(function (a, b) { return cmpDateDir(a.endDate, b.endDate, -1); });
+  var activeCount = projects.filter(function (p) { return p.status === "active"; }).length;
+  var recent = data.notes.slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }).slice(0, 4);
+  var notesBlock = recent.length ? '<div class="stack">' + recent.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有記事。</p>';
+  return '<div class="page home-page"><header class="page-head"><h1>總覽</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
+    '<p class="lead">今天 ' + esc(todayLong()) + "。日期直接標在每張專案卡上。</p>" +
+    '<div class="stats">' +
+    statButton("active", "進行中", activeCount, "") +
+    statButton("soon", "七天內", projects.filter(isDueSoon).length, "stat-warn") +
+    statButton("overdue", "已逾期", overdue.length, overdue.length ? "stat-danger" : "") +
+    statButton("notes", "記事", data.notes.length, "") +
+    "</div>" +
+    '<div class="home-lists">' +
+    sectionProjects("已逾期", overdue, "沒有逾期的專案。已完成和已取消不會算進逾期。") +
+    (today.length ? sectionProjects("今天到期", today, "") : "") +
+    sectionProjects("七天內到期", soon, "未來七天沒有其他到期的專案。") +
+    (notStarted.length ? sectionProjects("尚未開始", notStarted, "") : "") +
+    (rest.length ? sectionProjects("其他未完成", rest, "", 3) : "") +
+    (done.length ? sectionProjects("已完成", done, "", 2) : "") +
+    '<section class="block"><div class="section-head"><h2>最近的記事</h2><a class="btn btn-secondary" href="#/notes">全部記事</a></div>' + notesBlock + "</section>" +
+    '<section class="block"><div class="section-head"><h2>功能說明</h2><a class="btn btn-secondary" href="#/guide">開啟說明</a></div>' +
+    '<p class="hint">每個按鈕都有對應功能。說明頁列出全部功能、程式寫法，以及用 AI 做這類工具時的做法。</p></section></div></div>';
+}
+
+function dirLabel() {
+  var asc = data.prefs.sortDir !== "desc";
+  if (data.prefs.sort === "name") return asc ? "甲到乙" : "乙到甲";
+  if (data.prefs.sort === "status") return asc ? "預設狀態順序" : "相反狀態順序";
+  return asc ? "早的在前" : "晚的在前";
+}
+function filterSummary(list) {
+  var status = data.prefs.status === "all" ? "全部狀態" : statusLabel(data.prefs.status);
+  var due = DUE_LABELS[data.prefs.due] || "全部期限";
+  var sort = SORT_LABELS[data.prefs.sort] || "結束日";
+  return list.length + " 個專案 · " + status + " · " + due + " · 依" + sort + " · " + dirLabel();
+}
+function filteredProjects() {
+  var q = ui.query.trim().toLowerCase();
+  return data.projects.filter(function (p) {
+    if (data.prefs.status !== "all" && p.status !== data.prefs.status) return false;
+    var due = data.prefs.due;
+    if (due === "overdue" && !isOverdue(p)) return false;
+    if (due === "soon" && !isDueSoon(p)) return false;
+    if (due === "nodate" && p.endDate) return false;
+    if (due === "notstarted" && !isNotStarted(p)) return false;
+    if (q) {
+      var hay = [p.name, p.description, (p.tags || []).join(" "), p.startDate, p.endDate, statusLabel(p.status)].join(" ").toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  }).sort(compareProjects);
+}
+function groupKey(p) {
+  if (data.prefs.sort === "status") return p.status || "";
+  if (data.prefs.sort === "name") return "all";
+  var iso = data.prefs.sort === "start" ? p.startDate : p.endDate;
+  return iso ? iso.slice(0, 7) : "";
+}
+function groupLabel(key) {
+  if (data.prefs.sort === "status") return statusLabel(key);
+  if (data.prefs.sort === "name") return "";
+  if (!key) return "未設日期";
+  var parts = key.split("-");
+  return parts[0] + "年" + Number(parts[1]) + "月";
+}
+function timelineHTML(items) {
+  if (data.prefs.sort === "name") return '<div class="stack">' + items.map(function (p) { return timelineItem(p); }).join("") + "</div>";
+  var html = "";
+  var current = null;
+  items.forEach(function (p) {
+    var key = groupKey(p);
+    if (key !== current) {
+      if (current !== null) html += "</div>";
+      current = key;
+      html += '<div class="tl-group"><div class="month-label">' + esc(groupLabel(key)) + "</div>";
+    }
+    html += timelineItem(p);
+  });
+  if (current !== null) html += "</div>";
+  return html;
+}
+function timelineItem(p) {
+  return '<div class="tl-item"><a class="card-link tl-split" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    dateBadgesHTML(p) +
+    '<div><div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    (p.description ? '<p class="desc">' + esc(excerpt(p.description, 180)) + "</p>" : "") +
+    tagsHTML(p.tags) + "</div></a></div>";
+}
+function projectListInner(list) {
+  if (!list.length) {
+    var msg = data.projects.length ? "沒有符合的專案。可以按「重設篩選」。" : "還沒有專案。新增一個之後，開始日和結束日會以大字顯示。";
+    return '<p class="empty">' + esc(msg) + "</p>";
+  }
+  if (data.prefs.layout === "timeline") return timelineHTML(list);
+  return '<div class="cards">' + list.map(projectCard).join("") + "</div>";
+}
+function selectPref(label, pref, optionsHTML) {
+  return '<label class="field"><span>' + esc(label) + '</span><select data-pref="' + pref + '">' + optionsHTML + "</select></label>";
+}
+function optionList(pairs, current) {
+  return pairs.map(function (pair) {
+    return '<option value="' + esc(pair[0]) + '"' + (pair[0] === current ? " selected" : "") + ">" + esc(pair[1]) + "</option>";
+  }).join("");
+}
+function projectsHTML() {
+  var list = filteredProjects();
+  var statusPairs = [["all", "全部狀態"]].concat(STATUSES.map(function (s) { return [s.id, s.label]; }));
+  var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
+  var sortPairs = [["end", "結束日"], ["start", "開始日"], ["status", "狀態"], ["name", "名稱"]];
+  return '<div class="page"><header class="page-head"><h1>專案</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
+    '<div class="toolbar">' +
+    '<label class="field grow"><span>搜尋</span><input id="q" type="search" value="' + esc(ui.query) + '" placeholder="名稱、說明、標籤、日期" autocomplete="off"></label>' +
+    selectPref("狀態", "status", optionList(statusPairs, data.prefs.status)) +
+    selectPref("期限", "due", optionList(duePairs, data.prefs.due)) +
+    selectPref("排序", "sort", optionList(sortPairs, data.prefs.sort)) +
+    '<div class="field"><span>方向</span><button type="button" class="btn btn-secondary" id="dir-btn" data-action="toggle-dir">' + esc(dirLabel()) + "</button></div>" +
+    '<div class="field"><span>版面</span><div class="seg"><button type="button" data-action="layout" data-layout="cards" id="layout-cards">卡片</button><button type="button" data-action="layout" data-layout="timeline" id="layout-timeline">時間軸</button></div></div>' +
+    '<div class="field"><span>清除</span><button type="button" class="btn btn-secondary" data-action="reset-filters">重設篩選</button></div>' +
+    "</div><p class=\"summary\" id=\"filter-summary\">" + esc(filterSummary(list)) + '</p><div id="project-list">' + projectListInner(list) + "</div></div>";
+}
+
+function filteredNotes() {
+  var q = ui.noteQuery.trim().toLowerCase();
+  return data.notes.filter(function (n) {
+    var pref = data.prefs.noteProject;
+    if (pref === "none" && n.projectId) return false;
+    if (pref !== "all" && pref !== "none" && n.projectId !== pref) return false;
+    if (!q) return true;
+    var p = findProject(n.projectId);
+    var hay = [n.title, n.body, p ? p.name : ""].join(" ").toLowerCase();
+    return hay.indexOf(q) >= 0;
+  }).sort(function (a, b) {
+    var key = data.prefs.noteSort || "updated";
+    if (key === "title") return displayNoteTitle(a).localeCompare(displayNoteTitle(b), "zh-Hant");
+    if (key === "created") return String(b.createdAt).localeCompare(String(a.createdAt));
+    return String(b.updatedAt).localeCompare(String(a.updatedAt));
+  });
+}
+function noteListInner(list) {
+  if (!list.length) {
+    var msg = data.notes.length ? "沒有符合的記事。" : "還沒有記事。";
+    return '<p class="empty">' + esc(msg) + "</p>";
+  }
+  return '<div class="stack">' + list.map(noteCard).join("") + "</div>";
+}
+function notesHTML() {
+  var list = filteredNotes();
+  var pairs = [["all", "全部專案"], ["none", "未連結"]];
+  data.projects.slice().sort(function (a, b) { return displayName(a).localeCompare(displayName(b), "zh-Hant"); }).forEach(function (p) {
+    pairs.push([p.id, displayName(p)]);
+  });
+  var sortPairs = [["updated", "最近更新"], ["created", "最近建立"], ["title", "標題"]];
+  return '<div class="page"><header class="page-head"><h1>記事</h1><a class="btn" href="#/notes/new">＋ 新增記事</a></header>' +
+    '<div class="toolbar">' +
+    '<label class="field grow"><span>搜尋</span><input id="nq" type="search" value="' + esc(ui.noteQuery) + '" placeholder="標題、內文、專案名稱" autocomplete="off"></label>' +
+    selectPref("專案", "noteProject", optionList(pairs, data.prefs.noteProject)) +
+    selectPref("排序", "noteSort", optionList(sortPairs, data.prefs.noteSort)) +
+    "</div><p class=\"summary\" id=\"note-summary\">" + list.length + ' 則記事</p><div id="note-list">' + noteListInner(list) + "</div></div>";
+}
+
+function statusOptions(current) {
+  return STATUSES.map(function (s) {
+    return '<option value="' + s.id + '"' + (s.id === current ? " selected" : "") + ">" + s.label + "</option>";
+  }).join("");
+}
+function projectOptions(current) {
+  var known = {};
+  data.projects.forEach(function (p) { known[p.id] = true; });
+  var html = '<option value=""' + (current ? "" : " selected") + ">未連結專案</option>";
+  data.projects.slice().sort(function (a, b) { return displayName(a).localeCompare(displayName(b), "zh-Hant"); }).forEach(function (p) {
+    html += '<option value="' + esc(p.id) + '"' + (p.id === current ? " selected" : "") + ">" + esc(displayName(p)) + "</option>";
+  });
+  if (current && !known[current]) html += '<option value="' + esc(current) + '" selected>專案已刪除</option>';
+  return html;
+}
+function colorSwatches(current) {
+  return '<div class="colors" role="radiogroup" aria-label="顏色">' + COLORS.map(function (c) {
+    var on = safeColor(current) === c;
+    return '<button type="button" class="swatch' + (on ? " on" : "") + '" style="background:' + c + '" data-action="color" data-color="' + c + '" aria-label="顏色 ' + c + '" aria-pressed="' + (on ? "true" : "false") + '"></button>';
+  }).join("") + "</div>";
+}
+function stampsHTML(entity) {
+  return '<div class="meta-grid"><div><span>建立</span><strong>' + esc(formatStamp(entity.createdAt)) + '</strong></div><div><span>更新</span><strong id="updated-stamp">' + esc(formatStamp(entity.updatedAt)) + "</strong></div></div>";
+}
+function filesBlock() {
+  return '<section class="block"><h2>附件</h2><p class="hint">檔案存在這台瀏覽器的資料庫，可稍後下載。匯出備份時可以一併帶走。</p>' +
+    '<div class="drop" id="drop"><p class="hint">把檔案拖到這裡，或按下面的按鈕。</p><div class="row"><button type="button" class="btn btn-secondary" data-action="pick-file">選擇檔案</button></div>' +
+    '<input id="file-input" type="file" multiple hidden></div><div id="files"><p class="hint">正在讀取附件…</p></div></section>';
+}
+function projectEditor(p) {
+  var af = ui.autofocus && ui.autofocusId === p.id ? " data-autofocus" : "";
+  var warn = p.startDate && p.endDate && p.startDate > p.endDate ? "結束日早於開始日。" : "";
+  var linked = data.notes.filter(function (n) { return n.projectId === p.id; }).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
+  var linkedHTML = linked.length ? '<div class="stack">' + linked.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有連結到這個專案的記事。</p>';
+  return '<div class="page narrow" data-entity="project" data-entity-id="' + esc(p.id) + '">' +
+    '<a class="back" href="#/projects">← 返回專案</a>' +
+    '<div class="accent-bar" id="accent-bar" style="background:' + safeColor(p.color) + '"></div>' +
+    '<p class="kicker" style="font-weight:800;margin:0">專案</p>' +
+    '<h1 id="editor-name-heading">' + esc(displayName(p)) + "</h1>" +
+    '<p class="save-state" id="save-state">上次更新 ' + esc(formatStamp(p.updatedAt)) + " · 變更會自動存在這台裝置</p>" +
+    '<div id="live-dates">' + dateBadgesHTML(p) + "</div>" +
+    '<p id="date-warn" class="error-text"' + (warn ? "" : " hidden") + ">" + esc(warn) + "</p>" +
+    '<label class="field"><span>名稱</span><input class="giant" type="text" data-bind="name" maxlength="200" value="' + esc(p.name) + '" placeholder="專案名稱"' + af + "></label>" +
+    '<label class="field"><span>狀態</span><select data-bind="status">' + statusOptions(p.status) + "</select></label>" +
+    '<div class="grid-2"><label class="field"><span>開始日</span><input type="date" data-bind="startDate" value="' + esc(p.startDate) + '"></label>' +
+    '<label class="field"><span>結束日</span><input type="date" data-bind="endDate" value="' + esc(p.endDate) + '"></label></div>' +
+    '<label class="field"><span>說明</span><textarea data-bind="description" maxlength="20000" placeholder="這個專案要完成什麼、卡在哪裡。">' + esc(p.description) + "</textarea></label>" +
+    '<label class="field"><span>標籤（以逗號分隔）</span><input type="text" data-bind="tags" value="' + esc(formatTags(p.tags)) + '" placeholder="例如：維運，後端" spellcheck="false"></label>' +
+    '<div class="field"><span>顏色</span>' + colorSwatches(p.color) + "</div>" +
+    stampsHTML(p) +
+    filesBlock() +
+    '<section class="block"><div class="section-head"><h2>連結的記事</h2><button type="button" class="btn btn-secondary" data-action="note-for-project">＋ 寫一則記事</button></div>' + linkedHTML + "</section>" +
+    '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-project">刪除這個專案</button></div></div>';
+}
+function noteProjectDatesHTML(n) {
+  var p = findProject(n.projectId);
+  if (!p && n.projectId) return '<p class="error-text">連結的專案已刪除。可以改選其他專案，或選「未連結專案」。</p>';
+  if (!p) return '<p class="hint">未連結專案。日期屬於專案，可在下面選擇。</p>';
+  return '<a class="card-link" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '"><div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" + dateBadgesHTML(p) + "</a>";
+}
+function noteEditor(n) {
+  var af = ui.autofocus && ui.autofocusId === n.id ? " data-autofocus" : "";
+  return '<div class="page narrow" data-entity="note" data-entity-id="' + esc(n.id) + '">' +
+    '<a class="back" href="#/notes">← 返回記事</a>' +
+    '<p style="font-weight:800;margin:8px 0 0">記事</p>' +
+    '<h1 id="editor-name-heading">' + esc(displayNoteTitle(n)) + "</h1>" +
+    '<p class="save-state" id="save-state">上次更新 ' + esc(formatStamp(n.updatedAt)) + " · 變更會自動存在這台裝置</p>" +
+    '<div id="note-project-dates">' + noteProjectDatesHTML(n) + "</div>" +
+    '<label class="field"><span>標題</span><input class="giant" type="text" data-bind="title" maxlength="200" value="' + esc(n.title) + '" placeholder="記事標題"' + af + "></label>" +
+    '<label class="field"><span>連結專案</span><select data-bind="projectId">' + projectOptions(n.projectId) + "</select></label>" +
+    '<label class="field"><span>內文</span><textarea class="tall" data-bind="body" maxlength="100000" placeholder="寫下決定、下一步，或還沒整理的事實。">' + esc(n.body) + "</textarea></label>" +
+    stampsHTML(n) +
+    filesBlock() +
+    '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-note">刪除這則記事</button></div></div>';
+}
+function missingHTML(title, href, label) {
+  return '<div class="page"><h1>' + esc(title) + '</h1><p>可能已經刪除。</p><a class="btn" href="' + href + '">' + esc(label) + "</a></div>";
+}
+
+function endpointCard(ep) {
+  var af = ui.autofocus && ui.autofocusId === ep.id ? " data-autofocus" : "";
+  var stored = ui.apiResults[ep.id];
+  var resultClass = "result" + (stored && stored.ok === true ? " result-ok" : stored && stored.ok === false ? " result-bad" : "");
+  var resultText = stored ? stored.text : "按「測試連線」後，結果會顯示在這裡。";
+  return '<article class="endpoint" id="ep-' + esc(ep.id) + '" data-entity="endpoint" data-entity-id="' + esc(ep.id) + '">' +
+    '<h3 id="ep-heading-' + esc(ep.id) + '">' + esc(ep.name || "未命名端點") + "</h3>" +
+    '<label class="field"><span>名稱</span><input type="text" data-bind="name" maxlength="80" value="' + esc(ep.name) + '" placeholder="例如：公司內部 API"' + af + "></label>" +
+    '<label class="field"><span>網址</span><input type="url" data-bind="url" maxlength="2000" value="' + esc(ep.url) + '" placeholder="https://example.com/sync 或 local://mock" spellcheck="false" autocomplete="off"></label>' +
+    '<div class="grid-2"><label class="field"><span>標頭名稱</span><input type="text" data-bind="headerName" maxlength="64" value="' + esc(ep.headerName || "Authorization") + '" spellcheck="false" autocomplete="off"></label>' +
+    '<label class="field"><span>金鑰寫法</span><select data-bind="authStyle"><option value="raw"' + (ep.authStyle !== "bearer" ? " selected" : "") + '>原樣放入標頭</option><option value="bearer"' + (ep.authStyle === "bearer" ? " selected" : "") + ">加上 Bearer 前綴</option></select></label></div>" +
+    '<label class="field"><span>金鑰（只存在這台裝置）</span><input type="password" data-bind="apiKey" data-secret="1" maxlength="2000" value="" placeholder="' + (ep.apiKey ? "已儲存，輸入可取代" : "沒有金鑰也可以") + '" autocomplete="new-password" spellcheck="false"></label>' +
+    '<label class="field"><span>推送方法</span><select data-bind="pushMethod"><option value="PUT"' + (ep.pushMethod !== "POST" ? " selected" : "") + '>PUT</option><option value="POST"' + (ep.pushMethod === "POST" ? " selected" : "") + ">POST</option></select></label>" +
+    '<div class="row" style="margin-top:8px"><button type="button" class="btn" data-action="test-endpoint">測試連線</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="pull-endpoint">拉取</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="push-endpoint">推送</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="clear-key">清除金鑰</button>' +
+    '<button type="button" class="btn btn-danger" data-action="delete-endpoint">刪除端點</button></div>' +
+    '<pre class="' + resultClass + '" id="result-' + esc(ep.id) + '">' + esc(resultText) + "</pre></article>";
+}
+function guideHTML() {
+  return '<div class="page narrow guide"><header class="page-head"><h1>說明</h1></header>' +
+    '<p class="lead">這是個人用的專案與記事工具。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
+    '<section class="block"><h2>iPhone 打開沒有反應</h2>' +
+    '<p>這通常不是按鈕沒有功能，而是 iPhone 在「檔案」或 OneDrive 的預覽裡打開 HTML 時，系統不會執行程式，所以按下去沒有反應。</p>' +
+    '<ol><li>在「檔案」找到 <code>project-notes.html</code>。</li><li>點分享（方框加向上箭頭）。</li><li>選擇「用 Safari 開啟」。</li><li>之後可在 Safari 選分享 → 加入主畫面。</li></ol></section>' +
+
+    '<section class="block"><h2>寫法</h2>' +
+    '<p>全部程式、樣式和說明都寫在同一個 HTML 檔裡，不需要安裝，也不需要自己架伺服器。公司電腦、手機、iPad 用瀏覽器打開就能用。</p>' +
+    '<ul>' +
+    '<li><strong>資料</strong>：專案、記事和設定存在這個瀏覽器的本地儲存；附件存在瀏覽器資料庫。</li>' +
+    '<li><strong>按鈕</strong>：每個按鈕都有 <code>data-action</code> 名稱，由同一個 <code>runAction</code> 函數分配去對應功能。如果出現未接上的按鈕，畫面會提示，而不會沒有反應。</li>' +
+    '<li><strong>備份</strong>：匯出成一份 JSON。公司電腦的 Chrome 或 Edge 可以把它直接寫進 OneDrive 資料夾，改完後自動更新。</li>' +
+    '<li><strong>API</strong>：可選。金鑰只留在這台裝置，只有按測試、拉取或推送時才會送出。</li>' +
+    '<li><strong>離線</strong>：檔案已在裝置上就可以睇和改。要跨裝置看到最新內容，靠 OneDrive 同步那份 JSON，而不是靠一個公開網站保存你的紀錄。</li>' +
+    '</ul></section>' +
+
+    '<section class="block"><h2>總覽與導覽</h2><dl>' +
+    '<dt>總覽、專案、記事、設定、說明</dt><dd>切換主要頁面。手機右上角也可以開啟說明。</dd>' +
+    '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。</dd>' +
+    '<dt>進行中、七天內、已逾期、記事（總覽數字）</dt><dd>帶你到對應列表或篩選結果。</dd>' +
+    '<dt>知道了</dt><dd>收起示範資料橫額，示範內容仍在。</dd>' +
+    '<dt>清除示範資料</dt><dd>刪除尚未改過的示範專案、記事和端點。你改過的項目會留下。</dd>' +
+    '<dt>前往備份／稍後</dt><dd>提醒你把資料存到 OneDrive。稍後只是先收起提示。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>專案與記事</h2><dl>' +
+    '<dt>搜尋、狀態、期限、排序、升序／降序</dt><dd>即時篩選和排列列表。</dd>' +
+    '<dt>卡片／時間軸</dt><dd>切換專案版面。時間軸仍然用大字顯示開始日、結束日和剩餘天數。</dd>' +
+    '<dt>重設篩選</dt><dd>恢复預設的列表條件。</dd>' +
+    '<dt>顏色圓點</dt><dd>設定專案顏色，方便在列表辨認。</dd>' +
+    '<dt>為這個專案新增記事</dt><dd>開一則已連結該專案的記事，記事上會顯示該專案的日期。</dd>' +
+    '<dt>選擇檔案／下載／刪除附件</dt><dd>附件存在這台瀏覽器，之後可以下載。匯出備份時可一併帶走。</dd>' +
+    '<dt>刪除專案／刪除記事</dt><dd>刪除前會先確認。刪專案時會移除該專案附件，並解除記事連結，記事本身會保留。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>同步、備份與設定</h2><dl>' +
+    '<dt>儲存到 OneDrive 檔案</dt><dd>用 Chrome 或 Edge 選一個 OneDrive 資料夾，寫入 <code>project-notes-backup.json</code>。之後改資料會自動更新這個檔。</dd>' +
+    '<dt>更新已連結的檔案</dt><dd>立刻覆寫你上次選過的那個檔，不必再揀一次。</dd>' +
+    '<dt>從檔案載入</dt><dd>讀取 JSON。可以合併或取代。手機、iPad 主要用這個睇公司電腦的進度。</dd>' +
+    '<dt>取消連結</dt><dd>這台瀏覽器不再自動寫入該檔，OneDrive 裡的備份不會被刪除。</dd>' +
+    '<dt>匯出備份（下載）</dt><dd>下載一份 JSON，適合 iPhone 或不能直接寫入資料夾的瀏覽器，再自行存到 OneDrive。</dd>' +
+    '<dt>包含附件／包含 API 金鑰</dt><dd>決定備份要不要帶走這些內容。含金鑰的檔等於密碼，請自行保管。</dd>' +
+    '<dt>還原上一份本機資料</dt><dd>回到瀏覽器自動留下的上一份文字資料，不含附件，不能代替匯出檔。</dd>' +
+    '<dt>下載讀不出的原始資料</dt><dd>本機資料損壞時，可先把原始內容存下來。</dd>' +
+    '<dt>清除無主附件</dt><dd>刪掉已沒有所屬專案或記事的檔案，騰出空間。</dd>' +
+    '<dt>要求瀏覽器盡量保留</dt><dd>請瀏覽器不要隨便清掉本機資料。這不是保證，仍要定期備份。</dd>' +
+    '<dt>檢查這台瀏覽器</dt><dd>測試本地儲存、附件資料庫、日期計算和備份功能是否正常。</dd>' +
+    '<dt>載入示範資料</dt><dd>再放入一套用來展示日期狀態的例子，不會蓋掉你自己的專案。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>API 端點</h2><dl>' +
+    '<dt>加入端點／加入內建模擬</dt><dd>可不設。內建 <code>local://mock</code> 可離線練習拉取和推送；<code>local://fail</code> 用來查看錯誤狀態。</dd>' +
+    '<dt>測試、拉取、推送</dt><dd>測試只檢查連線；拉取把遠端專案和記事合併或取代到本機；推送送出專案和記事，不含附件和金鑰。</dd>' +
+    '<dt>清除金鑰／刪除端點</dt><dd>金鑰只存在這台裝置。刪除前會確認。</dd>' +
+    '</dl></section>' +
+
+    '<section class="block"><h2>目前主流 AI 用家可以怎樣做好這類工具</h2>' +
+    '<p>現在很多人用 ChatGPT、Copilot、Gemini、Claude 或 Grok 整個人工具。比較穩陣的做法不是叫它「做一個 Notion」，而是把限制和驗收條件先寫清楚，再請它寫程式。</p>' +
+    '<ol>' +
+    '<li><strong>先寫規格，再叫它寫程式。</strong>說明誰用、在哪裡用（例如不能裝軟件的公司電腦、手機、iPad）、能不能離線、資料放在哪、日期要怎樣顯示、要不要備份和同步。一次只交代一個主要目標。</li>' +
+    '<li><strong>優先做「一個 HTML 檔就能用」。</strong>不需安裝、不需開伺服器，工作電腦和手機都較容易打開。把完成的檔放進 OneDrive，比一開始就架網站更實際。</li>' +
+    '<li><strong>要求每個按鈕都有功能。</strong>請 AI 列出所有按鈕和對應函數，做完再對一次。並且規定：按下去一定要有結果，做不到也要顯示原因，不要沒有反應。</li>' +
+    '<li><strong>資料和程式分開。</strong>畫面可以是 HTML，真正的紀錄要用 JSON 匯出和匯入。先有備份，再加雲端同步。公司紀錄不要放到公開網站。</li>' +
+    '<li><strong>在你真正會用的瀏覽器試。</strong>公司電腦的 Chrome 或 Edge、手機的 Safari，行為並不一樣。尤其 iPhone 直接打開 HTML 時，可能不能自動寫入資料夾。</li>' +
+    '<li><strong>改的時候指定「不要重寫，只改某一項」。</strong>每次大改之前先另存舊檔。這樣才不會一改，整份紀錄或版面都換掉。</li>' +
+    '<li><strong>少傳敏感內容。</strong>有專案名稱、金鑰或附件時，只問寫法和結構，或先刪掉真實資料再貼程式。</li>' +
+    '</ol>' +
+    '<p>這個工具就是按上面的方法來寫：單一檔案、按鈕全部有對應功能、資料可離線保存，再用你自己的 OneDrive 做同步。</p>' +
+    '</section></div>';
+}
+
+function settingsHTML() {
+  var hasDemo = data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+  var corruptBtn = "";
+  try { if (localStorage.getItem(KEY + ".corrupt")) corruptBtn = '<button type="button" class="btn btn-secondary" data-action="download-corrupt">下載讀不出的原始資料</button>'; } catch (e) {}
+  var fileNote = location.protocol === "file:" ? '<p class="error-text">你正在用檔案方式開啟（file://）。專案、記事和備份可用。對外的 http／https API 多半會被瀏覽器封鎖，請用 local://mock 測試連線。</p>' : "";
+  return '<div class="page narrow"><h1>設定</h1>' + fileNote +
+    '<p class="hint"><a href="#/guide">開啟功能說明</a>：每個按鈕的用途、寫法，以及用 AI 做這類工具的做法。</p>' +
+    '<section class="block"><h2>這台裝置的儲存</h2><p id="quota">正在讀取儲存空間…</p><p id="persisted">持久保留：檢查中</p>' +
+    '<div class="row"><button type="button" class="btn btn-secondary" data-action="ask-persist">要求瀏覽器盡量保留</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="self-check">檢查這台瀏覽器</button></div>' +
+    '<ul id="selfcheck" class="check-results"></ul>' +
+    '<p class="hint">瀏覽器可以清掉網站資料，iPhone 和 iPad 特別常見。持久保留不是保證，請把匯出檔另外保存。</p></section>' +
+    '<section class="block"><h2>雲端同步（OneDrive）</h2>' +
+    '<p class="hint">用法參考 Notion：資料可以離線改，連結檔案後，公司電腦會自動把最新紀錄寫入你的 OneDrive。重新打開或回到這個分頁時，如果雲端檔比較新，會自動載入。手機同 iPad 多數不能自動寫入資料夾，改完請用「從檔案載入」或「匯出備份」。</p>' +
+    '<ol class="hint-list">' +
+    '<li>把呢個 HTML 放進 OneDrive，例如「OneDrive／專案記事」。</li>' +
+    '<li>公司電腦用 Chrome 或 Edge 打開，按「儲存到 OneDrive 檔案」，選嗰個資料夾，檔名用 <strong>project-notes-backup.json</strong>。之後改專案或記事會自動更新呢個檔。</li>' +
+    '<li>等 OneDrive 同步完，手機打開同一個 HTML，按「從檔案載入」揀嗰份 JSON，就可以睇到公司電腦嘅進度。</li>' +
+    '<li>冇網絡都可以睇同改；要兩邊看到最新內容，先等 OneDrive 把檔案同步完。</li></ol>' +
+    '<p class="hint">單開一個網站連結可以開到工具外殼，但不會自己登入你的 OneDrive。工作紀錄請不要公開上網。</p>' +
+    '<p id="onedrive-status" class="hint"></p>' +
+    '<div class="row">' +
+    '<button type="button" class="btn" data-action="save-to-folder">儲存到 OneDrive 檔案</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="save-linked" id="save-linked-btn" hidden>更新已連結的檔案</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="import-pick">從檔案載入</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="unlink-backup" id="unlink-backup-btn" hidden>取消連結</button></div></section>' +
+    '<section class="block"><h2>備份與還原</h2>' +
+    '<p class="hint">如果你個瀏覽器唔支援直接寫入資料夾（iPhone、iPad、部分 Safari），請用「匯出備份」下載 JSON，再放到 OneDrive App。換電腦或清掉瀏覽器資料後可以匯入。附件會以 Base64 放進同一個檔案，所以檔案可能很大。</p>' +
+    '<label class="check"><input type="checkbox" id="export-files" checked>包含附件</label>' +
+    '<label class="check"><input type="checkbox" id="export-secrets" checked>包含 API 金鑰（備份檔等於密碼，請自行保管，不要傳到不信任的地方）</label>' +
+    '<div class="row"><button type="button" class="btn btn-secondary" data-action="export-data">匯出備份（下載）</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="restore-bak">還原上一份本機資料</button>' +
+    corruptBtn +
+    '<button type="button" class="btn btn-secondary" data-action="clean-orphans">清除無主附件</button></div>' +
+    '<input id="import-input" type="file" accept="application/json,.json" hidden></section>' +
+    '<section class="block"><h2>API 端點</h2>' +
+    '<p class="hint">不設定也能完整使用。金鑰只存在這台裝置，只有在你按測試、拉取或推送時，才會放到請求標頭送到你填的網址。不會寫進主控台。同步只含專案和記事，不含附件，也不含金鑰。</p>' +
+    '<p class="hint">內建 <strong>local://mock</strong> 不會離開這台裝置，可離線測試。把網址改成 <strong>local://fail</strong> 則會看到失敗訊息。直接打開 HTML 檔時，瀏覽器通常會封鎖對外的 http／https 請求。</p>' +
+    '<div class="row"><button type="button" class="btn" data-action="add-endpoint">加入端點</button><button type="button" class="btn btn-secondary" data-action="add-mock">加入內建模擬</button></div>' +
+    (data.endpoints.length ? data.endpoints.map(endpointCard).join("") : '<p class="empty">還沒有端點。</p>') +
+    "</section>" +
+    '<details><summary>同步與備份的 JSON 格式</summary>' +
+    '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。日期格式是 YYYY-MM-DD。</p>' +
+    '<p class="hint">推送本體如下。檔案備份另外有 format 為 project-notes，並可含 endpoints 與 files（dataBase64）。</p>' +
+    '<pre class="docs">' + esc(JSON_HELP) + "</pre></details>" +
+    '<section class="block"><h2>示範資料</h2>' +
+    (hasDemo ? '<p class="hint">示範專案和記事還在。清除不會刪掉你改過的項目（一經修改就不再算示範）。</p><button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>'
+      : '<p class="hint">目前沒有示範資料。</p><button type="button" class="btn btn-secondary" data-action="load-demo">載入示範資料</button>') +
+    "</section>" +
+    '<section class="block"><h2>關於</h2><p class="hint">專案記事版本 ' + APP_VERSION + "。沒有帳號，沒有作者的伺服器，也不會在背景連線。API 金鑰不會在你按下按鈕之外送出。若只保留 index.html，這個頁面仍然可用；圖示和 manifest 只在加入主畫面時有用。</p></section></div>";
+}
+
+function parseRoute() {
+  var raw = (location.hash || "#/home").replace(/^#/, "");
+  var parts = raw.split("/").filter(Boolean);
+  var name = parts[0] || "home";
+  var id = parts[1] ? decodeURIComponent(parts[1]) : "";
+  if (name === "p") return { name: "project", id: id };
+  if (name === "n") return { name: "note", id: id };
+  if (name === "home" || name === "projects" || name === "notes" || name === "settings" || name === "guide") return { name: name, id: "" };
+  return { name: "home", id: "" };
+}
+function routeKey(route) { return route.name + ":" + (route.id || ""); }
+function viewHTML(route) {
+  if (route.name === "home") return homeHTML();
+  if (route.name === "projects") return projectsHTML();
+  if (route.name === "notes") return notesHTML();
+  if (route.name === "settings") return settingsHTML();
+  if (route.name === "guide") return guideHTML();
+  if (route.name === "project") {
+    var p = findProject(route.id);
+    return p ? projectEditor(p) : missingHTML("找不到這個專案", "#/projects", "返回專案列表");
+  }
+  if (route.name === "note") {
+    var n = findNote(route.id);
+    return n ? noteEditor(n) : missingHTML("找不到這則記事", "#/notes", "返回記事列表");
+  }
+  return homeHTML();
+}
+function titleFor(route) {
+  if (route.name === "projects" || route.name === "project") return "專案";
+  if (route.name === "notes" || route.name === "note") return "記事";
+  if (route.name === "settings") return "設定";
+  if (route.name === "guide") return "說明";
+  return "總覽";
+}
+function render() {
+  var route = parseRoute();
+  var key = routeKey(route);
+  var skipScroll = key === ui.lastRouteKey;
+  ui.lastRouteKey = key;
+  ui.shownDay = todayISO();
+  document.getElementById("main").innerHTML = viewHTML(route);
+  document.title = "專案記事 · " + titleFor(route);
+  paintNav(route);
+  paintCounts();
+  paintToday();
+  paintBanners();
+  paintOneDriveStatus();
+  afterRender(route);
+  if (!skipScroll) window.scrollTo(0, 0);
+}
+function paintNav(route) {
+  var key = route.name === "project" ? "projects" : route.name === "note" ? "notes" : route.name;
+  document.querySelectorAll("[data-nav]").forEach(function (a) {
+    if (a.dataset.nav === key) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+}
+function paintCounts() {
+  var n = data.projects.filter(isOverdue).length;
+  document.querySelectorAll("[data-overdue-count]").forEach(function (el) {
+    el.textContent = n ? String(n) : "";
+    el.hidden = !n;
+  });
+}
+function paintToday() {
+  var side = document.getElementById("today-label");
+  var mobile = document.getElementById("today-label-mobile");
+  if (side) side.textContent = todaySide();
+  if (mobile) mobile.textContent = todayShort();
+}
+function needsExportHint() {
+  var own = data.projects.some(function (p) { return !p.demo; }) || data.notes.some(function (n) { return !n.demo; });
+  if (!own) return false;
+  if (!data.lastExportAt) return true;
+  var t = Date.parse(data.lastExportAt);
+  if (Number.isNaN(t)) return true;
+  return Date.now() - t > 7 * 86400000;
+}
+function paintBanners() {
+  var hasDemo = data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+  document.getElementById("demo-banner").hidden = !(data.demoBanner && hasDemo);
+  var warn = document.getElementById("storage-warn");
+  var warnText = document.getElementById("storage-warn-text");
+  warn.hidden = !memoryOnly && !ui.corruptLocked;
+  if (ui.corruptLocked) warnText.textContent = "原本的資料讀不出來，而且無法另存，所以沒有覆蓋它。目前的修改只留在這個分頁。請不要清掉瀏覽器資料。";
+  else if (memoryOnly) warnText.textContent = "這個瀏覽器現在不能寫入本地儲存。你可以先使用，但重新整理後會消失。請立刻匯出備份，並改用一般視窗。";
+  var showExp = needsExportHint() && !ui.dismissExportHint;
+  document.getElementById("export-banner").hidden = !showExp;
+  if (showExp) {
+    var when = data.lastExportAt ? "上次匯出 " + formatStamp(data.lastExportAt) : "還沒有匯出過";
+    document.getElementById("export-banner-text").textContent = "你已有自己的專案。瀏覽器可能清掉本地資料，尤其是 iPhone 和 iPad。請把備份存到 OneDrive，公司電腦同手機先睇到同一批紀錄。" + when + "。";
+  }
+}
+function paintLayoutButtons() {
+  ["cards", "timeline"].forEach(function (layout) {
+    var el = document.getElementById("layout-" + layout);
+    if (!el) return;
+    el.setAttribute("aria-pressed", data.prefs.layout === layout ? "true" : "false");
+  });
+}
+function paintProjects() {
+  var listEl = document.getElementById("project-list");
+  if (!listEl) return;
+  var items = filteredProjects();
+  listEl.innerHTML = projectListInner(items);
+  var sum = document.getElementById("filter-summary");
+  if (sum) sum.textContent = filterSummary(items);
+  var dir = document.getElementById("dir-btn");
+  if (dir) dir.textContent = dirLabel();
+  paintLayoutButtons();
+}
+function paintNotes() {
+  var listEl = document.getElementById("note-list");
+  if (!listEl) return;
+  var items = filteredNotes();
+  listEl.innerHTML = noteListInner(items);
+  var sum = document.getElementById("note-summary");
+  if (sum) sum.textContent = items.length + " 則記事";
+}
+function markSaved() {
+  var el = document.getElementById("save-state");
+  if (el) el.textContent = "已存到這台裝置 · " + formatStamp(nowISO());
+}
+function refreshProjectChrome(p) {
+  var box = document.getElementById("live-dates");
+  if (box) box.innerHTML = dateBadgesHTML(p);
+  var warn = document.getElementById("date-warn");
+  if (warn) {
+    var msg = p.startDate && p.endDate && p.startDate > p.endDate ? "結束日早於開始日。" : "";
+    warn.textContent = msg;
+    warn.hidden = !msg;
+  }
+  var h = document.getElementById("editor-name-heading");
+  if (h) h.textContent = displayName(p);
+  var upd = document.getElementById("updated-stamp");
+  if (upd) upd.textContent = formatStamp(p.updatedAt);
+  paintCounts();
+  markSaved();
+}
+function refreshNoteChrome(n) {
+  var h = document.getElementById("editor-name-heading");
+  if (h) h.textContent = displayNoteTitle(n);
+  var box = document.getElementById("note-project-dates");
+  if (box) box.innerHTML = noteProjectDatesHTML(n);
+  var upd = document.getElementById("updated-stamp");
+  if (upd) upd.textContent = formatStamp(n.updatedAt);
+  markSaved();
+}
+
+function touchEntity(entity) {
+  entity.updatedAt = nowISO();
+  if (entity.demo) entity.demo = false;
+}
+function updateProjectField(id, field, el) {
+  var allowed = { name: 1, description: 1, status: 1, startDate: 1, endDate: 1, tags: 1 };
+  if (!allowed[field]) return;
+  var p = findProject(id);
+  if (!p) return;
+  if (field === "tags") p.tags = parseTags(el.value);
+  else if (field === "status") {
+    if (!STATUSES.some(function (s) { return s.id === el.value; })) return;
+    p.status = el.value;
+  } else if (field === "startDate" || field === "endDate") {
+    if (el.value && !isDate(el.value)) return;
+    p[field] = el.value;
+  } else if (field === "name") p.name = String(el.value).slice(0, 200);
+  else p.description = String(el.value).slice(0, 20000);
+  touchEntity(p);
+  persistNow();
+  refreshProjectChrome(p);
+  paintBanners();
+}
+function updateNoteField(id, field, el) {
+  var allowed = { title: 1, body: 1, projectId: 1 };
+  if (!allowed[field]) return;
+  var n = findNote(id);
+  if (!n) return;
+  if (field === "title") n.title = String(el.value).slice(0, 200);
+  else if (field === "body") n.body = String(el.value).slice(0, 100000);
+  else n.projectId = String(el.value || "");
+  touchEntity(n);
+  persistNow();
+  refreshNoteChrome(n);
+  paintBanners();
+}
+function updateEndpointField(id, field, el) {
+  var allowed = { name: 1, url: 1, headerName: 1, apiKey: 1, authStyle: 1, pushMethod: 1 };
+  if (!allowed[field]) return;
+  var ep = findEndpoint(id);
+  if (!ep) return;
+  if (field === "apiKey") {
+    if (el.dataset.dirty !== "1") return;
+    ep.apiKey = String(el.value).slice(0, 2000);
+  } else if (field === "name") ep.name = String(el.value).slice(0, 80);
+  else if (field === "url") ep.url = String(el.value).trim().slice(0, 2000);
+  else if (field === "headerName") ep.headerName = String(el.value).trim().slice(0, 64);
+  else if (field === "authStyle") ep.authStyle = el.value === "bearer" ? "bearer" : "raw";
+  else ep.pushMethod = el.value === "POST" ? "POST" : "PUT";
+  touchEntity(ep);
+  persistNow();
+  var heading = document.getElementById("ep-heading-" + id);
+  if (heading) heading.textContent = ep.name || "未命名端點";
+  paintBanners();
+}
+function applyBindFromElement(el) {
+  var page = el.closest("[data-entity]");
+  if (!page) return;
+  var entity = page.dataset.entity;
+  var id = page.dataset.entityId;
+  var field = el.dataset.bind;
+  if (entity === "project") updateProjectField(id, field, el);
+  else if (entity === "note") updateNoteField(id, field, el);
+  else if (entity === "endpoint") updateEndpointField(id, field, el);
+}
+
+function toast(message) {
+  var el = document.getElementById("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove("show"); }, 4600);
+}
+function setInert(on) {
+  var app = document.getElementById("app");
+  if (on) app.setAttribute("inert", "");
+  else app.removeAttribute("inert");
+  document.body.classList.toggle("dialog-open", !!on);
+}
+function closeDialog(id) {
+  var root = document.getElementById("dialog");
+  root.hidden = true;
+  setInert(false);
+  var resolve = dialogResolve;
+  dialogResolve = null;
+  if (lastFocus && lastFocus.focus) {
+    try { lastFocus.focus(); } catch (e) {}
+  }
+  if (resolve) resolve(id || "cancel");
+}
+function chooseDialog(opts) {
+  if (dialogResolve) return Promise.resolve("cancel");
+  var root = document.getElementById("dialog");
+  document.getElementById("dialog-title").textContent = opts.title;
+  document.getElementById("dialog-body").textContent = opts.body;
+  var actions = document.getElementById("dialog-actions");
+  actions.innerHTML = "";
+  (opts.choices || []).forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn" + (c.danger ? " btn-danger" : c.id === "cancel" ? " btn-secondary" : "");
+    b.textContent = c.label;
+    b.addEventListener("click", function () { closeDialog(c.id); });
+    actions.appendChild(b);
+  });
+  lastFocus = document.activeElement;
+  root.hidden = false;
+  setInert(true);
+  var first = actions.querySelector("button");
+  if (first) first.focus();
+  return new Promise(function (resolve) { dialogResolve = resolve; });
+}
+
+function go(hash) {
+  if (location.hash !== hash) location.hash = hash;
+  else render();
+}
+function createProject() {
+  var p = {
+    id: uid("p"), name: "", description: "", status: "active",
+    startDate: todayISO(), endDate: "", tags: [],
+    color: COLORS[data.projects.length % COLORS.length],
+    createdAt: nowISO(), updatedAt: nowISO(), demo: false
+  };
+  data.projects.unshift(p);
+  persistNow();
+  return p;
+}
+function createNote(projectId) {
+  var n = {
+    id: uid("n"), title: "", body: "", projectId: projectId || "",
+    createdAt: nowISO(), updatedAt: nowISO(), demo: false
+  };
+  data.notes.unshift(n);
+  persistNow();
+  return n;
+}
+function createEndpoint(prefill) {
+  var ep = {
+    id: uid("e"),
+    name: prefill && prefill.name || "",
+    url: prefill && prefill.url || "",
+    headerName: "Authorization",
+    apiKey: "",
+    authStyle: "raw",
+    pushMethod: "PUT",
+    createdAt: nowISO(),
+    updatedAt: nowISO(),
+    demo: false
+  };
+  data.endpoints.push(ep);
+  persistNow();
+  ui.autofocus = true;
+  ui.autofocusId = ep.id;
+  render();
+}
+
+function fileRow(f) {
+  return '<div class="file-row"><div><strong>' + esc(f.name || "未命名檔案") + '</strong><div class="meta">' +
+    esc(formatSize(f.size || 0)) + " · " + esc(formatStamp(f.createdAt)) + "</div></div><div class=\"row\">" +
+    '<button type="button" class="btn btn-secondary" data-action="download-file" data-id="' + esc(f.id) + '">下載</button>' +
+    '<button type="button" class="btn btn-danger" data-action="delete-file" data-id="' + esc(f.id) + '">移除</button></div></div>';
+}
+function loadFileList(ownerType, ownerId) {
+  var token = ++fileLoadToken;
+  var host = document.getElementById("files");
+  if (!host) return Promise.resolve();
+  host.textContent = "正在讀取附件…";
+  return listFiles(ownerType, ownerId).then(function (files) {
+    if (token !== fileLoadToken) return;
+    var host2 = document.getElementById("files");
+    if (!host2) return;
+    files = files || [];
+    if (!files.length) { host2.textContent = "還沒有附件。"; return; }
+    files.sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
+    host2.innerHTML = files.map(fileRow).join("");
+  }).catch(function (e) {
+    var host2 = document.getElementById("files");
+    if (!host2 || token !== fileLoadToken) return;
+    host2.textContent = "無法讀取附件：" + (e && e.message ? e.message : "未知錯誤") + "。文字內容仍可保存。";
+  });
+}
+function addFiles(ownerType, ownerId, fileList) {
+  var files = Array.prototype.slice.call(fileList || []);
+  if (!files.length) return Promise.resolve();
+  var saved = 0;
+  var skipped = 0;
+  var chain = Promise.resolve();
+  files.forEach(function (file) {
+    chain = chain.then(function () {
+      if (file.size > 40 * 1024 * 1024) { skipped++; return; }
+      return putFile({
+        id: uid("f"), ownerType: ownerType, ownerId: ownerId,
+        name: file.name || "未命名檔案", mime: file.type || "application/octet-stream",
+        size: file.size, createdAt: nowISO(), blob: file
+      }).then(function () {
+        saved++;
+        if (file.size > 8 * 1024 * 1024) toast("已存入較大的檔案。瀏覽器空間有限，請另外保管原檔。");
+      });
+    });
+  });
+  return chain.then(function () {
+    if (skipped) toast(skipped + " 個檔案超過 40MB，沒有存入。");
+    if (saved) toast("已存入 " + saved + " 個附件。");
+    return loadFileList(ownerType, ownerId);
+  });
+}
+function downloadBlob(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 2500);
+}
+function blobToBase64(blob) {
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var s = String(reader.result || "");
+      var i = s.indexOf(",");
+      resolve(i >= 0 ? s.slice(i + 1) : s);
+    };
+    reader.onerror = function () { reject(reader.error || new Error("讀不到附件")); };
+    reader.readAsDataURL(blob);
+  });
+}
+function b64ToBlob(b64, mime) {
+  var clean = String(b64 || "").replace(/\s/g, "");
+  var bin = atob(clean);
+  var arr = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime || "application/octet-stream" });
+}
+
+function publicProject(p) {
+  return {
+    id: p.id, name: p.name, description: p.description, status: p.status,
+    startDate: p.startDate, endDate: p.endDate, tags: p.tags || [], color: safeColor(p.color),
+    createdAt: p.createdAt, updatedAt: p.updatedAt
+  };
+}
+function publicNote(n) {
+  return { id: n.id, title: n.title, body: n.body, projectId: n.projectId || "", createdAt: n.createdAt, updatedAt: n.updatedAt };
+}
+function syncPayload() {
+  return {
+    version: 1,
+    source: "project-notes",
+    exportedAt: nowISO(),
+    projects: data.projects.map(publicProject),
+    notes: data.notes.map(publicNote)
+  };
+}
+function sanitizeProject(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  return {
+    id: ensureId(raw.id, "p"),
+    name: String(raw.name || "").slice(0, 200),
+    description: String(raw.description || "").slice(0, 20000),
+    status: STATUSES.some(function (s) { return s.id === raw.status; }) ? raw.status : "planning",
+    startDate: isDate(raw.startDate) ? raw.startDate : "",
+    endDate: isDate(raw.endDate) ? raw.endDate : "",
+    tags: Array.isArray(raw.tags) ? raw.tags.map(function (t) { return String(t).trim(); }).filter(Boolean).slice(0, 12).map(function (t) { return t.slice(0, 24); }) : [],
+    color: safeColor(raw.color),
+    createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+    updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
+    demo: false
+  };
+}
+function sanitizeNote(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  return {
+    id: ensureId(raw.id, "n"),
+    title: String(raw.title || "").slice(0, 200),
+    body: String(raw.body || "").slice(0, 100000),
+    projectId: raw.projectId ? String(raw.projectId).slice(0, 80) : "",
+    createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+    updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
+    demo: false
+  };
+}
+function sanitizeEndpoint(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  var header = String(raw.headerName || "");
+  return {
+    id: ensureId(raw.id, "e"),
+    name: String(raw.name || "未命名端點").slice(0, 80),
+    url: String(raw.url || "").slice(0, 2000),
+    headerName: /^[A-Za-z0-9-]{1,64}$/.test(header) ? header : "Authorization",
+    apiKey: String(raw.apiKey || ""),
+    authStyle: raw.authStyle === "bearer" ? "bearer" : "raw",
+    pushMethod: raw.pushMethod === "POST" ? "POST" : "PUT",
+    createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+    updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
+    demo: false
+  };
+}
+function mergeById(local, incoming) {
+  var map = new Map();
+  local.forEach(function (item) { map.set(item.id, item); });
+  incoming.forEach(function (item) { map.set(item.id, item); });
+  return Array.from(map.values());
+}
+function mergeEndpoints(local, incoming) {
+  var map = new Map();
+  local.forEach(function (item) { map.set(item.id, item); });
+  incoming.forEach(function (item) {
+    var prev = map.get(item.id);
+    if (prev && !item.apiKey) item.apiKey = prev.apiKey;
+    map.set(item.id, item);
+  });
+  return Array.from(map.values());
+}
+function applyCollections(body, mode) {
+  var stats = { projects: 0, notes: 0, endpoints: 0 };
+  if (Array.isArray(body.projects)) {
+    var projects = body.projects.slice(0, 2000).map(sanitizeProject).filter(Boolean);
+    stats.projects = projects.length;
+    data.projects = mode === "replace" ? projects : mergeById(data.projects, projects);
+  }
+  if (Array.isArray(body.notes)) {
+    var notes = body.notes.slice(0, 2000).map(sanitizeNote).filter(Boolean);
+    stats.notes = notes.length;
+    data.notes = mode === "replace" ? notes : mergeById(data.notes, notes);
+  }
+  if (Array.isArray(body.endpoints)) {
+    var endpoints = body.endpoints.slice(0, 100).map(sanitizeEndpoint).filter(Boolean);
+    stats.endpoints = endpoints.length;
+    if (mode === "replace") data.endpoints = endpoints;
+    else data.endpoints = mergeEndpoints(data.endpoints, endpoints);
+  }
+  data = normalizeData(data);
+  persistNow();
+  return stats;
+}
+function importFiles(files, mode) {
+  if (!Array.isArray(files)) return Promise.resolve({ imported: 0, skipped: 0 });
+  var prep = mode === "replace" ? clearAllFiles() : Promise.resolve();
+  return prep.then(function () {
+    var imported = 0;
+    var skipped = 0;
+    var list = files.slice(0, 500);
+    var chain = Promise.resolve();
+    list.forEach(function (raw) {
+      chain = chain.then(function () {
+        try {
+          if (!raw || (raw.ownerType !== "project" && raw.ownerType !== "note")) { skipped++; return; }
+          var b64 = String(raw.dataBase64 || "");
+          if (!b64 || b64.length > 40000000) { skipped++; return; }
+          var blob = b64ToBlob(b64, raw.mime || "application/octet-stream");
+          return putFile({
+            id: ensureId(raw.id, "f"),
+            ownerType: raw.ownerType,
+            ownerId: String(raw.ownerId || ""),
+            name: String(raw.name || "未命名檔案").slice(0, 200),
+            mime: String(raw.mime || "application/octet-stream").slice(0, 120),
+            size: blob.size,
+            createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+            blob: blob
+          }).then(function () { imported++; });
+        } catch (e) { skipped++; }
+      }).catch(function () { skipped++; });
+    });
+    return chain.then(function () { return { imported: imported, skipped: skipped }; });
+  });
+}
+
+function redactSecrets(text, ep) {
+  var out = String(text || "");
+  if (ep && ep.apiKey && String(ep.apiKey).length >= 4) out = out.split(ep.apiKey).join("＊＊＊");
+  return out;
+}
+function setResult(id, text, ok) {
+  ui.apiResults[id] = { text: String(text || "").slice(0, 4000), ok: ok };
+  var box = document.getElementById("result-" + id);
+  if (!box) return;
+  box.textContent = ui.apiResults[id].text;
+  box.classList.remove("result-ok", "result-bad");
+  if (ok === true) box.classList.add("result-ok");
+  if (ok === false) box.classList.add("result-bad");
+}
+function headerPreview(ep) {
+  if (!ep.apiKey) return "這次沒有附上金鑰。";
+  var name = (ep.headerName || "Authorization").trim() || "Authorization";
+  return "已準備標頭「" + name + "」。值只會送到你填的網址，不會顯示在畫面上。";
+}
+function parseEndpointUrl(url) {
+  if (!url) return { error: "請先填寫網址。" };
+  if (url === "local://mock" || url === "local://fail") return { kind: url };
+  var u;
+  try { u = new URL(url); } catch (e) { return { error: "網址格式不正確。需要完整的 http 或 https 網址，或 local://mock。" }; }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return { error: "只支援 http、https，或內建的 local://mock。" };
+  if (u.username || u.password) return { error: "請不要把帳號密碼寫在網址裡。金鑰請填在金鑰欄。" };
+  return { kind: "http", url: u.toString() };
+}
+function readMock() {
+  try {
+    var raw = localStorage.getItem(MOCK_KEY);
+    if (!raw) return null;
+    var parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch (e) { return null; }
+}
+function defaultMock() {
+  return {
+    version: 1,
+    source: "project-notes",
+    exportedAt: nowISO(),
+    projects: [{
+      id: "mock_project", name: "模擬端點回傳的專案", description: "這筆來自內建模擬端點，用來確認拉取。",
+      status: "active", startDate: isoOffset(-2), endDate: isoOffset(12), tags: ["模擬"], color: "#17364a",
+      createdAt: nowISO(), updatedAt: nowISO()
+    }],
+    notes: [{
+      id: "mock_note", title: "模擬端點回傳的記事", body: "拉取後應能在記事列表看到這則。",
+      projectId: "mock_project", createdAt: nowISO(), updatedAt: nowISO()
+    }]
+  };
+}
+function mockRequest(op, payload) {
+  if (op === "test") {
+    return { ok: true, status: 200, detail: "成功。HTTP 200（內建模擬，請求沒有離開這台裝置）\n" + JSON.stringify({ ok: true, service: "local-mock" }, null, 2) };
+  }
+  if (op === "pull") {
+    var body = readMock() || defaultMock();
+    return { ok: true, status: 200, detail: "已從內建模擬取得 JSON。", json: body };
+  }
+  if (op === "push") {
+    var stored = { version: 1, source: "project-notes", exportedAt: payload.exportedAt, projects: payload.projects, notes: payload.notes };
+    try { localStorage.setItem(MOCK_KEY, JSON.stringify(stored)); }
+    catch (e) { return { ok: false, status: 0, detail: "內建模擬寫不進本地儲存。" }; }
+    return { ok: true, status: 200, detail: "已推送到內建模擬。資料仍在這台瀏覽器，可用「拉取」取回。\n" + JSON.stringify({ ok: true, projects: stored.projects.length, notes: stored.notes.length }, null, 2), json: stored };
+  }
+  return { ok: false, status: 0, detail: "不支援的操作。" };
+}
+function httpRequest(ep, url, op, payload) {
+  var headers = {};
+  if (ep.apiKey) {
+    var name = (ep.headerName || "Authorization").trim();
+    if (!/^[A-Za-z0-9-]{1,64}$/.test(name)) {
+      return Promise.resolve({ ok: false, status: 0, detail: "標頭名稱只可使用英數與連字號，例如 Authorization。" });
+    }
+    headers[name] = ep.authStyle === "bearer" ? "Bearer " + ep.apiKey : ep.apiKey;
+  }
+  var init = { method: op === "push" ? (ep.pushMethod === "POST" ? "POST" : "PUT") : "GET", headers: headers, credentials: "omit", cache: "no-store", redirect: "follow" };
+  if (op === "push") {
+    headers["Content-Type"] = "application/json";
+    init.body = JSON.stringify(payload);
+  }
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 15000);
+  init.signal = ctrl.signal;
+  return fetch(url, init).then(function (res) {
+    return res.text().then(function (text) {
+      if (text.length > 8000000) return { ok: false, status: res.status, detail: "回應超過 8MB，已停止處理。" };
+      var json = null;
+      if (text) { try { json = JSON.parse(text); } catch (e) { json = null; } }
+      var snippet = text.slice(0, 1500);
+      var head = (res.ok ? "成功。HTTP " : "失敗。HTTP ") + res.status + (res.statusText ? " " + res.statusText : "");
+      return { ok: res.ok, status: res.status, detail: head + "\n" + (snippet || "（沒有回應內容）"), json: json };
+    });
+  }).catch(function (err) {
+    var aborted = err && err.name === "AbortError";
+    var message = aborted
+      ? "超過 15 秒沒有回應。"
+      : "連線失敗。若你是直接打開 HTML 檔（網址以 file:// 開頭），瀏覽器通常會封鎖對外請求。請改用 local://mock 測試，或把檔案放到 https 網站再呼叫自己的 API。";
+    var raw = err && err.message ? err.message : String(err);
+    return { ok: false, status: 0, detail: message + "\n原始錯誤：" + raw };
+  }).then(function (result) { clearTimeout(timer); return result; }, function (err) { clearTimeout(timer); throw err; });
+}
+function requestEndpoint(ep, op, payload) {
+  var parsed = parseEndpointUrl(String(ep.url || "").trim());
+  if (parsed.error) return Promise.resolve({ ok: false, status: 0, detail: parsed.error });
+  if (parsed.kind === "local://fail") {
+    return Promise.resolve({ ok: false, status: 0, detail: "內建失敗模擬：連線被拒絕。資料沒有送出這台裝置。把網址改回 local://mock 可再試成功的流程。" });
+  }
+  if (parsed.kind === "local://mock") return Promise.resolve(mockRequest(op, payload));
+  return httpRequest(ep, parsed.url, op, payload);
+}
+function unwrapSync(json) {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return null;
+  var obj = json;
+  if (!Array.isArray(obj.projects) && !Array.isArray(obj.notes) && obj.data && typeof obj.data === "object") obj = obj.data;
+  if (!Array.isArray(obj.projects) && !Array.isArray(obj.notes)) return null;
+  return obj;
+}
+
+function currentEntity() {
+  var page = document.querySelector("[data-entity='project'], [data-entity='note']");
+  if (!page) return null;
+  return { type: page.dataset.entity, id: page.dataset.entityId };
+}
+function endpointFromButton(btn) {
+  var card = btn.closest("[data-entity='endpoint']");
+  if (!card) return null;
+  return findEndpoint(card.dataset.entityId);
+}
+
+function assertDateLogic() {
+  var today = todayISO();
+  var overdue = { status: "active", startDate: isoOffset(-10), endDate: isoOffset(-3) };
+  var dueToday = { status: "active", startDate: isoOffset(-1), endDate: today };
+  var done = { status: "done", startDate: isoOffset(-10), endDate: isoOffset(-3) };
+  var future = { status: "planning", startDate: isoOffset(4), endDate: isoOffset(10) };
+  var soon = { status: "active", startDate: isoOffset(-1), endDate: isoOffset(7) };
+  var later = { status: "active", startDate: isoOffset(-1), endDate: isoOffset(8) };
+  if (!isOverdue(overdue)) throw new Error("逾期沒有標出來");
+  if (endInfo(overdue).kind !== "overdue") throw new Error("逾期樣式不對");
+  if (endInfo(dueToday).sub !== "今天到期") throw new Error("今天到期不對");
+  if (isOverdue(done) || endInfo(done).sub !== "已完成") throw new Error("已完成不應標逾期");
+  if (!isNotStarted(future)) throw new Error("尚未開始不對");
+  if (!isDueSoon(soon) || isDueSoon(later)) throw new Error("七天界限不對");
+  if (isDate("2026-02-31")) throw new Error("無效日期不應通過");
+}
+
+function runSelfCheck() {
+  var results = [];
+  function add(ok, name, detail) { results.push({ ok: ok, name: name, detail: detail }); }
+  try { assertDateLogic(); add(true, "日期計算", "逾期、今天到期、七天、已完成都正確"); }
+  catch (e) { add(false, "日期計算", e.message); }
+  try {
+    var k = KEY + ".selfcheck";
+    localStorage.setItem(k, "1");
+    var okStore = localStorage.getItem(k) === "1";
+    localStorage.removeItem(k);
+    add(okStore, "本地儲存", okStore ? "可以讀寫" : "寫入後讀不回來");
+  } catch (e) { add(false, "本地儲存", e.message || "不可用"); }
+  return putFile({
+    id: "selfcheck", ownerType: "note", ownerId: "selfcheck", name: "selfcheck.txt",
+    mime: "text/plain", size: 2, createdAt: nowISO(), blob: new Blob(["ok"], { type: "text/plain" })
+  }).then(function () { return getFile("selfcheck"); }).then(function (got) {
+    return (got && got.blob && got.blob.text ? got.blob.text() : Promise.resolve("")).then(function (text) {
+      return deleteFile("selfcheck").catch(function () {}).then(function () { return text === "ok"; });
+    });
+  }).then(function (ok) {
+    add(!!ok, "附件資料庫", ok ? "可以存取小檔" : "讀回內容不對");
+  }).catch(function (e) {
+    add(false, "附件資料庫", e && e.message ? e.message : "不可用");
+  }).then(function () {
+    try {
+      var payload = syncPayload();
+      var again = JSON.parse(JSON.stringify(payload));
+      if (!Array.isArray(again.projects) || !Array.isArray(again.notes)) throw new Error("格式不對");
+      if (Object.prototype.hasOwnProperty.call(again, "endpoints") || Object.prototype.hasOwnProperty.call(again, "files")) throw new Error("同步不應含端點或附件");
+      again.projects.concat(again.notes).forEach(function (item) {
+        if (Object.prototype.hasOwnProperty.call(item, "apiKey")) throw new Error("同步不應含金鑰");
+      });
+      add(true, "同步 JSON", again.projects.length + " 個專案、" + again.notes.length + " 則記事，不含金鑰");
+    } catch (e) { add(false, "同步 JSON", e.message); }
+    try {
+      var res = mockRequest("test");
+      if (!res.ok) throw new Error(res.detail);
+      add(true, "內建模擬端點", "測試回應成功，沒有離開這台裝置");
+    } catch (e) { add(false, "內建模擬端點", e.message); }
+    var ul = document.getElementById("selfcheck");
+    if (!ul) return;
+    ul.innerHTML = "";
+    results.forEach(function (it) {
+      var li = document.createElement("li");
+      li.className = it.ok ? "pass" : "fail";
+      li.textContent = (it.ok ? "通過：" : "失敗：") + it.name + (it.detail ? " — " + it.detail : "");
+      ul.appendChild(li);
+    });
+  });
+}
+
+function paintQuota() {
+  var qEl = document.getElementById("quota");
+  var pEl = document.getElementById("persisted");
+  if (!qEl) return;
+  if (!navigator.storage || !navigator.storage.estimate) qEl.textContent = "這個環境沒有回報儲存配額。";
+  else {
+    navigator.storage.estimate().then(function (est) {
+      if (!document.body.contains(qEl)) return;
+      qEl.textContent = est && est.quota ? "大約已用 " + formatSize(est.usage || 0) + "，配額約 " + formatSize(est.quota) + "。" : "無法取得配額數字。";
+    }).catch(function () { if (document.body.contains(qEl)) qEl.textContent = "無法讀取配額。"; });
+  }
+  if (!pEl) return;
+  if (!navigator.storage || !navigator.storage.persisted) {
+    pEl.textContent = "持久保留：這個瀏覽器沒有提供這項狀態。請靠匯出備份。";
+    return;
+  }
+  navigator.storage.persisted().then(function (yes) {
+    if (!document.body.contains(pEl)) return;
+    pEl.textContent = yes ? "持久保留：瀏覽器已標記盡量保留。這仍不是保證。" : "持久保留：尚未要求。可按下面的按鈕，但系統不一定同意。";
+  }).catch(function () { if (document.body.contains(pEl)) pEl.textContent = "持久保留：無法讀取。"; });
+}
+function afterRender(route) {
+  paintLayoutButtons();
+  var af = document.querySelector("[data-autofocus]");
+  if (af && ui.autofocus) {
+    af.focus();
+    ui.autofocus = false;
+  }
+  if (route.name === "project") loadFileList("project", route.id);
+  if (route.name === "note") loadFileList("note", route.id);
+  if (route.name === "settings") paintQuota();
+  var input = document.getElementById("file-input");
+  if (input) {
+    input.addEventListener("change", function () {
+      var page = input.closest("[data-entity]");
+      if (!page || !input.files) return;
+      addFiles(page.dataset.entity, page.dataset.entityId, input.files).catch(function (err) {
+        toast("附件失敗：" + (err && err.message ? err.message : "未知錯誤"));
+      });
+      input.value = "";
+    });
+  }
+  var drop = document.getElementById("drop");
+  if (drop) {
+    ["dragenter", "dragover"].forEach(function (type) {
+      drop.addEventListener(type, function (e) { e.preventDefault(); drop.classList.add("drag"); });
+    });
+    drop.addEventListener("dragleave", function () { drop.classList.remove("drag"); });
+    drop.addEventListener("drop", function (e) {
+      e.preventDefault();
+      drop.classList.remove("drag");
+      var page = drop.closest("[data-entity]");
+      if (!page || !e.dataTransfer) return;
+      addFiles(page.dataset.entity, page.dataset.entityId, e.dataTransfer.files).catch(function (err) {
+        toast("附件失敗：" + (err && err.message ? err.message : "未知錯誤"));
+      });
+    });
+  }
+  var importInput = document.getElementById("import-input");
+  if (importInput) {
+    importInput.addEventListener("change", function () {
+      var file = importInput.files && importInput.files[0];
+      importInput.value = "";
+      if (file) importFromFile(file);
+    });
+  }
+}
+
+function openProjectsFilter(due, status) {
+  data.prefs.due = due || "all";
+  data.prefs.status = status || "all";
+  persistNow();
+  go("#/projects");
+}
+function hasDemoData() {
+  return data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+}
+function clearDemo() {
+  var removedProjects = data.projects.filter(function (p) { return p.demo; }).map(function (p) { return p.id; });
+  var removedNotes = data.notes.filter(function (n) { return n.demo; }).map(function (n) { return n.id; });
+  data.projects = data.projects.filter(function (p) { return !p.demo; });
+  data.notes = data.notes.filter(function (n) { return !n.demo; });
+  data.endpoints = data.endpoints.filter(function (e) { return !e.demo; });
+  data.demoBanner = false;
+  persistNow();
+  var chain = Promise.resolve();
+  removedProjects.forEach(function (id) { chain = chain.then(function () { return deleteFilesFor("project", id); }); });
+  removedNotes.forEach(function (id) { chain = chain.then(function () { return deleteFilesFor("note", id); }); });
+  return chain.catch(function () { toast("示範資料已清除，但部分附件未能移除。"); }).then(function () {
+    toast("已清除示範資料。");
+    var route = parseRoute();
+    if (route.name === "project" && removedProjects.indexOf(route.id) >= 0) go("#/projects");
+    else if (route.name === "note" && removedNotes.indexOf(route.id) >= 0) go("#/notes");
+    else render();
+  });
+}
+function loadDemo() {
+  if (hasDemoData()) {
+    data.demoBanner = true;
+    persistNow();
+    paintBanners();
+    toast("示範資料還在。");
+    return;
+  }
+  var demo = buildDemo();
+  data.projects = data.projects.concat(demo.projects);
+  data.notes = data.notes.concat(demo.notes);
+  if (!data.endpoints.some(function (e) { return String(e.url).trim() === "local://mock"; })) data.endpoints.push(demo.endpoints[0]);
+  data.demoBanner = true;
+  persistNow();
+  toast("已載入示範資料。");
+  render();
+}
+
+function exportOptions() {
+  return {
+    includeFiles: document.getElementById("export-files") ? document.getElementById("export-files").checked : true,
+    includeSecrets: document.getElementById("export-secrets") ? document.getElementById("export-secrets").checked : false
+  };
+}
+function defaultBackupName() {
+  var stamp = new Date();
+  return "project-notes-backup.json";
+}
+function datedBackupName() {
+  var stamp = new Date();
+  return "project-notes-" + stamp.getFullYear() + String(stamp.getMonth() + 1).padStart(2, "0") + String(stamp.getDate()).padStart(2, "0") + "-" + String(stamp.getHours()).padStart(2, "0") + String(stamp.getMinutes()).padStart(2, "0") + ".json";
+}
+function canPickFile(save) {
+  return save ? typeof window.showSaveFilePicker === "function" : typeof window.showOpenFilePicker === "function";
+}
+function backupPickerTypes() {
+  return [{ description: "專案記事備份", accept: { "application/json": [".json"] } }];
+}
+function ensureHandlePermission(handle, mode) {
+  if (!handle || !handle.queryPermission) return Promise.resolve(false);
+  var opts = { mode: mode || "readwrite" };
+  return handle.queryPermission(opts).then(function (state) {
+    if (state === "granted") return true;
+    if (!handle.requestPermission) return false;
+    return handle.requestPermission(opts).then(function (next) { return next === "granted"; });
+  }).catch(function () { return false; });
+}
+function loadBackupLink() {
+  return getMeta("backupFile").catch(function () { return null; }).then(function (rec) {
+    return rec && rec.handle ? rec : null;
+  });
+}
+function rememberBackupHandle(handle, name) {
+  data.lastBackupName = name || (handle && handle.name) || "project-notes-backup.json";
+  persistNow();
+  return putMeta({ id: "backupFile", handle: handle, name: data.lastBackupName, updatedAt: nowISO() });
+}
+function forgetBackupHandle() {
+  data.lastBackupName = "";
+  persistNow();
+  return deleteMeta("backupFile").catch(function () {});
+}
+function paintOneDriveStatus() {
+  var el = document.getElementById("onedrive-status");
+  if (!el) return;
+  var picker = canPickFile(true);
+  loadBackupLink().then(function (rec) {
+    if (!el.isConnected) return;
+    var last = data.lastExportAt ? "上次備份：" + formatStamp(data.lastExportAt) + "。" : "還沒有備份過。";
+    var linked = rec && rec.name ? "已連結檔案：" + rec.name + "。" : "尚未連結 OneDrive 檔案。";
+    if (!picker) {
+      el.textContent = "這個瀏覽器不能直接寫入資料夾（iPhone／iPad 常見）。請用下面的「匯出備份」下載 JSON，放到 OneDrive，另一邊用「從檔案載入」。" + last;
+      var saveBtn = document.getElementById("save-linked-btn");
+      var unlinkBtn = document.getElementById("unlink-backup-btn");
+      if (saveBtn) saveBtn.hidden = true;
+      if (unlinkBtn) unlinkBtn.hidden = true;
+      return;
+    }
+    el.textContent = linked + last + "請選 OneDrive 裡的資料夾。這個瀏覽器只記住你選過的檔，不會自己登入 OneDrive。";
+    var saveBtn = document.getElementById("save-linked-btn");
+    var unlinkBtn = document.getElementById("unlink-backup-btn");
+    if (saveBtn) saveBtn.hidden = !rec;
+    if (unlinkBtn) unlinkBtn.hidden = !rec;
+  });
+}
+function contentHash() {
+  var s = JSON.stringify({
+    projects: data.projects,
+    notes: data.notes,
+    endpoints: data.endpoints.map(function (ep) {
+      return { id: ep.id, name: ep.name, url: ep.url, headerName: ep.headerName, authStyle: ep.authStyle, pushMethod: ep.pushMethod, apiKey: ep.apiKey || "", createdAt: ep.createdAt, updatedAt: ep.updatedAt };
+    })
+  });
+  var h = 2166136261;
+  for (var i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16);
+}
+function isOwnData() {
+  return data.projects.some(function (p) { return !p.demo; }) || data.notes.some(function (n) { return !n.demo; });
+}
+function isLocalDirty() {
+  return !!data.lastSyncedHash && data.lastSyncedHash !== contentHash();
+}
+function paintSyncStatus() {
+  var text = ui.syncText || "";
+  var el = document.getElementById("sync-status");
+  var mob = document.getElementById("sync-status-mobile");
+  if (el) {
+    el.textContent = text;
+    el.setAttribute("data-state", ui.syncState || "local");
+  }
+  if (mob) {
+    mob.textContent = text;
+    mob.setAttribute("data-state", ui.syncState || "local");
+  }
+}
+function setSyncState(state, text) {
+  ui.syncState = state;
+  if (text) ui.syncText = text;
+  paintSyncStatus();
+}
+function markLocalSynced() {
+  ui.skipCloudSave = true;
+  data.lastSyncedHash = contentHash();
+  data.lastExportAt = nowISO();
+  persistNow();
+  ui.skipCloudSave = false;
+}
+function applyBackupQuietly(parsed, choice) {
+  ui.skipCloudSave = true;
+  var stats = applyCollections(parsed, choice);
+  return importFiles(parsed.files, choice).then(function (fileStats) {
+    data.lastSyncedHash = contentHash();
+    if (isStamp(parsed.exportedAt)) data.lastExportAt = parsed.exportedAt;
+    persistNow();
+    ui.skipCloudSave = false;
+    return { stats: stats, fileStats: fileStats };
+  }).catch(function (err) {
+    ui.skipCloudSave = false;
+    throw err;
+  });
+}
+function scheduleCloudSave() {
+  if (!ui.ready || ui.skipCloudSave || !canPickFile(true)) return;
+  if (ui.syncTimer) clearTimeout(ui.syncTimer);
+  ui.pendingCloudSave = true;
+  ui.syncTimer = setTimeout(function () { flushCloudSave(false); }, 1200);
+  if (ui.syncState !== "saving") setSyncState("saving", "正在儲存到 OneDrive…");
+}
+function flushCloudSave(manual) {
+  if (ui.syncTimer) { clearTimeout(ui.syncTimer); ui.syncTimer = null; }
+  if (ui.syncBusy) { ui.pendingCloudSave = true; return Promise.resolve(); }
+  ui.pendingCloudSave = false;
+  if (!canPickFile(true)) {
+    setSyncState("local", "這個瀏覽器不能自動寫入資料夾。改動已留在本機，請匯出或從檔案載入。");
+    return Promise.resolve();
+  }
+  ui.syncBusy = true;
+  return loadBackupLink().then(function (rec) {
+    if (!rec || !rec.handle) {
+      setSyncState("local", "未連結 OneDrive，只存在這台瀏覽器");
+      return;
+    }
+    setSyncState("saving", "正在儲存到 " + (rec.name || rec.handle.name) + "…");
+    return ensureHandlePermission(rec.handle, "readwrite").then(function (ok) {
+      if (!ok) {
+        setSyncState("error", "沒有寫入權限，請到設定再選一次檔案");
+        return;
+      }
+      return buildBackupPayload().then(function (pack) {
+        return writeBackupToHandle(rec.handle, pack).then(function () {
+          data.lastBackupName = rec.name || rec.handle.name;
+          markLocalSynced();
+          var offlineNote = (typeof navigator !== "undefined" && navigator.onLine === false) ? "。已寫入檔案，等有網絡時 OneDrive 會再同步" : "";
+          setSyncState("synced", "已同步到 " + data.lastBackupName + offlineNote);
+        });
+      });
+    });
+  }).catch(function (e) {
+    setSyncState("error", "同步失敗：" + (e && e.message ? e.message : "未知錯誤"));
+    if (manual) toast("同步失敗：" + (e && e.message ? e.message : "未知錯誤"));
+  }).then(function () {
+    ui.syncBusy = false;
+    if (ui.pendingCloudSave) return flushCloudSave(false);
+  });
+}
+function stampMs(s) {
+  var n = Date.parse(s || "");
+  return Number.isNaN(n) ? 0 : n;
+}
+function refreshCloud() {
+  if (!ui.ready || ui.syncBusy) return Promise.resolve();
+  if (!canPickFile(true)) {
+    setSyncState("local", "這個瀏覽器不能自動同步資料夾。本機可離線使用，請用「從檔案載入」睇 OneDrive 嘅最新紀錄。");
+    return Promise.resolve();
+  }
+  return loadBackupLink().then(function (rec) {
+    if (!rec || !rec.handle) {
+      setSyncState("local", "未連結 OneDrive，只存在這台瀏覽器");
+      return;
+    }
+    return ensureHandlePermission(rec.handle, "readwrite").then(function (ok) {
+      if (!ok) {
+        setSyncState("error", "沒有檔案權限，請到設定再選一次");
+        return;
+      }
+      setSyncState("saving", "正在檢查 OneDrive 最新內容…");
+      return rec.handle.getFile().then(function (file) {
+        return readFileText(file).then(function (text) {
+          var parsed;
+          try { parsed = JSON.parse(text); } catch (e) {
+            setSyncState("error", "雲端檔不是有效的 JSON");
+            return;
+          }
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+            setSyncState("error", "認不出雲端備份格式");
+            return;
+          }
+          var remoteNewer = stampMs(parsed.exportedAt) > stampMs(data.lastExportAt);
+          var localDirty = isLocalDirty() || (isOwnData() && !data.lastSyncedHash && stampMs(data.lastExportAt) >= stampMs(parsed.exportedAt) && stampMs(data.lastExportAt) > 0);
+          if (!isOwnData() && (Array.isArray(parsed.projects) || Array.isArray(parsed.notes))) {
+            return applyBackupQuietly(parsed, "replace").then(function () {
+              setSyncState("synced", "已從 " + (rec.name || file.name) + " 載入");
+              render();
+            });
+          }
+          if (remoteNewer && localDirty) {
+            setSyncState("error", "本機同雲端都有較新改動");
+            return chooseDialog({
+              title: "同步有衝突",
+              body: "OneDrive 裡的「" + (rec.name || file.name) + "」比較新，但這台裝置也有未同步的修改。要用雲端版本取代這台，還是把這台的修改寫上雲端？",
+              choices: [
+                { id: "cancel", label: "稍後" },
+                { id: "pull", label: "用雲端版本" },
+                { id: "push", label: "寫上這台的修改", danger: true }
+              ]
+            }).then(function (choice) {
+              if (choice === "pull") {
+                return applyBackupQuietly(parsed, "replace").then(function () {
+                  setSyncState("synced", "已改用雲端版本");
+                  toast("已載入 OneDrive 的版本。");
+                  render();
+                });
+              }
+              if (choice === "push") return flushCloudSave(true);
+              setSyncState("error", "同步暫停，本機同雲端版本不一致");
+            });
+          }
+          if (remoteNewer) {
+            return applyBackupQuietly(parsed, "replace").then(function () {
+              setSyncState("synced", "已同步到 " + (rec.name || file.name));
+              render();
+            });
+          }
+          if (!data.lastSyncedHash || data.lastSyncedHash !== contentHash()) {
+            return flushCloudSave(false);
+          }
+          setSyncState("synced", "已同步到 " + (rec.name || file.name));
+        });
+      });
+    });
+  }).catch(function (e) {
+    setSyncState("error", "無法讀取 OneDrive 檔：" + (e && e.message ? e.message : "未知錯誤"));
+  });
+}
+
+function buildBackupPayload() {
+  var opts = exportOptions();
+  var filePromise = opts.includeFiles ? listAllFiles().then(function (all) {
+    var out = [];
+    var chain = Promise.resolve();
+    (all || []).forEach(function (f) {
+      if (!f || f.id === "selfcheck" || !f.blob) return;
+      chain = chain.then(function () {
+        return blobToBase64(f.blob).then(function (b64) {
+          out.push({ id: f.id, ownerType: f.ownerType, ownerId: f.ownerId, name: f.name, mime: f.mime, size: f.size, createdAt: f.createdAt, dataBase64: b64 });
+        });
+      });
+    });
+    return chain.then(function () { return out; });
+  }).catch(function () { toast("附件讀不出來，這次備份只含文字。"); return []; }) : Promise.resolve(null);
+  return filePromise.then(function (files) {
+    var payload = {
+      format: "project-notes",
+      version: 1,
+      exportedAt: nowISO(),
+      projects: data.projects.map(publicProject),
+      notes: data.notes.map(publicNote),
+      endpoints: data.endpoints.map(function (ep) {
+        return {
+          id: ep.id, name: ep.name, url: ep.url, headerName: ep.headerName,
+          authStyle: ep.authStyle, pushMethod: ep.pushMethod,
+          apiKey: opts.includeSecrets ? (ep.apiKey || "") : "",
+          createdAt: ep.createdAt, updatedAt: ep.updatedAt
+        };
+      })
+    };
+    if (files) payload.files = files;
+    return { payload: payload, includeSecrets: opts.includeSecrets, blob: new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }) };
+  });
+}
+function markExported() {
+  ui.skipCloudSave = true;
+  data.lastExportAt = nowISO();
+  data.lastSyncedHash = contentHash();
+  persistNow();
+  ui.skipCloudSave = false;
+  paintBanners();
+  paintOneDriveStatus();
+  setSyncState("synced", data.lastBackupName ? ("已同步到 " + data.lastBackupName) : "已備份");
+}
+function exportData(btn) {
+  var old = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "正在準備備份…"; }
+  return buildBackupPayload().then(function (pack) {
+    downloadBlob(pack.blob, datedBackupName());
+    markExported();
+    toast(pack.includeSecrets ? "已開始下載備份。請把檔案放到 OneDrive。檔案含 API 金鑰，請不要傳到不信任的地方。" : "已開始下載備份。請把檔案放到 OneDrive。這份沒有 API 金鑰。");
+  }).catch(function (e) {
+    toast("匯出失敗：" + (e && e.message ? e.message : "未知錯誤"));
+  }).then(function () {
+    if (btn) { btn.disabled = false; btn.textContent = old; }
+  });
+}
+function writeBackupToHandle(handle, pack) {
+  return handle.createWritable().then(function (writable) {
+    return writable.write(pack.blob).then(function () { return writable.close(); });
+  });
+}
+function saveToFolder(btn) {
+  if (!canPickFile(true)) {
+    toast("這個瀏覽器不能直接寫入資料夾。已改為下載備份，請自行存到 OneDrive。");
+    return exportData(btn);
+  }
+  var old = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "正在準備備份…"; }
+  return window.showSaveFilePicker({
+    suggestedName: defaultBackupName(),
+    types: backupPickerTypes()
+  }).then(function (handle) {
+    return buildBackupPayload().then(function (pack) {
+      return writeBackupToHandle(handle, pack).then(function () {
+        return rememberBackupHandle(handle, handle.name).then(function () {
+          markExported();
+          toast((pack.includeSecrets ? "已寫入「" + handle.name + "」。檔案含 API 金鑰，請自行保管。" : "已寫入「" + handle.name + "」。") + "等 OneDrive 同步後，手機就可以從檔案載入。");
+        });
+      });
+    });
+  }).catch(function (e) {
+    if (e && (e.name === "AbortError" || e.name === "AbortError")) return;
+    toast("儲存失敗：" + (e && e.message ? e.message : "未知錯誤") + "。可以改用「匯出備份」下載。");
+  }).then(function () {
+    if (btn) { btn.disabled = false; btn.textContent = old; }
+  });
+}
+function saveLinked(btn) {
+  var old = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "正在寫入…"; }
+  return loadBackupLink().then(function (rec) {
+    if (!rec || !rec.handle) {
+      toast("還沒有連結檔案，請先按「儲存到 OneDrive 檔案」。");
+      return;
+    }
+    return ensureHandlePermission(rec.handle, "readwrite").then(function (ok) {
+      if (!ok) {
+        toast("沒有寫入權限。請再按「儲存到 OneDrive 檔案」選一次。");
+        return;
+      }
+      return buildBackupPayload().then(function (pack) {
+        return writeBackupToHandle(rec.handle, pack).then(function () {
+          markExported();
+          toast("已更新「" + (rec.name || rec.handle.name) + "」。等 OneDrive 同步後，其他裝置就可以載入。");
+        });
+      });
+    });
+  }).catch(function (e) {
+    toast("更新失敗：" + (e && e.message ? e.message : "未知錯誤") + "。請再選一次檔案。");
+  }).then(function () {
+    if (btn) { btn.disabled = false; btn.textContent = old; }
+  });
+}
+function pickImportFile() {
+  if (canPickFile(false)) {
+    return window.showOpenFilePicker({
+      types: backupPickerTypes(),
+      multiple: false
+    }).then(function (handles) {
+      var handle = handles && handles[0];
+      if (!handle) return;
+      return handle.getFile().then(function (file) {
+        return importFromFile(file).then(function (ok) {
+          if (ok) {
+            return rememberBackupHandle(handle, handle.name).then(function () {
+              setSyncState("synced", "已連結並載入 " + handle.name);
+              paintOneDriveStatus();
+            });
+          }
+        });
+      });
+    }).catch(function (e) {
+      if (e && e.name === "AbortError") return;
+      var importInput = document.getElementById("import-input");
+      if (importInput) importInput.click();
+    });
+  }
+  var importInput = document.getElementById("import-input");
+  if (importInput) importInput.click();
+}
+function readFileText(file) {
+  if (file && file.text) return file.text();
+  return new Promise(function (resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function () { resolve(String(reader.result || "")); };
+    reader.onerror = function () { reject(reader.error || new Error("讀不到檔案")); };
+    reader.readAsText(file);
+  });
+}
+function importFromFile(file) {
+  return readFileText(file).then(function (text) {
+    var parsed;
+    try { parsed = JSON.parse(text); } catch (e) { toast("這個檔案不是有效的 JSON。"); return; }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) { toast("認不出備份格式。"); return; }
+    if (parsed.format && parsed.format !== "project-notes" && !Array.isArray(parsed.projects) && !Array.isArray(parsed.notes)) {
+      toast("認不出備份格式。需要 projects 或 notes 陣列。");
+      return;
+    }
+    if (!Array.isArray(parsed.projects) && !Array.isArray(parsed.notes) && !Array.isArray(parsed.endpoints) && !Array.isArray(parsed.files)) {
+      toast("認不出備份格式。需要 projects 或 notes 陣列。");
+      return;
+    }
+    var pc = Array.isArray(parsed.projects) ? parsed.projects.length : 0;
+    var nc = Array.isArray(parsed.notes) ? parsed.notes.length : 0;
+    var ec = Array.isArray(parsed.endpoints) ? parsed.endpoints.length : 0;
+    var fc = Array.isArray(parsed.files) ? parsed.files.length : 0;
+    return chooseDialog({
+      title: "匯入備份",
+      body: "檔案裡有 " + pc + " 個專案、" + nc + " 則記事、" + ec + " 個端點、" + fc + " 個附件。\n合併會以相同 id 覆蓋，並保留本地其餘資料。沒有金鑰的端點不會清掉已存金鑰。\n取代會換掉檔案裡有提供的那些清單。",
+      choices: [
+        { id: "cancel", label: "取消" },
+        { id: "merge", label: "合併" },
+        { id: "replace", label: "取代", danger: true }
+      ]
+    }).then(function (choice) {
+      if (choice !== "merge" && choice !== "replace") return;
+      var stats = applyCollections(parsed, choice);
+      ui.skipCloudSave = true;
+      return importFiles(parsed.files, choice).then(function (fileStats) {
+        data.lastSyncedHash = contentHash();
+        if (isStamp(parsed.exportedAt)) data.lastExportAt = parsed.exportedAt;
+        persistNow();
+        ui.skipCloudSave = false;
+        toast("已匯入。專案 " + stats.projects + "、記事 " + stats.notes + "、端點 " + stats.endpoints + "、附件 " + fileStats.imported + (fileStats.skipped ? "，略過附件 " + fileStats.skipped : "") + "。");
+        render();
+        return true;
+      }).catch(function (err) { ui.skipCloudSave = false; throw err; });
+    });
+  }).catch(function (e) {
+    toast("匯入失敗：" + (e && e.message ? e.message : "未知錯誤"));
+  });
+}
+
+function testEndpoint(ep) {
+  setResult(ep.id, "正在測試…\n" + headerPreview(ep), null);
+  return requestEndpoint(ep, "test").then(function (res) {
+    setResult(ep.id, redactSecrets(res.detail, ep) + "\n" + headerPreview(ep), !!res.ok);
+  });
+}
+function pullEndpoint(ep) {
+  setResult(ep.id, "正在拉取…", null);
+  return requestEndpoint(ep, "pull").then(function (res) {
+    if (!res.ok) { setResult(ep.id, redactSecrets(res.detail, ep), false); return; }
+    var body = unwrapSync(res.json);
+    if (!body) {
+      setResult(ep.id, "拉取失敗。JSON 裡找不到 projects 或 notes 陣列。\n" + redactSecrets(res.detail, ep), false);
+      return;
+    }
+    var pc = Array.isArray(body.projects) ? body.projects.length : null;
+    var nc = Array.isArray(body.notes) ? body.notes.length : null;
+    return chooseDialog({
+      title: "拉取完成，要怎樣寫入？",
+      body: "遠端" + (pc === null ? "沒有 projects 欄位" : "有 " + pc + " 個專案") + "，" + (nc === null ? "沒有 notes 欄位" : "有 " + nc + " 則記事") + "。\n合併會以相同 id 覆蓋，並保留本地其餘資料。\n取代會換掉有提供的清單。附件不會改動。",
+      choices: [
+        { id: "cancel", label: "取消" },
+        { id: "merge", label: "合併到本地" },
+        { id: "replace", label: "取代本地", danger: true }
+      ]
+    }).then(function (choice) {
+      if (choice !== "merge" && choice !== "replace") {
+        setResult(ep.id, "已取消。本地資料沒有改動。\n" + redactSecrets(res.detail, ep), false);
+        return;
+      }
+      var syncBody = {};
+      if (Array.isArray(body.projects)) syncBody.projects = body.projects;
+      if (Array.isArray(body.notes)) syncBody.notes = body.notes;
+      var stats = applyCollections(syncBody, choice);
+      setResult(ep.id, (choice === "merge" ? "已合併。" : "已取代。") + "專案 " + stats.projects + "、記事 " + stats.notes + "。\n" + redactSecrets(res.detail, ep), true);
+      toast("拉取已寫入這台裝置。");
+      render();
+    });
+  });
+}
+function pushEndpoint(ep) {
+  var payload = syncPayload();
+  return chooseDialog({
+    title: "推送資料",
+    body: "將把 " + payload.projects.length + " 個專案、" + payload.notes.length + " 則記事以 JSON 推送到「" + (ep.name || ep.url) + "」。\n不含附件，也不含 API 金鑰。金鑰只會放在請求標頭。",
+    choices: [
+      { id: "cancel", label: "取消" },
+      { id: "push", label: "推送" }
+    ]
+  }).then(function (choice) {
+    if (choice !== "push") return;
+    setResult(ep.id, "正在推送…\n" + headerPreview(ep), null);
+    return requestEndpoint(ep, "push", payload).then(function (res) {
+      setResult(ep.id, redactSecrets(res.detail, ep) + "\n" + headerPreview(ep), !!res.ok);
+      if (res.ok) toast("推送完成。");
+    });
+  });
+}
+
+function runAction(action, btn) {
+  if (action === "dismiss-demo") { data.demoBanner = false; persistNow(); paintBanners(); return; }
+  if (action === "dismiss-export-hint") { ui.dismissExportHint = true; paintBanners(); return; }
+  if (action === "clear-demo") return clearDemo();
+  if (action === "load-demo") { loadDemo(); return; }
+  if (action === "stat") {
+    var kind = btn.dataset.kind;
+    if (kind === "notes") go("#/notes");
+    else if (kind === "active") openProjectsFilter("all", "active");
+    else if (kind === "soon") openProjectsFilter("soon", "all");
+    else if (kind === "overdue") openProjectsFilter("overdue", "all");
+    return;
+  }
+  if (action === "toggle-dir") {
+    data.prefs.sortDir = data.prefs.sortDir === "desc" ? "asc" : "desc";
+    persistNow();
+    paintProjects();
+    return;
+  }
+  if (action === "layout") {
+    data.prefs.layout = btn.dataset.layout === "timeline" ? "timeline" : "cards";
+    persistNow();
+    paintProjects();
+    return;
+  }
+  if (action === "reset-filters") {
+    data.prefs.status = "all";
+    data.prefs.due = "all";
+    data.prefs.sort = "end";
+    data.prefs.sortDir = "asc";
+    ui.query = "";
+    persistNow();
+    render();
+    return;
+  }
+  if (action === "color") {
+    var page = btn.closest("[data-entity='project']");
+    if (!page) return;
+    var project = findProject(page.dataset.entityId);
+    if (!project) return;
+    project.color = safeColor(btn.dataset.color);
+    touchEntity(project);
+    persistNow();
+    var bar = document.getElementById("accent-bar");
+    if (bar) bar.style.background = project.color;
+    document.querySelectorAll(".swatch").forEach(function (el) {
+      var on = el.dataset.color === project.color;
+      el.classList.toggle("on", on);
+      el.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    markSaved();
+    paintBanners();
+    return;
+  }
+  if (action === "pick-file") {
+    var input = document.getElementById("file-input");
+    if (input) input.click();
+    return;
+  }
+  if (action === "download-file") {
+    return getFile(btn.dataset.id).then(function (rec) {
+      if (!rec || !rec.blob) { toast("找不到附件。"); return; }
+      downloadBlob(rec.blob, rec.name || "attachment");
+    });
+  }
+  if (action === "delete-file") {
+    return chooseDialog({
+      title: "移除附件",
+      body: "確定從這台裝置移除這個附件？若還沒有另外保存，刪了就沒有了。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "delete", label: "移除", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "delete") return;
+      return deleteFile(btn.dataset.id).then(function () {
+        var ent = currentEntity();
+        toast("已移除附件。");
+        if (ent) return loadFileList(ent.type, ent.id);
+      });
+    });
+  }
+  if (action === "delete-project") {
+    var cur = currentEntity();
+    if (!cur || cur.type !== "project") return;
+    var p = findProject(cur.id);
+    if (!p) return;
+    return chooseDialog({
+      title: "刪除專案",
+      body: "確定刪除「" + displayName(p) + "」？連結到它的記事會保留，但會解除連結。這個專案的附件會刪除。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "delete", label: "刪除專案", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "delete") return;
+      data.projects = data.projects.filter(function (item) { return item.id !== p.id; });
+      data.notes.forEach(function (n) {
+        if (n.projectId === p.id) { n.projectId = ""; n.updatedAt = nowISO(); }
+      });
+      persistNow();
+      return deleteFilesFor("project", p.id).catch(function () {
+        toast("專案已刪除，但附件未能全部移除。");
+      }).then(function () {
+        toast("已刪除專案。");
+        go("#/projects");
+      });
+    });
+  }
+  if (action === "delete-note") {
+    var noteEnt = currentEntity();
+    if (!noteEnt || noteEnt.type !== "note") return;
+    var note = findNote(noteEnt.id);
+    if (!note) return;
+    return chooseDialog({
+      title: "刪除記事",
+      body: "確定刪除「" + displayNoteTitle(note) + "」？這則記事的附件會一併刪除。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "delete", label: "刪除記事", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "delete") return;
+      data.notes = data.notes.filter(function (item) { return item.id !== note.id; });
+      persistNow();
+      return deleteFilesFor("note", note.id).catch(function () {
+        toast("記事已刪除，但附件未能全部移除。");
+      }).then(function () {
+        toast("已刪除記事。");
+        go("#/notes");
+      });
+    });
+  }
+  if (action === "note-for-project") {
+    var host = currentEntity();
+    if (!host || host.type !== "project") return;
+    var created = createNote(host.id);
+    ui.autofocus = true;
+    ui.autofocusId = created.id;
+    go("#/n/" + created.id);
+    return;
+  }
+  if (action === "add-endpoint") { createEndpoint(null); return; }
+  if (action === "add-mock") {
+    var existing = data.endpoints.find(function (e) { return String(e.url).trim() === "local://mock"; });
+    if (existing) {
+      toast("已經有內建模擬端點。");
+      var el = document.getElementById("ep-" + existing.id);
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    createEndpoint({ name: "內建模擬", url: "local://mock" });
+    return;
+  }
+  if (action === "clear-key") {
+    var ep = endpointFromButton(btn);
+    if (!ep) return;
+    ep.apiKey = "";
+    touchEntity(ep);
+    persistNow();
+    toast("已清除這個端點的金鑰。");
+    render();
+    return;
+  }
+  if (action === "delete-endpoint") {
+    var target = endpointFromButton(btn);
+    if (!target) return;
+    return chooseDialog({
+      title: "刪除端點",
+      body: "確定刪除「" + (target.name || target.url || "這個端點") + "」？金鑰會一起從這台裝置移除。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "delete", label: "刪除端點", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "delete") return;
+      data.endpoints = data.endpoints.filter(function (e) { return e.id !== target.id; });
+      delete ui.apiResults[target.id];
+      persistNow();
+      toast("已刪除端點。");
+      render();
+    });
+  }
+  if (action === "test-endpoint" || action === "pull-endpoint" || action === "push-endpoint") {
+    var endpoint = endpointFromButton(btn);
+    if (!endpoint) return;
+    if (action === "test-endpoint") return testEndpoint(endpoint);
+    if (action === "pull-endpoint") return pullEndpoint(endpoint);
+    return pushEndpoint(endpoint);
+  }
+  if (action === "export-data") return exportData(btn);
+  if (action === "save-to-folder") return saveToFolder(btn);
+  if (action === "save-linked") return saveLinked(btn);
+  if (action === "unlink-backup") {
+    return forgetBackupHandle().then(function () {
+      toast("已取消檔案連結。OneDrive 裡的備份檔不會被刪除。");
+      paintOneDriveStatus();
+    });
+  }
+  if (action === "import-pick") {
+    return pickImportFile();
+  }
+  if (action === "restore-bak") {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY + ".bak"); } catch (e) { raw = null; }
+    if (!raw) { toast("沒有上一份本機備份。"); return; }
+    var parsedBak;
+    try { parsedBak = JSON.parse(raw); } catch (e2) { toast("上一份備份已損壞。"); return; }
+    return chooseDialog({
+      title: "還原上一份本機資料",
+      body: "用上一份自動留下的本機資料取代現在的專案、記事和端點。附件不會還原。還原後，現在這份會變成新的「上一份」。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "replace", label: "還原", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "replace") return;
+      data = normalizeData(parsedBak);
+      persistNow();
+      toast("已還原上一份本機資料。");
+      render();
+    });
+  }
+  if (action === "download-corrupt") {
+    var corrupt = null;
+    try { corrupt = localStorage.getItem(KEY + ".corrupt"); } catch (e3) { corrupt = null; }
+    if (!corrupt) { toast("沒有讀不出的原始資料。"); return; }
+    downloadBlob(new Blob([corrupt], { type: "application/json" }), "project-notes-unreadable.json");
+    return;
+  }
+  if (action === "clean-orphans") {
+    return chooseDialog({
+      title: "清除無主附件",
+      body: "移除已經沒有對應專案或記事的附件。仍掛在現有專案或記事上的檔案會保留。",
+      choices: [{ id: "cancel", label: "取消" }, { id: "delete", label: "清除", danger: true }]
+    }).then(function (choice) {
+      if (choice !== "delete") return;
+      var ids = {};
+      data.projects.forEach(function (p) { ids[p.id] = true; });
+      data.notes.forEach(function (n) { ids[n.id] = true; });
+      return listAllFiles().then(function (all) {
+        var doomed = (all || []).filter(function (f) { return f && f.id !== "selfcheck" && !ids[f.ownerId]; });
+        var chain = Promise.resolve();
+        doomed.forEach(function (f) { chain = chain.then(function () { return deleteFile(f.id); }); });
+        return chain.then(function () { toast(doomed.length ? "已移除 " + doomed.length + " 個無主附件。" : "沒有無主附件。"); });
+      });
+    });
+  }
+  if (action === "self-check") return runSelfCheck();
+  if (action === "ask-persist") {
+    if (!navigator.storage || !navigator.storage.persist) {
+      toast("這個瀏覽器沒有提供「持久保留」請求。請靠匯出備份。");
+      return;
+    }
+    return navigator.storage.persist().then(function (granted) {
+      toast(granted ? "瀏覽器已標記盡量保留這份資料。這不是保證，仍請定期匯出。" : "瀏覽器沒有同意持久保留。請定期匯出 JSON。");
+      paintQuota();
+    });
+  }
+  toast("這個按鈕還沒有接上功能：" + action);
+}
+
+function bindGlobal() {
+  document.body.addEventListener("click", function (e) {
+    if (e.target.closest("#dialog")) return;
+    var btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    var action = btn.dataset.action;
+    Promise.resolve(runAction(action, btn)).catch(function (err) {
+      toast("發生問題：" + (err && err.message ? err.message : "未知錯誤"));
+    });
+  });
+  document.body.addEventListener("input", function (e) {
+    var t = e.target;
+    if (!t) return;
+    if (t.id === "q") { ui.query = t.value; paintProjects(); return; }
+    if (t.id === "nq") { ui.noteQuery = t.value; paintNotes(); return; }
+    if (t.dataset && t.dataset.secret) t.dataset.dirty = "1";
+    if (t.dataset && t.dataset.bind) applyBindFromElement(t);
+  });
+  document.body.addEventListener("change", function (e) {
+    var t = e.target;
+    if (!t || !t.dataset) return;
+    if (t.dataset.pref) {
+      data.prefs[t.dataset.pref] = t.value;
+      persistNow();
+      paintProjects();
+      paintNotes();
+      return;
+    }
+    if (t.dataset.secret) t.dataset.dirty = "1";
+    if (t.dataset.bind) applyBindFromElement(t);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && dialogResolve) {
+      e.preventDefault();
+      closeDialog("cancel");
+      return;
+    }
+    if (e.key !== "Tab" || !dialogResolve) return;
+    var root = document.getElementById("dialog");
+    var items = Array.prototype.slice.call(root.querySelectorAll("button"));
+    if (!items.length) return;
+    var first = items[0];
+    var last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  document.getElementById("dialog").addEventListener("click", function (e) {
+    if (e.target.id === "dialog") closeDialog("cancel");
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") {
+      persistNow();
+      if (ui.pendingCloudSave || (ui.ready && canPickFile(true))) flushCloudSave(false);
+    }
+    if (document.visibilityState !== "visible") return;
+    var day = todayISO();
+    if (ui.shownDay && ui.shownDay !== day) render();
+    else paintToday();
+    refreshCloud();
+  });
+  window.addEventListener("online", function () { refreshCloud(); });
+  window.addEventListener("offline", function () {
+    if (ui.syncState === "synced") setSyncState("offline", "離線。改動會先寫入本機檔案，有網時 OneDrive 再同步");
+  });
+  window.addEventListener("pagehide", persistNow);
+}
+function onRoute() {
+  var hash = location.hash;
+  if (hash === "#/projects/new") {
+    var p = createProject();
+    ui.autofocus = true;
+    ui.autofocusId = p.id;
+    history.replaceState(null, "", "#/p/" + p.id);
+  } else if (hash === "#/notes/new") {
+    var n = createNote("");
+    ui.autofocus = true;
+    ui.autofocusId = n.id;
+    history.replaceState(null, "", "#/n/" + n.id);
+  }
+  render();
+}
+function revealApp() {
+  var help = document.getElementById("boot-help");
+  var app = document.getElementById("app");
+  var tabbar = document.getElementById("tabbar");
+  if (help) help.hidden = true;
+  if (app) app.hidden = false;
+  if (tabbar) tabbar.hidden = false;
+}
+function showBootError(err) {
+  var help = document.getElementById("boot-help");
+  if (help) {
+    help.hidden = false;
+    var p = document.createElement("p");
+    p.style.color = "#6f1212";
+    p.style.fontWeight = "800";
+    p.textContent = "開啟失敗：" + (err && err.message ? err.message : String(err || "未知錯誤"));
+    help.appendChild(p);
+  }
+  var app = document.getElementById("app");
+  var tabbar = document.getElementById("tabbar");
+  if (app) app.hidden = true;
+  if (tabbar) tabbar.hidden = true;
+}
+function goHomeHash() {
+  try {
+    if (!location.hash) history.replaceState(null, "", "#/home");
+  } catch (e) {
+    try { if (!location.hash) location.hash = "#/home"; } catch (e2) {}
+  }
+}
+function init() {
+  try {
+    revealApp();
+    load();
+    bindGlobal();
+    paintToday();
+    paintSyncStatus();
+    goHomeHash();
+    onRoute();
+    ui.ready = true;
+    if (ui.toastOnStart) toast(ui.toastOnStart);
+    refreshCloud();
+  } catch (err) {
+    showBootError(err);
+  }
+}
+window.addEventListener("hashchange", onRoute);
+init();
+  </script>
+</body>
+</html>
