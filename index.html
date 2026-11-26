@@ -60,7 +60,7 @@
       border: 2px solid var(--navy); z-index: 30; transform: translateY(-140%);
     }
     .skip:focus { transform: none; }
-    .app { min-height: 100vh; background: var(--bg); }
+    .app { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
     .sidebar {
       display: none;
       background: var(--navy);
@@ -78,8 +78,9 @@
     .mobile-top-title { display: flex; flex-direction: column; min-width: 0; }
     .mobile-top-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
     .help-link {
-      color: white; text-decoration: none; font-weight: 800; font-size: 13px;
-      border: 2px solid rgba(255,255,255,.45); border-radius: 999px; padding: 2px 10px;
+      color: white; text-decoration: none; font-weight: 800; font-size: 14px;
+      border: 2px solid rgba(255,255,255,.45); border-radius: 999px; padding: 8px 12px;
+      min-height: 44px; display: inline-flex; align-items: center;
     }
     .help-link[aria-current="page"] { background: white; color: var(--navy); border-color: white; }
     .guide h2 { font-size: 22px; margin: 1.5em 0 .45em; }
@@ -101,14 +102,15 @@
       min-width: 28px; text-align: center; font-weight: 800; padding: 2px 8px; font-size: 16px;
     }
     .mobile-top {
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
-      padding: calc(10px + var(--safe-t)) 16px 10px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: calc(6px + var(--safe-t)) 12px 6px;
       background: var(--navy); color: white; position: sticky; top: 0; z-index: 6;
+      min-height: calc(48px + var(--safe-t));
     }
-    .mobile-top strong { font-size: 20px; }
-    .mobile-top span { font-size: 15px; font-weight: 800; text-align: right; }
+    .mobile-top strong { font-size: 18px; }
+    .mobile-top span { font-size: 13px; font-weight: 800; text-align: right; }
     .column { min-width: 0; }
-    main { padding: 8px 16px 28px; }
+    main { padding: 8px 14px 20px; }
     .page { max-width: 1080px; margin: 0 auto; }
     .narrow { max-width: 760px; }
     .banner {
@@ -223,7 +225,8 @@
     .seg button[aria-pressed="true"] { background: var(--navy); color: white; }
     .summary { font-weight: 800; margin: 4px 0 12px; }
     .month-label {
-      font-size: 20px; font-weight: 800; padding: 8px 0; position: sticky; top: 64px;
+      font-size: 20px; font-weight: 800; padding: 8px 0; position: sticky;
+      top: calc(var(--mobile-header) + var(--safe-t));
       background: var(--bg); z-index: 2;
     }
     .tl-item { margin-bottom: 12px; }
@@ -268,7 +271,9 @@
     .fail { background: var(--danger-bg); color: var(--danger); }
     .tabbar {
       display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-      background: white; border-top: 2px solid var(--navy); padding-bottom: var(--safe-b);
+      background: white; border-top: 2px solid var(--navy);
+      padding-bottom: max(var(--safe-b), 4px);
+      min-height: calc(var(--tab-h) + var(--safe-b));
     }
     .tabbar a {
       position: relative; flex: 1; min-height: 62px; display: flex; flex-direction: column;
@@ -282,7 +287,8 @@
       position: absolute; top: 4px; margin-left: 28px; background: var(--danger); color: white;
       min-width: 22px; height: 22px; line-height: 22px; padding: 0 5px; font-size: 13px;
     }
-    .column { padding-bottom: calc(74px + var(--safe-b)); }
+    .column { padding-bottom: calc(var(--tab-h) + 12px + var(--safe-b)); }
+    body.has-dock .column { padding-bottom: calc(var(--tab-h) + var(--dock-h) + 12px + var(--safe-b)); }
     #toast {
       position: fixed; left: 50%; top: 16px; transform: translateX(-50%) translateY(-8px);
       max-width: min(520px, 92vw); background: #121820; color: white; padding: 12px 16px;
@@ -304,22 +310,42 @@
     .dialog-actions .btn { width: 100%; }
     body.dialog-open { overflow: hidden; }
     @media (max-width: 860px) {
-      h1 { font-size: 30px; margin: 8px 0 4px; }
-      .lead { margin: 0 0 8px; }
-      .stat { min-height: 0; padding: 10px 12px; }
-      .stat b { font-size: 34px; }
-      .banner { margin-top: 8px; padding: 12px; }
-      .block { margin-top: 18px; }
-      .home-page { display: flex; flex-direction: column; }
-      .home-page .ask-box { order: 1; }
-      .home-page .stats { order: 2; }
-      .home-page .home-lists { order: 3; }
+      h1 { font-size: 24px; margin: 4px 0 4px; }
+      .lead { margin: 0 0 8px; font-size: 16px; }
+      .stat { min-height: 64px; padding: 8px 8px; }
+      .stat b { font-size: 26px; }
+      .stat span { font-size: 13px; line-height: 1.25; }
+      .banner { margin-top: 8px; padding: 10px 12px; }
+      .block { margin-top: 14px; }
       .home-lists > .block:first-child { margin-top: 8px; }
+      .desk-only { display: none !important; }
+      .card-link .dates { display: none; }
+      .card-link { padding: 10px 12px; }
+      .flag-head { margin-bottom: 6px; }
+      .flag-head h3 { font-size: 18px; }
+      .date-pill { min-height: 0; min-width: 0; padding: 4px 8px; }
+      .date-pill b, .date-pill span { font-size: 14px; }
+      .wb-card .chips { margin-top: 4px; }
+      .ask-box { padding: 12px; margin: 8px 0 4px; }
+      .ask-box h2, .ready-box h2 { font-size: 20px; }
+      .answer-box { min-height: 0; }
+      .page-head .btn { min-height: 44px; }
+      .toolbar { display: block; }
+      .month-label { top: calc(48px + var(--safe-t)); }
+      .ready-box .row { display: grid; grid-template-columns: 1fr 1fr; }
+      .ready-box .row .btn { width: 100%; }
+    }
+    @media (max-width: 860px) {
+      .stats.stats-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      body.kbd-open .action-dock { display: none !important; }
+      body.kbd-open.has-dock .column { padding-bottom: calc(var(--tab-h) + 12px + var(--safe-b)); }
     }
     @media (max-width: 380px) {
       .dates { grid-template-columns: 1fr; }
       .date-day { font-size: 44px; }
-      h1 { font-size: 30px; }
+      h1 { font-size: 22px; }
+      .stat b { font-size: 22px; }
+      .stat span { font-size: 12px; }
     }
     @media (min-width: 640px) {
       .grid-2 { grid-template-columns: 1fr 1fr; }
@@ -333,15 +359,19 @@
     }
     @media (min-width: 861px) {
       .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-      .sidebar { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow: auto; }
+      .sidebar { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: auto; }
       .mobile-top { display: none; }
       .tabbar { display: none; }
-      .column { padding-bottom: 0; }
+      .action-dock, body.has-dock .action-dock { display: none !important; }
+      .column, body.has-dock .column { padding-bottom: 0; }
+      .mobile-only { display: none !important; }
       .month-label { top: 0; }
       #toast { top: 18px; }
+      #ask-box, #ready-box { scroll-margin-top: 8px; scroll-margin-bottom: 8px; }
     }
     @media (max-width: 860px) {
-      #toast { top: calc(62px + var(--safe-t)); }
+      #toast { top: calc(8px + var(--safe-t) + 48px); }
+      .dialog-back { padding-bottom: max(16px, var(--safe-b)); }
     }
     @media (min-width: 1100px) {
       .cards { grid-template-columns: 1fr 1fr; }
@@ -440,6 +470,47 @@
     @media (min-width: 700px) {
       .stats.stats-3 { grid-template-columns: repeat(3, 1fr); }
     }
+
+    :root {
+      --tab-h: 62px;
+      --dock-h: 72px;
+      --mobile-header: 52px;
+    }
+    html, body { overflow-x: clip; }
+    .app { min-height: 100vh; min-height: 100dvh; }
+    textarea.short { min-height: 72px; }
+    .situation-line { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .jump-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .jump-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px;
+      border: 2px solid var(--navy); background: white; color: var(--ink);
+      font-weight: 800; text-decoration: none; text-align: left;
+    }
+    .jump-row b { font-variant-numeric: tabular-nums; }
+    .action-dock {
+      display: none; position: fixed; left: 0; right: 0; z-index: 9;
+      bottom: calc(var(--tab-h) + var(--safe-b));
+      background: #fff; border-top: 2px solid var(--navy);
+      padding: 8px 12px; gap: 8px;
+    }
+    body.has-dock .action-dock { display: flex; }
+    .action-dock .btn { flex: 1; }
+    .sync-chip {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 58vw;
+    }
+    #ask-box, #ready-box {
+      scroll-margin-top: calc(12px + var(--mobile-header) + var(--safe-t));
+      scroll-margin-bottom: calc(12px + var(--tab-h) + var(--dock-h) + var(--safe-b));
+    }
+    .page-head.compact { gap: 8px; margin: 0; }
+    .page-head.compact .lead { margin: 0; }
+    details.fold > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; cursor: pointer; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::after { content: "＋"; margin-left: auto; }
+    details.fold[open] > summary::after { content: "－"; }
+    details.fold.tight { margin-top: 10px; padding-bottom: 8px; }
     .noscript {
       margin: 16px; padding: 16px; background: var(--danger-bg); color: var(--danger);
       border: 2px solid var(--danger); border-radius: 14px; font-weight: 800;
@@ -485,7 +556,6 @@
         </div>
         <div class="mobile-top-actions">
           <a class="help-link" href="#/guide" data-nav="guide">說明</a>
-          <span id="today-label-mobile"></span>
         </div>
       </header>
       <div id="storage-warn" class="banner banner-danger" hidden>
@@ -499,7 +569,7 @@
         </div>
       </div>
       <div id="demo-banner" class="banner" hidden>
-        <p>這是示範資料，用來展示升降機／自動梯專案的開工、期限、機房、現代化範圍，以及尚欠資料、待驗證、可即答三種就緒狀態。內容是虛構例子，不是真實合約。你可以修改，或清除後建立自己的專案。</p>
+        <p>這是虛構示範（升降機／自動梯），不是真實合約。可修改，或清除後建立自己的專案。</p>
         <div class="row">
           <button type="button" class="btn btn-secondary" data-action="dismiss-demo">知道了</button>
           <button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>
@@ -508,6 +578,7 @@
       <main id="main"></main>
     </div>
   </div>
+  <div id="action-dock" class="action-dock" hidden></div>
   <nav id="tabbar" class="tabbar" aria-label="主要" hidden>
     <a href="#/home" data-nav="home">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M7 10.5V20h10v-9.5"/></svg>
@@ -541,7 +612,7 @@
 
 var KEY = "ky-project-notes-v1";
 var MOCK_KEY = "ky-project-notes-mock-v1";
-var APP_VERSION = 3;
+var APP_VERSION = 4;
 var COLORS = ["#17364a", "#1d3f8f", "#084028", "#8a4b08", "#8f1d1d", "#3f3a6b", "#24556e", "#3d4a3e"];
 var WEEK = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 var STATUSES = [
@@ -675,7 +746,11 @@ var ui = {
   askProjectId: "",
   askEndpointId: "",
   askAnswer: "",
-  lastAsk: null
+  lastAsk: null,
+  askOpen: false,
+  homeMore: false,
+  editorOpen: false,
+  scrollTo: ""
 };
 
 function esc(s) {
@@ -945,7 +1020,7 @@ function soonDateItems(p) {
 }
 function hasOverdueDates(p) { return overdueDateItems(p).length > 0; }
 function hasSoonDates(p) { return soonDateItems(p).length > 0; }
-function chipsHTML(p) {
+function chipsHTML(p, compact) {
   var bits = [];
   if (p.projectKind) {
     var cls = p.projectKind === "mod" ? "chip-mod" : p.projectKind === "ni" ? "chip-ni" : "chip";
@@ -957,21 +1032,28 @@ function chipsHTML(p) {
   if (p.machineRoom) bits.push('<span class="chip">' + esc(machineRoomLabel(p.machineRoom)) + "</span>");
   if (isWaitingCommence(p)) bits.push('<span class="chip chip-warn">等候開工</span>');
   else if (commenceStatus(p) === "done") bits.push('<span class="chip chip-ok">已開工</span>');
-  if (p.retainItems) bits.push('<span class="chip">保留：' + esc(excerpt(p.retainItems, 24)) + "</span>");
+  if (!compact && p.retainItems) bits.push('<span class="chip">保留：' + esc(excerpt(p.retainItems, 24)) + "</span>");
   bits.unshift(readinessChipHTML(p));
   if (!bits.length) return "";
   return '<div class="chips">' + bits.join("") + "</div>";
 }
-function datePillsHTML(p) {
+function datePillsHTML(p, limit, withHint) {
   var items = collectProjectDates(p).filter(function (item) {
     return item.key === "end" || item.key === "commence" || (item.key.indexOf("ms:") === 0 && (item.date || !item.done));
   });
+  var rank = { overdue: 0, soon: 1, info: 2, ok: 3, neutral: 4, none: 5 };
+  items.sort(function (a, b) { return (rank[a.info.kind] || 9) - (rank[b.info.kind] || 9); });
+  var more = "";
+  if (typeof limit === "number" && items.length > limit) {
+    if (withHint) more = '<p class="hint">另有 ' + (items.length - limit) + " 個日期在「編輯資料」。</p>";
+    items = items.slice(0, limit);
+  }
   if (!items.length) return "";
   return '<div class="date-pills">' + items.map(function (item) {
     var kind = KIND[item.info.kind] ? item.info.kind : "none";
     var when = item.date ? formatLong(item.date) : "未設日期";
     return '<div class="date-pill date-badge--' + kind + '"><b>' + esc(item.name) + "</b><span>" + esc(item.info.sub) + "</span><span>" + esc(when) + "</span></div>";
-  }).join("") + "</div>";
+  }).join("") + "</div>" + more;
 }
 function projectSearchHay(p) {
   var bits = [
@@ -1351,15 +1433,12 @@ function readinessChipHTML(p) {
 function cycleCard(p) {
   var r = readinessOf(p);
   var reason = cycleReason(p);
-  var gaps = openGapsFor(p.id);
   var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
-  var miss = r.issues.length ? '<p class="due-line due-' + (r.id === "missing" ? "overdue" : "info") + '">尚欠：' + esc(r.issues.map(function (it) { return it.label; }).join("、")) + "</p>" : "";
-  var gapLine = gaps.length ? '<p class="due-line due-soon">要補 ' + gaps.length + " 項</p>" : "";
   return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
-    chipsHTML(p) + sit +
+    chipsHTML(p, true) + sit +
     (reason ? '<p class="due-line due-' + (r.id === "missing" ? "overdue" : r.id === "unverified" ? "info" : "ok") + '">' + esc(reason) + "</p>" : "") +
-    miss + gapLine +
+    datePillsHTML(p, 2) +
     "</a>";
 }
 function setProjectDocsMeta(p, files) {
@@ -1665,20 +1744,21 @@ function readyBoxHTML(p) {
     return "<li><strong>" + esc(a.label) + "：</strong>" + esc(detail) + "</li>";
   }).join("");
   var closedNote = isClosed(p) ? '<p class="hint">這單已完結，不會出現在工作台的待辦清單，但仍可補料和驗證。</p>' : "";
+  var gapN = openGapsFor(p.id).length;
   return '<section class="block ready-box" id="ready-box">' +
     "<h2>驗證與就緒</h2>" +
-    '<p class="hint">持續進步的做法：先填你知道的，被問之前先驗證，答不了就記入要補，補完再驗證一次。</p>' +
     '<div class="chips">' + readinessChipHTML(p) + "</div>" +
     closedNote +
-    '<ul class="hint-list">' + aspectLines + "</ul>" +
+    (r.issues.length ? '<p class="due-line due-overdue">尚欠：' + esc(r.issues.map(function (it) { return it.label; }).join("、")) + "</p>" : "") +
+    '<details class="fold tight"><summary>各項狀態</summary><ul class="hint-list">' + aspectLines + "</ul></details>" +
     '<label class="field"><span>驗證備註（可選）</span><input type="text" id="verify-note" maxlength="200" placeholder="例如：已對過開工日和機房"></label>' +
     '<div class="row">' +
     '<button type="button" class="btn" data-action="verify-all">驗證全部</button>' +
     '<button type="button" class="btn btn-secondary" data-action="verify-dates">驗證日期</button>' +
     '<button type="button" class="btn btn-secondary" data-action="verify-machine">驗證機種情況</button>' +
     '<button type="button" class="btn btn-secondary" data-action="verify-contract">驗證合約重點</button></div>' +
-    "<h3>要補與今次被問</h3>" +
-    gapsBlockHTML(p.id) +
+    '<details class="fold tight"' + (gapN ? " open" : "") + "><summary>要補與今次被問" + (gapN ? "（" + gapN + "）" : "") + "</summary>" +
+    gapsBlockHTML(p.id) + "</details>" +
     "</section>";
 }
 function refreshReadyChrome(p) {
@@ -1691,28 +1771,27 @@ function refreshReadyChrome(p) {
     if (next) box.replaceWith(next);
   }
   var chips = document.getElementById("live-chips");
-  if (chips) chips.innerHTML = chipsHTML(p);
+  if (chips) chips.innerHTML = chipsHTML(p, true);
 }
 
 
 function workbenchCard(p) {
-  var overdueN = overdueDateItems(p).length;
   var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
   return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
-    chipsHTML(p) + sit + datePillsHTML(p) +
-    (overdueN ? '<p class="due-line due-overdue">有 ' + overdueN + " 個日期已過</p>" : "") +
+    chipsHTML(p, true) + sit + datePillsHTML(p, 2) +
     "</a>";
 }
 function riskCard(p, items) {
   var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
-  var focus = (items || []).map(function (item) {
+  var focusItems = (items || []).slice(0, 2);
+  var focus = focusItems.map(function (item) {
     var kind = KIND[item.info.kind] ? item.info.kind : "none";
     return '<div class="date-pill date-badge--' + kind + '"><b>' + esc(item.name) + "</b><span>" + esc(item.info.sub) + "</span><span>" + esc(item.date ? formatLong(item.date) + " · " + weekday(item.date) : "未設日期") + "</span></div>";
   }).join("");
   return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
-    chipsHTML(p) + sit + (focus ? '<div class="date-pills">' + focus + "</div>" : datePillsHTML(p)) +
+    chipsHTML(p, true) + sit + (focus ? '<div class="date-pills">' + focus + "</div>" : datePillsHTML(p, 2)) +
     "</a>";
 }
 function sectionWorkbench(title, list, emptyText, limit, mapper) {
@@ -1755,15 +1834,22 @@ function askBoxHTML(opts) {
     followCtx.projectId = projectId;
     followCtx.logProjectId = projectId;
   }
+  var expanded = !!(ui.askOpen || answer || (ui.lastAsk && ui.lastAsk.showLog) || opts.expanded);
+  if (!expanded) {
+    return '<section class="ask-box ask-collapsed" id="ask-box">' +
+      "<h2>" + title + "</h2>" +
+      '<p class="hint">用本機欄位和可讀附件整理一段可複製的回覆，不會自動外送。</p>' +
+      '<button type="button" class="btn btn-block" data-action="open-ask">開始即時解答或記入今次被問</button></section>';
+  }
   return '<section class="ask-box" id="ask-box">' +
     "<h2>" + title + "</h2>" +
-    '<p class="hint">突擊被問開工、機房、全改／部分改、保留項目或合約重點時，先按「即時解答」。答案來自這台裝置上的欄位、記事和可讀附件，可一鍵複製。不會自動送到外面。若尚欠資料，可記入要補，之後再驗證。</p>' +
+    '<p class="hint">答案來自這台裝置上的欄位、記事和可讀附件。不會自動送到外面。</p>' +
     sel +
-    '<label class="field"><span>問題（可留空，直接整理現況）</span><textarea id="ask-q" maxlength="2000" placeholder="例如：呢單係全改定部分改？開工未？有冇機房？保留咗啲咩？">' + esc(question) + "</textarea></label>" +
+    '<label class="field"><span>問題（可留空，直接整理現況）</span><textarea id="ask-q" class="short" maxlength="2000" placeholder="例如：呢單係全改定部分改？開工未？有冇機房？">' + esc(question) + "</textarea></label>" +
     '<div class="row"><button type="button" class="btn" data-action="ask-local">即時解答</button>' +
     '<button type="button" class="btn btn-secondary" data-action="ask-copy">複製答案</button>' +
     '<button type="button" class="btn btn-secondary" data-action="ask-api">問外部 API</button></div>' +
-    epField +
+    '<details class="fold tight"><summary>外部 API</summary>' + epField + "</details>" +
     '<pre class="answer-box" id="ask-answer">' + esc(answer || "按「即時解答」後，這裡會出現可複製的短回覆。") + "</pre>" +
     askFollowHTML(followCtx) + "</section>";
 }
@@ -2818,8 +2904,8 @@ function projectCard(p) {
   var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
   return '<a class="card-link" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
     '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
-    chipsHTML(p) + sit + dateBadgesHTML(p) + datePillsHTML(p) +
-    (p.description ? '<p class="desc">' + esc(excerpt(p.description, 140)) + "</p>" : "") +
+    chipsHTML(p, true) + sit + dateBadgesHTML(p) + datePillsHTML(p, 3) +
+    (p.description ? '<p class="desc">' + esc(excerpt(p.description, 90)) + "</p>" : "") +
     tagsHTML(p.tags) + "</a>";
 }
 
@@ -2881,31 +2967,37 @@ function homeHTML() {
   var readyN = projects.filter(function (p) { return isReadyOpen(p, "ready"); }).length;
   var cycle = cycleProjects();
   var homeGaps = openGapsFor("");
-  return '<div class="page home-page"><header class="page-head"><h1>工作台</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
-    '<p class="lead">今天 ' + esc(todayLong()) + "。這一頁用來應付突擊提問，也用來持續補料和驗證：先填你知道的，被問之前先驗證；答不了就記入要補，補完再驗證。</p>" +
-    askBoxHTML({ locked: false }) +
-    '<div class="stats stats-4">' +
-    statButton("active", "進行中", activeCount, "") +
-    statButton("soon", "本週到期", projects.filter(hasSoonDates).length, "stat-warn") +
-    statButton("overdue", "已逾期", overdueP.length, overdueP.length ? "stat-danger" : "") +
-    statButton("waiting", "等候開工", waiting.length, waiting.length ? "stat-warn" : "") +
-    "</div>" +
+  function jumpRow(kind, label, count, cls) {
+    return '<button type="button" class="jump-row ' + (cls || "") + '" data-action="stat" data-kind="' + kind + '"><span>' + esc(label) + "</span><b>" + count + "</b></button>";
+  }
+  var moreLists = (ui.homeMore ? "" : " hidden");
+  return '<div class="page home-page">' +
+    '<header class="page-head compact"><div><h1>工作台</h1><p class="lead">今天 ' + esc(todayLong()) + "。</p></div>" +
+    '<a class="btn desk-only" href="#/projects/new">＋ 新增專案</a></header>' +
     '<div class="stats stats-3">' +
     statButton("missing", "尚欠資料", missingN, missingN ? "stat-danger" : "") +
     statButton("unverified", "待驗證", unverifiedN, unverifiedN ? "stat-info" : "") +
     statButton("ready", "可即答", readyN, readyN ? "stat-ok" : "") +
     "</div>" +
+    '<div class="jump-list">' +
+    jumpRow("overdue", "已逾期", overdueP.length, overdueP.length ? "stat-danger" : "") +
+    jumpRow("soon", "本週到期", projects.filter(hasSoonDates).length, projects.filter(hasSoonDates).length ? "stat-warn" : "") +
+    jumpRow("waiting", "等候開工", waiting.length, waiting.length ? "stat-warn" : "") +
+    "</div>" +
     '<div class="home-lists">' +
     sectionWorkbench("本輪要補／要驗證", cycle, "沒有待辦。已完成和已取消不會出現在這份清單。", null, cycleCard) +
-    (homeGaps.length ? '<section class="block"><div class="section-head"><h2>要補項目</h2><span class="count-pill">' + homeGaps.length + "</span></div>" + gapsBlockHTML("", true) + "</section>" : "") +
-    sectionWorkbench("已逾期（結束、開工或其他期限）", overdueP, "沒有逾期日期。已完成和已取消不會算進逾期。", null, riskMapper(overdueDateItems)) +
-    sectionWorkbench("本週到期", soonP, "未來七天沒有其他期限。", null, riskMapper(soonDateItems)) +
-    sectionWorkbench("等候開工", waiting, "沒有專案在等候開工。", null, riskMapper(function (p) { return [{ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: false }]; })) +
+    (homeGaps.length ? '<p class="hint">有 ' + homeGaps.length + " 項要補。打開專案後可標成已補完。</p>" : "") +
+    '<button type="button" class="btn btn-secondary btn-block" data-action="toggle-home-more" style="margin-top:12px">' + (ui.homeMore ? "收起其他清單" : "其他清單（逾期、本週、記事）") + "</button>" +
+    '<div id="home-more"' + moreLists + ">" +
+    sectionWorkbench("已逾期（結束、開工或其他期限）", overdueP, "沒有逾期日期。已完成和已取消不會算進逾期。", 4, riskMapper(overdueDateItems)) +
+    sectionWorkbench("本週到期", soonP, "未來七天沒有其他期限。", 4, riskMapper(soonDateItems)) +
+    sectionWorkbench("等候開工", waiting, "沒有專案在等候開工。", 4, riskMapper(function (p) { return [{ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: false }]; })) +
     (rest.length ? sectionWorkbench("其他未完成", rest, "", 4) : "") +
     (done.length ? sectionWorkbench("已完成", done, "", 2) : "") +
     '<section class="block"><div class="section-head"><h2>最近的記事</h2><a class="btn btn-secondary" href="#/notes">全部記事</a></div>' + notesBlock + "</section>" +
-    '<section class="block"><div class="section-head"><h2>功能說明</h2><a class="btn btn-secondary" href="#/guide">開啟說明</a></div>' +
-    '<p class="hint">每個按鈕都有對應功能。說明頁列出就緒狀態、驗證循環、專案欄位、文件連結，以及如何自行接上外部 API 來問合約內容。</p></section></div></div>';
+    "</div></div>" +
+    askBoxHTML({ locked: false }) +
+    "</div>";
 }
 
 function dirLabel() {
@@ -3000,16 +3092,19 @@ function projectsHTML() {
   var statusPairs = [["all", "全部狀態"]].concat(STATUSES.map(function (s) { return [s.id, s.label]; }));
   var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["waiting", "等候開工"], ["missing", "尚欠資料"], ["unverified", "待驗證"], ["ready", "可即答"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
   var sortPairs = [["end", "結束日"], ["start", "開始日"], ["status", "狀態"], ["name", "名稱"]];
-  return '<div class="page"><header class="page-head"><h1>專案</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
+  var filterOpen = typeof window !== "undefined" && window.innerWidth >= 861;
+  return '<div class="page"><header class="page-head compact"><h1>專案</h1><a class="btn desk-only" href="#/projects/new">＋ 新增專案</a></header>' +
     '<div class="toolbar">' +
     '<label class="field grow"><span>搜尋</span><input id="q" type="search" value="' + esc(ui.query) + '" placeholder="名稱、情況、機房、保留項目、日期" autocomplete="off"></label>' +
+    '<details class="fold tight filters-fold"' + (filterOpen ? " open" : "") + '><summary>篩選與排序</summary>' +
+
     selectPref("狀態", "status", optionList(statusPairs, data.prefs.status)) +
     selectPref("期限", "due", optionList(duePairs, data.prefs.due)) +
     selectPref("排序", "sort", optionList(sortPairs, data.prefs.sort)) +
     '<div class="field"><span>方向</span><button type="button" class="btn btn-secondary" id="dir-btn" data-action="toggle-dir">' + esc(dirLabel()) + "</button></div>" +
     '<div class="field"><span>版面</span><div class="seg"><button type="button" data-action="layout" data-layout="cards" id="layout-cards">卡片</button><button type="button" data-action="layout" data-layout="timeline" id="layout-timeline">時間軸</button></div></div>' +
     '<div class="field"><span>清除</span><button type="button" class="btn btn-secondary" data-action="reset-filters">重設篩選</button></div>' +
-    "</div><p class=\"summary\" id=\"filter-summary\">" + esc(filterSummary(list)) + '</p><div id="project-list">' + projectListInner(list) + "</div></div>";
+    "</details></div><p class=\"summary\" id=\"filter-summary\">" + esc(filterSummary(list)) + '</p><div id="project-list">' + projectListInner(list) + "</div></div>";
 }
 
 function filteredNotes() {
@@ -3043,7 +3138,7 @@ function notesHTML() {
     pairs.push([p.id, displayName(p)]);
   });
   var sortPairs = [["updated", "最近更新"], ["created", "最近建立"], ["title", "標題"]];
-  return '<div class="page"><header class="page-head"><h1>記事</h1><a class="btn" href="#/notes/new">＋ 新增記事</a></header>' +
+  return '<div class="page"><header class="page-head compact"><h1>記事</h1><a class="btn desk-only" href="#/notes/new">＋ 新增記事</a></header>' +
     '<div class="toolbar">' +
     '<label class="field grow"><span>搜尋</span><input id="nq" type="search" value="' + esc(ui.noteQuery) + '" placeholder="標題、內文、專案名稱" autocomplete="off"></label>' +
     selectPref("專案", "noteProject", optionList(pairs, data.prefs.noteProject)) +
@@ -3089,12 +3184,15 @@ function projectEditor(p) {
   return '<div class="page narrow" data-entity="project" data-entity-id="' + esc(p.id) + '">' +
     '<a class="back" href="#/projects">← 返回專案</a>' +
     '<div class="accent-bar" id="accent-bar" style="background:' + safeColor(p.color) + '"></div>' +
-    '<p class="kicker" style="font-weight:800;margin:0">專案</p>' +
     '<h1 id="editor-name-heading">' + esc(displayName(p)) + "</h1>" +
-    '<p class="save-state" id="save-state">上次更新 ' + esc(formatStamp(p.updatedAt)) + " · 變更會自動存在這台裝置</p>" +
-    '<div id="live-chips">' + chipsHTML(p) + "</div>" +
-    '<div id="live-dates">' + dateBadgesHTML(p) + "</div>" +
+    '<p class="save-state" id="save-state">已自動儲存 · ' + esc(formatStamp(p.updatedAt)) + "</p>" +
+    '<div id="live-chips">' + chipsHTML(p, true) + "</div>" +
+    (p.situation ? '<p class="situation-line" id="live-situation">' + esc(p.situation) + "</p>" : '<p class="situation-line" id="live-situation" hidden></p>') +
+    '<div id="live-dates">' + datePillsHTML(p, 4, true) + "</div>" +
     '<p id="date-warn" class="error-text"' + (warn ? "" : " hidden") + ">" + esc(warn) + "</p>" +
+    readyBoxHTML(p) +
+    askBoxHTML({ locked: true, projectId: p.id, question: ui.askQuery || "", answer: ui.askAnswer || "" }) +
+    '<details class="block fold editor-fold"' + (ui.editorOpen ? " open" : "") + '><summary>編輯資料</summary>' +
     '<label class="field"><span>名稱</span><input class="giant" type="text" data-bind="name" maxlength="200" value="' + esc(p.name) + '" placeholder="大廈或地盤名稱"' + af + "></label>" +
     '<label class="field"><span>狀態</span><select data-bind="status">' + statusOptions(p.status) + "</select></label>" +
     '<label class="field"><span>目前情況／做到邊</span><input type="text" data-bind="situation" maxlength="800" value="' + esc(p.situation || "") + '" placeholder="例如：等候業主簽回開工文件"></label>' +
@@ -3102,7 +3200,7 @@ function projectEditor(p) {
     '<label class="field"><span>項目類型</span><select data-bind="projectKind">' + optionFromList(PROJECT_KINDS, p.projectKind || "") + "</select></label>" +
     '<label class="field" id="mod-scope-wrap"' + modHidden + "><span>現代化範圍</span><select data-bind=\"modScope\">" + optionFromList(MOD_SCOPES, p.modScope || "") + "</select></label>" +
     '<label class="field"><span>機房</span><select data-bind="machineRoom">' + optionFromList(MACHINE_ROOMS, p.machineRoom || "") + "</select></label></div>" +
-    '<label class="field"><span>保留項目</span><textarea data-bind="retainItems" maxlength="2000" placeholder="例如：轎廂裝潢、部分導軌。沒有可填「無」。">' + esc(p.retainItems || "") + "</textarea></label>" +
+    '<label class="field"><span>保留項目</span><textarea class="short" data-bind="retainItems" maxlength="2000" placeholder="例如：轎廂裝潢、部分導軌。沒有可填「無」。">' + esc(p.retainItems || "") + "</textarea></label>" +
     '<div class="grid-2"><label class="field"><span>開始日</span><input type="date" data-bind="startDate" value="' + esc(p.startDate) + '"></label>' +
     '<label class="field"><span>結束日</span><input type="date" data-bind="endDate" value="' + esc(p.endDate) + '"></label></div>' +
     '<div class="grid-2"><label class="field"><span>開工日（Work commenced）</span><input type="date" data-bind="workCommenced" value="' + esc(p.workCommenced || "") + '"></label>' +
@@ -3117,10 +3215,10 @@ function projectEditor(p) {
     '<label class="field"><span>標籤（以逗號分隔）</span><input type="text" data-bind="tags" value="' + esc(formatTags(p.tags)) + '" placeholder="例如：升降機，現代化" spellcheck="false"></label>' +
     '<div class="field"><span>顏色</span>' + colorSwatches(p.color) + "</div>" +
     stampsHTML(p) +
-    askBoxHTML({ locked: true, projectId: p.id, question: ui.askQuery || "", answer: ui.askAnswer || "" }) +
-    filesBlockFor("project") +
-    readyBoxHTML(p) +
-    '<section class="block"><div class="section-head"><h2>連結的記事</h2><button type="button" class="btn btn-secondary" data-action="note-for-project">＋ 寫一則記事</button></div>' + linkedHTML + "</section>" +
+    "</details>" +
+    '<details class="block fold"><summary>合約與文件</summary>' + filesBlockFor("project") + "</details>" +
+    '<details class="block fold"><summary>連結的記事</summary>' +
+    '<div class="section-head"><button type="button" class="btn btn-secondary" data-action="note-for-project">＋ 寫一則記事</button></div>' + linkedHTML + "</details>" +
     '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-project">刪除這個專案</button></div></div>';
 }
 
@@ -3172,12 +3270,16 @@ function endpointCard(ep) {
 }
 function guideHTML() {
   return '<div class="page narrow guide"><header class="page-head"><h1>說明</h1></header>' +
-    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並以「填好 → 驗證 → 被問 → 記入缺口 → 補料再驗證」的方式，讓回覆愈來愈即答。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
-    '<section class="block"><h2>iPhone 打開沒有反應</h2>' +
+    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並以「填好 → 驗證 → 被問 → 記入缺口 → 補料再驗證」的方式，讓回覆愈來愈即答。</p>' +
+    '<details class="block fold" open><summary>手機怎麼用</summary>' +
+    '<p>iPhone 頂部標題和底部「工作台／專案／記事／設定」會固定在畫面，不用上落搵導覽。工作台預設只顯示就緒數字、「已逾期／本週／等候開工」入口，以及「本輪要補／要驗證」。即時解答和新增按鈕固定在底欄上方。要睇逾期完整清單或其他項目，再按「其他清單」。</p>' +
+    '<p>專案頁先顯示現況、驗證和即時解答；詳細欄位、合約文件和記事收在可展開的區塊，不用先滾過一長串表格。</p>' +
+    '<p>請用 Safari 打開，不要停在「檔案」或 OneDrive 的預覽畫面。</p></details>' +
+    '<details class="block fold" open><summary>iPhone 打開沒有反應</summary>' +
     '<p>這通常不是按鈕沒有功能，而是 iPhone 在「檔案」或 OneDrive 的預覽裡打開 HTML 時，系統不會執行程式，所以按下去沒有反應。</p>' +
-    '<ol><li>在「檔案」找到 <code>project-notes.html</code>。</li><li>點分享（方框加向上箭頭）。</li><li>選擇「用 Safari 開啟」。</li><li>之後可在 Safari 選分享 → 加入主畫面。</li></ol></section>' +
+    '<ol><li>在「檔案」找到 <code>project-notes.html</code>。</li><li>點分享（方框加向上箭頭）。</li><li>選擇「用 Safari 開啟」。</li><li>之後可在 Safari 選分享 → 加入主畫面。</li></ol></details>' +
 
-    '<section class="block"><h2>寫法</h2>' +
+    '<details class="block fold"><summary>寫法</summary>' +
     '<p>全部程式、樣式和說明都寫在同一個 HTML 檔裡，不需要安裝，也不需要自己架伺服器。公司電腦、手機、iPad 用瀏覽器打開就能用。</p>' +
     '<ul>' +
     '<li><strong>資料</strong>：專案、記事和設定存在這個瀏覽器的本地儲存；附件存在瀏覽器資料庫。</li>' +
@@ -3185,9 +3287,9 @@ function guideHTML() {
     '<li><strong>備份</strong>：匯出成一份 JSON。公司電腦的 Chrome 或 Edge 可以把它直接寫進 OneDrive 資料夾，改完後自動更新。</li>' +
     '<li><strong>API</strong>：可選。金鑰只留在這台裝置，只有按測試、拉取或推送時才會送出。</li>' +
     '<li><strong>離線</strong>：檔案已在裝置上就可以睇和改。要跨裝置看到最新內容，靠 OneDrive 同步那份 JSON，而不是靠一個公開網站保存你的紀錄。</li>' +
-    '</ul></section>' +
+    '</ul></details>' +
 
-    '<section class="block"><h2>持續改良與驗證</h2>' +
+    '<details class="block fold" open><summary>持續改良與驗證</summary>' +
     '<p>這個工具的工作方式不是一次填完就不管，而是讓每單愈來愈禁得起突擊提問：</p>' +
     '<ol>' +
     '<li><strong>先填你知道的。</strong>項目類型、機房、全改或部分改、保留項目、目前情況、開工狀態和關鍵日期（開工、完工、驗收）隨時可補。</li>' +
@@ -3202,29 +3304,29 @@ function guideHTML() {
     '<li><strong>可即答</strong>：已齊並且目前仍然有效的驗證。</li>' +
     '</ul>' +
     '<p>所有要補紀錄和驗證時間都只留在這台裝置，或你自己匯出／同步的備份裡，不會自動送到這個公開網站，也不會把合約放到網上。</p>' +
-    '</section>' +
+    '</details>' +
 
-    '<section class="block"><h2>工作台與導覽</h2><dl>' +
-    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。工作台第一眼顯示每單情況、就緒狀態和有風險的日期。手機右上角也可以開啟說明。</dd>' +
-    '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。</dd>' +
-    '<dt>進行中、本週到期、已逾期、等候開工</dt><dd>帶你到對應列表或篩選結果。已逾期包括結束日和其他未完成期限；已完成或已取消不會算進去。</dd>' +
+    '<details class="block fold"><summary>工作台與導覽</summary><dl>' +
+    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。手機頂部標題和底部標籤會固定在畫面，即時解答、驗證和新增固定在底欄上方，不用上落搵。工作台第一眼顯示就緒數字、日期入口和本輪要補／要驗證；完整清單按「其他清單」才展開。電腦用左側欄。手機右上角也可以開啟說明。</dd>' +
+    '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。手機可按底欄上方的按鈕新增。</dd>' +
+    '<dt>進行中、本週到期、已逾期、等候開工</dt><dd>工作台以一列入口顯示數量，點進去就到對應列表。已逾期包括結束日和其他未完成期限；已完成或已取消不會算進去。</dd>' +
     '<dt>尚欠資料、待驗證、可即答</dt><dd>帶你到對應就緒狀態的專案列表。工作台另有「本輪要補／要驗證」，會列出高風險尚欠、資料已改、尚未驗證，以及驗證已超過十四日的項目。</dd>' +
     '<dt>知道了</dt><dd>收起示範資料橫額，示範內容仍在。</dd>' +
     '<dt>清除示範資料</dt><dd>刪除尚未改過的示範專案、記事和端點。你改過的項目會留下。</dd>' +
     '<dt>前往備份／稍後</dt><dd>提醒你把資料存到 OneDrive。稍後只是先收起提示。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
-    '<section class="block"><h2>專案與記事</h2><dl>' +
-    '<dt>搜尋、狀態、期限、排序、升序／降序</dt><dd>即時篩選和排列列表。</dd>' +
+    '<details class="block fold"><summary>專案與記事</summary><dl>' +
+    '<dt>搜尋、狀態、期限、排序、升序／降序</dt><dd>搜尋列一直可見。其他篩選在手機收在「篩選與排序」裡，點開才顯示，避免一長排條件佔滿畫面。</dd>' +
     '<dt>卡片／時間軸</dt><dd>切換專案版面。時間軸仍然用大字顯示開始日、結束日和剩餘天數。</dd>' +
-    '<dt>重設篩選</dt><dd>恢复預設的列表條件。</dd>' +
+    '<dt>重設篩選</dt><dd>恢復預設的列表條件。</dd>' +
     '<dt>顏色圓點</dt><dd>設定專案顏色，方便在列表辨認。</dd>' +
     '<dt>為這個專案新增記事</dt><dd>開一則已連結該專案的記事，記事上會顯示該專案的日期。</dd>' +
     '<dt>選擇檔案／下載／刪除附件</dt><dd>附件存在這台瀏覽器，之後可以下載。匯出備份時可一併帶走。</dd>' +
     '<dt>刪除專案／刪除記事</dt><dd>刪除前會先確認。刪專案時會移除該專案附件，並解除記事連結，記事本身會保留。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
-    '<section class="block"><h2>專案欄位（機種與日期）</h2><dl>' +
+    '<details class="block fold"><summary>專案欄位（機種與日期）</summary><dl>' +
     '<dt>目前情況／做到邊</dt><dd>短句顯示在工作台卡片上，方便被問到時先睇現況。</dd>' +
     '<dt>項目類型</dt><dd>新裝、現代化或其他。可不填。</dd>' +
     '<dt>現代化範圍</dt><dd>只有類型是現代化時才顯示：全改或部分改。</dd>' +
@@ -3232,9 +3334,9 @@ function guideHTML() {
     '<dt>保留項目</dt><dd>自由填寫這一單保留了什麼。</dd>' +
     '<dt>開工（Work commenced）</dt><dd>開工日、等候開工或已開工，以及短備註。等候中的專案會集中出現在工作台。</dd>' +
     '<dt>其他期限</dt><dd>除開始、結束和開工外，可新增完工、驗收或自訂日期。完成的期限或已完結專案不會標成逾期。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
-    '<section class="block"><h2>合約文件與即時解答</h2><dl>' +
+    '<details class="block fold"><summary>合約文件與即時解答</summary><dl>' +
     '<dt>選擇檔案並存入</dt><dd>把合約、圖則或往來文件存進這台瀏覽器，可標類型。匯出備份時一併帶走。檔案不會上傳到公開網站。</dd>' +
     '<dt>只記下檔名或路徑</dt><dd>檔案仍留在公司 OneDrive 或共用資料夾，這裡只記住名稱和位置。</dd>' +
     '<dt>連結本機或 OneDrive 檔案</dt><dd>在支援的電腦瀏覽器（通常是 Chrome 或 Edge）可直接連結檔案，之後在這台電腦打開。連結不能寫進 JSON 備份，請另外保留原檔。</dd>' +
@@ -3244,9 +3346,9 @@ function guideHTML() {
     '<dt>今次被問</dt><dd>記下今次被問什麼、能否即答、還欠什麼。補完後可標「已補完，待再驗證」。</dd>' +
     '<dt>驗證全部／驗證日期、機種情況、合約重點</dt><dd>在專案頁把已齊的資料標成已驗證，並留下時間和可選備註。之後若欄位或附件有改，該部分會回到待驗證。</dd>' +
     '<dt>問外部 API</dt><dd>只有你按下時，才把問題、專案欄位、記事和已抽出的文字送到你在設定裡填的端點。不會把檔案二元內容或金鑰寫進請求本體。沒有端點時會說明做法。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
-    '<section class="block"><h2>同步、備份與設定</h2><dl>' +
+    '<details class="block fold"><summary>同步、備份與設定</summary><dl>' +
     '<dt>儲存到 OneDrive 檔案</dt><dd>用 Chrome 或 Edge 選一個 OneDrive 資料夾，寫入 <code>project-notes-backup.json</code>。之後改資料會自動更新這個檔。</dd>' +
     '<dt>更新已連結的檔案</dt><dd>立刻覆寫你上次選過的那個檔，不必再揀一次。</dd>' +
     '<dt>從檔案載入</dt><dd>讀取 JSON。可以合併或取代。手機、iPad 主要用這個睇公司電腦的進度。</dd>' +
@@ -3259,16 +3361,16 @@ function guideHTML() {
     '<dt>要求瀏覽器盡量保留</dt><dd>請瀏覽器不要隨便清掉本機資料。這不是保證，仍要定期備份。</dd>' +
     '<dt>檢查這台瀏覽器</dt><dd>測試本地儲存、附件資料庫、日期計算和備份功能是否正常。</dd>' +
     '<dt>載入示範資料</dt><dd>再放入一套用來展示日期狀態的例子，不會蓋掉你自己的專案。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
     '<section class="block"><h2>API 端點</h2><dl>' +
     '<dt>加入端點／加入內建模擬</dt><dd>可不設。內建 <code>local://mock</code> 可離線練習拉取和推送；<code>local://fail</code> 用來查看錯誤狀態。</dd>' +
     '<dt>測試、拉取、推送</dt><dd>測試只檢查連線；拉取把遠端專案和記事合併或取代到本機；推送送出專案和記事，不含附件和金鑰。</dd>' +
     '<dt>問外部 API</dt><dd>用同一個端點，以你選的 PUT 或 POST 送出提問。內建 <code>local://mock</code> 會在裝置上回一段模擬答案，方便先試流程。</dd>' +
     '<dt>清除金鑰／刪除端點</dt><dd>金鑰只存在這台裝置。刪除前會確認。</dd>' +
-    '</dl></section>' +
+    '</dl></details>' +
 
-    '<section class="block"><h2>目前主流 AI 用家可以怎樣做好這類工具</h2>' +
+    '<details class="block fold"><summary>目前主流 AI 用家可以怎樣做好這類工具</summary>' +
     '<p>現在很多人用 ChatGPT、Copilot、Gemini、Claude 或 Grok 整個人工具。比較穩陣的做法不是叫它「做一個 Notion」，而是把限制和驗收條件先寫清楚，再請它寫程式。</p>' +
     '<ol>' +
     '<li><strong>先寫規格，再叫它寫程式。</strong>說明誰用、在哪裡用（例如不能裝軟件的公司電腦、手機、iPad）、能不能離線、資料放在哪、日期要怎樣顯示、要不要備份和同步。一次只交代一個主要目標。</li>' +
@@ -3283,7 +3385,7 @@ function guideHTML() {
     '<h3>若要用主流 AI 解答合約問題</h3>' +
     '<p>不要把合約放到公開網站。正確做法是：合約留在這台裝置或公司 OneDrive；這個工具只在本機抽出文字（純文字或可選取文字的 PDF）。然後到「設定 → API 端點」填寫<strong>你自己</strong>控制的網址，例如公司內部轉發服務，或你在自己伺服器上架的一小段程式，由它再轉去你有帳號的 AI。</p>' +
     '<p>端點應接受 JSON（<code>op</code> 為 <code>ask</code>），內容包括問題、專案欄位、記事和已抽出的文件文字，並以 <code>{ "answer": "……" }</code> 或純文字回覆。金鑰只在你按下「問外部 API」時放到你指定的標頭。直接用 <code>file://</code> 打開時，瀏覽器通常會封鎖對外請求，請改在 https 開啟，或先用 <code>local://mock</code> 練習。</p>' +
-    '</section></div>';
+    '</details></div>';
 }
 
 function settingsHTML() {
@@ -3321,20 +3423,20 @@ function settingsHTML() {
     corruptBtn +
     '<button type="button" class="btn btn-secondary" data-action="clean-orphans">清除無主附件</button></div>' +
     '<input id="import-input" type="file" accept="application/json,.json" hidden></section>' +
-    '<section class="block"><h2>API 端點</h2>' +
+    '<details class="block fold"><summary>API 端點</summary>' +
     '<p class="hint">不設定也能完整使用。金鑰只存在這台裝置，只有在你按測試、拉取或推送時，才會放到請求標頭送到你填的網址。不會寫進主控台。同步只含專案和記事，不含附件，也不含金鑰。</p>' +
     '<p class="hint">內建 <strong>local://mock</strong> 不會離開這台裝置，可離線測試。把網址改成 <strong>local://fail</strong> 則會看到失敗訊息。直接打開 HTML 檔時，瀏覽器通常會封鎖對外的 http／https 請求。</p>' +
     '<div class="row"><button type="button" class="btn" data-action="add-endpoint">加入端點</button><button type="button" class="btn btn-secondary" data-action="add-mock">加入內建模擬</button></div>' +
     (data.endpoints.length ? data.endpoints.map(endpointCard).join("") : '<p class="empty">還沒有端點。</p>') +
-    "</section>" +
-    '<details><summary>同步與備份的 JSON 格式</summary>' +
+    "</details>" +
+    '<details class="block fold"><summary>同步與備份的 JSON 格式</summary>' +
     '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。項目類型是 ni／mod／other，現代化範圍是 full／partial，機房是 with／without，開工狀態是 waiting／done。日期格式是 YYYY-MM-DD。備份可含 gaps（要補紀錄）和專案的 verification、docsMeta。</p>' +
     '<p class="hint">推送本體如下。檔案備份另外有 format 為 project-notes，並可含 endpoints 與 files（dataBase64）。</p>' +
     '<pre class="docs">' + esc(JSON_HELP) + "</pre></details>" +
-    '<section class="block"><h2>示範資料</h2>' +
+    '<details class="block fold"><summary>示範資料</summary>' +
     (hasDemo ? '<p class="hint">示範專案和記事還在。清除不會刪掉你改過的項目（一經修改就不再算示範）。</p><button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>'
       : '<p class="hint">目前沒有示範資料。</p><button type="button" class="btn btn-secondary" data-action="load-demo">載入示範資料</button>') +
-    "</section>" +
+    "</details>" +
     '<section class="block"><h2>關於</h2><p class="hint">專案記事版本 ' + APP_VERSION + "。沒有帳號，沒有作者的伺服器，也不會在背景連線。API 金鑰不會在你按下按鈕之外送出。若只保留 index.html，這個頁面仍然可用；圖示和 manifest 只在加入主畫面時有用。</p></section></div>";
 }
 
@@ -3373,10 +3475,42 @@ function titleFor(route) {
   return "工作台";
 }
 
+function scrollToId(id) {
+  var el = document.getElementById(id);
+  if (!el || !el.scrollIntoView) return;
+  var reduce = false;
+  try { reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  el.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+}
+function openAskPanel() {
+  ui.askOpen = true;
+  ui.scrollTo = "ask-box";
+  render();
+}
+function paintActionDock(route) {
+  var dock = document.getElementById("action-dock");
+  if (!dock) return;
+  var html = "";
+  if (route.name === "home") {
+    html = '<button type="button" class="btn" data-action="open-ask">即時解答</button>' +
+      '<a class="btn btn-secondary" href="#/projects/new">＋ 新增</a>';
+  } else if (route.name === "projects") {
+    html = '<a class="btn" href="#/projects/new">＋ 新增專案</a>';
+  } else if (route.name === "project") {
+    html = '<button type="button" class="btn" data-action="open-ask">即時解答</button>' +
+      '<button type="button" class="btn btn-secondary" data-action="goto-verify">驗證</button>';
+  } else if (route.name === "notes") {
+    html = '<a class="btn" href="#/notes/new">＋ 新增記事</a>';
+  }
+  dock.innerHTML = html;
+  dock.hidden = !html;
+  document.body.classList.toggle("has-dock", !!html);
+}
 function render() {
   var route = parseRoute();
   var key = routeKey(route);
   var skipScroll = key === ui.lastRouteKey;
+  if (!skipScroll && route.name !== "project") ui.editorOpen = false;
   ui.lastRouteKey = key;
   ui.shownDay = todayISO();
   document.getElementById("main").innerHTML = viewHTML(route);
@@ -3386,8 +3520,21 @@ function render() {
   paintToday();
   paintBanners();
   paintOneDriveStatus();
+  paintActionDock(route);
   afterRender(route);
-  if (!skipScroll) window.scrollTo(0, 0);
+  if (ui.scrollTo) {
+    var target = ui.scrollTo;
+    ui.scrollTo = "";
+    setTimeout(function () {
+      scrollToId(target);
+      if (target === "ask-box") {
+        var q = document.getElementById("ask-q");
+        if (q) q.focus();
+      }
+    }, 30);
+  } else if (!skipScroll) {
+    window.scrollTo(0, 0);
+  }
 }
 function paintNav(route) {
   var key = route.name === "project" ? "projects" : route.name === "note" ? "notes" : route.name;
@@ -3464,9 +3611,14 @@ function markSaved() {
 }
 function refreshProjectChrome(p) {
   var box = document.getElementById("live-dates");
-  if (box) box.innerHTML = dateBadgesHTML(p);
+  if (box) box.innerHTML = datePillsHTML(p, 4, true);
+  var sit = document.getElementById("live-situation");
+  if (sit) {
+    sit.textContent = p.situation || "";
+    sit.hidden = !p.situation;
+  }
   var chips = document.getElementById("live-chips");
-  if (chips) chips.innerHTML = chipsHTML(p);
+  if (chips) chips.innerHTML = chipsHTML(p, true);
   var wrap = document.getElementById("mod-scope-wrap");
   if (wrap) wrap.hidden = p.projectKind !== "mod";
   var warn = document.getElementById("date-warn");
@@ -4956,6 +5108,19 @@ function runAction(action, btn) {
     removeMilestone(entR.id, btn.dataset.id);
     return;
   }
+  if (action === "open-ask") { openAskPanel(); return; }
+  if (action === "goto-verify") {
+    var onProj = parseRoute().name === "project";
+    if (!onProj) { toast("請先打開一單專案再驗證。"); return; }
+    ui.scrollTo = "ready-box";
+    render();
+    return;
+  }
+  if (action === "toggle-home-more") {
+    ui.homeMore = !ui.homeMore;
+    render();
+    return;
+  }
   if (action === "ask-local") return runLocalAsk();
   if (action === "ask-api") return runApiAsk();
   if (action === "ask-copy") return copyAskAnswer();
@@ -5160,6 +5325,24 @@ function runAction(action, btn) {
 }
 
 function bindGlobal() {
+  document.body.addEventListener("toggle", function (e) {
+    var t = e.target;
+    if (!t || t.tagName !== "DETAILS") return;
+    if (t.classList && t.classList.contains("editor-fold")) ui.editorOpen = !!t.open;
+  }, true);
+  function isEditField(el) {
+    if (!el || !el.tagName) return false;
+    var tag = el.tagName.toLowerCase();
+    return tag === "input" || tag === "textarea" || tag === "select";
+  }
+  document.addEventListener("focusin", function (e) {
+    if (isEditField(e.target)) document.body.classList.add("kbd-open");
+  });
+  document.addEventListener("focusout", function () {
+    setTimeout(function () {
+      if (!isEditField(document.activeElement)) document.body.classList.remove("kbd-open");
+    }, 80);
+  });
   document.body.addEventListener("click", function (e) {
     if (e.target.closest("#dialog")) return;
     var btn = e.target.closest("[data-action]");
@@ -5248,6 +5431,7 @@ function onRoute() {
     var p = createProject();
     ui.autofocus = true;
     ui.autofocusId = p.id;
+    ui.editorOpen = true;
     history.replaceState(null, "", "#/p/" + p.id);
   } else if (hash === "#/notes/new") {
     var n = createNote("");
