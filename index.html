@@ -415,6 +415,31 @@
     @media (min-width: 700px) {
       .stats.stats-4 { grid-template-columns: repeat(4, 1fr); }
     }
+
+    .chip-ready { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+    .chip-missing { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+    .chip-unverified { background: var(--info-bg); border-color: var(--info); color: var(--info); }
+    .stat-ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+    .stat-info { background: var(--info-bg); border-color: var(--info); color: var(--info); }
+    .ready-box, .ask-follow, .log-form {
+      background: #f4f7fb; border: 2px solid var(--navy); border-radius: 14px;
+      padding: 12px; margin-top: 10px;
+    }
+    .ready-box { background: white; padding: 14px; margin-top: 26px; }
+    .ready-box h2 { margin: 0 0 6px; font-size: 22px; }
+    .ready-box h3 { margin: 16px 0 8px; font-size: 18px; }
+    .ask-follow { margin-top: 10px; }
+    .log-form { margin-top: 10px; background: white; }
+    .gap-row {
+      background: #f4f6f8; border: 2px solid var(--line); border-radius: 12px;
+      padding: 10px; margin-top: 8px;
+    }
+    .gap-row p { margin: 0 0 6px; font-weight: 700; }
+    .gap-row p:last-child { margin-bottom: 0; }
+    .gap-done { opacity: .78; }
+    @media (min-width: 700px) {
+      .stats.stats-3 { grid-template-columns: repeat(3, 1fr); }
+    }
     .noscript {
       margin: 16px; padding: 16px; background: var(--danger-bg); color: var(--danger);
       border: 2px solid var(--danger); border-radius: 14px; font-weight: 800;
@@ -474,7 +499,7 @@
         </div>
       </div>
       <div id="demo-banner" class="banner" hidden>
-        <p>這是示範資料，用來展示升降機／自動梯專案的開工、期限、機房和現代化範圍。內容是虛構例子，不是真實合約。你可以修改，或清除後建立自己的專案。</p>
+        <p>這是示範資料，用來展示升降機／自動梯專案的開工、期限、機房、現代化範圍，以及尚欠資料、待驗證、可即答三種就緒狀態。內容是虛構例子，不是真實合約。你可以修改，或清除後建立自己的專案。</p>
         <div class="row">
           <button type="button" class="btn btn-secondary" data-action="dismiss-demo">知道了</button>
           <button type="button" class="btn btn-danger" data-action="clear-demo">清除示範資料</button>
@@ -516,7 +541,7 @@
 
 var KEY = "ky-project-notes-v1";
 var MOCK_KEY = "ky-project-notes-mock-v1";
-var APP_VERSION = 2;
+var APP_VERSION = 3;
 var COLORS = ["#17364a", "#1d3f8f", "#084028", "#8a4b08", "#8f1d1d", "#3f3a6b", "#24556e", "#3d4a3e"];
 var WEEK = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 var STATUSES = [
@@ -528,7 +553,7 @@ var STATUSES = [
 ];
 var STATUS_ORDER = { active: 0, planning: 1, paused: 2, done: 3, cancelled: 4 };
 var KIND = { overdue: 1, soon: 1, ok: 1, info: 1, neutral: 1, none: 1 };
-var DUE_LABELS = { all: "全部期限", overdue: "已逾期", soon: "七天內", waiting: "等候開工", nodate: "未設結束日", notstarted: "尚未開始" };
+var DUE_LABELS = { all: "全部期限", overdue: "已逾期", soon: "七天內", waiting: "等候開工", nodate: "未設結束日", notstarted: "尚未開始", missing: "尚欠資料", unverified: "待驗證", ready: "可即答" };
 var SORT_LABELS = { end: "結束日", start: "開始日", status: "狀態", name: "名稱" };
 
 var PROJECT_KINDS = [
@@ -554,10 +579,16 @@ var DOC_TYPES = [
   { id: "other", label: "其他" }
 ];
 var MILESTONE_SUGGESTIONS = ["開工", "完工", "驗收"];
+var STALE_VERIFY_DAYS = 14;
+var READY_ASPECTS = [
+  { id: "dates", label: "日期" },
+  { id: "machine", label: "機種情況" },
+  { id: "contract", label: "合約重點" }
+];
 
 var JSON_HELP = [
   "{",
-  '  "version": 2,',
+  '  "version": 3,',
   '  "source": "project-notes",',
   '  "exportedAt": "2026-11-25T00:00:00.000Z",',
   '  "projects": [',
@@ -579,6 +610,25 @@ var JSON_HELP = [
   '      "milestones": [{ "id": "m_example", "name": "驗收", "date": "2027-01-10", "done": false }],',
   '      "tags": ["升降機"],',
   '      "color": "#17364a",',
+  '      "createdAt": "2026-11-01T00:00:00.000Z",',
+  '      "updatedAt": "2026-11-01T00:00:00.000Z",',
+  '      "docsMeta": { "count": 1, "hasAny": true, "hasContract": true, "fingerprint": "example" },',
+  '      "verification": {',
+  '        "dates": { "verifiedAt": "", "note": "", "fingerprint": "" },',
+  '        "machine": { "verifiedAt": "", "note": "", "fingerprint": "" },',
+  '        "contract": { "verifiedAt": "", "note": "", "fingerprint": "" }',
+  '      }',
+  "    }",
+  "  ],",
+  '  "gaps": [',
+  "    {",
+  '      "id": "g_example",',
+  '      "projectId": "p_example",',
+  '      "question": "有冇機房？",',
+  '      "missing": "未填機房",',
+  '      "answered": "partial",',
+  '      "source": "manual",',
+  '      "status": "open",',
   '      "createdAt": "2026-11-01T00:00:00.000Z",',
   '      "updatedAt": "2026-11-01T00:00:00.000Z"',
   "    }",
@@ -624,7 +674,8 @@ var ui = {
   askQuery: "",
   askProjectId: "",
   askEndpointId: "",
-  askAnswer: ""
+  askAnswer: "",
+  lastAsk: null
 };
 
 function esc(s) {
@@ -802,7 +853,9 @@ function defaultProjectExtras() {
     workCommenced: "",
     workCommencedStatus: "",
     workCommencedNote: "",
-    milestones: []
+    milestones: [],
+    docsMeta: emptyDocsMeta(),
+    verification: emptyVerification()
   };
 }
 function applyProjectExtras(p) {
@@ -817,6 +870,8 @@ function applyProjectExtras(p) {
   p.workCommencedStatus = p.workCommencedStatus === "done" || p.workCommencedStatus === "waiting" ? p.workCommencedStatus : "";
   p.workCommencedNote = String(p.workCommencedNote || "").slice(0, 500);
   p.milestones = normalizeMilestones(p.milestones);
+  p.docsMeta = normalizeDocsMeta(p.docsMeta);
+  p.verification = normalizeVerification(p.verification);
   return p;
 }
 function commenceStatus(p) {
@@ -903,6 +958,7 @@ function chipsHTML(p) {
   if (isWaitingCommence(p)) bits.push('<span class="chip chip-warn">等候開工</span>');
   else if (commenceStatus(p) === "done") bits.push('<span class="chip chip-ok">已開工</span>');
   if (p.retainItems) bits.push('<span class="chip">保留：' + esc(excerpt(p.retainItems, 24)) + "</span>");
+  bits.unshift(readinessChipHTML(p));
   if (!bits.length) return "";
   return '<div class="chips">' + bits.join("") + "</div>";
 }
@@ -922,11 +978,722 @@ function projectSearchHay(p) {
     p.name, p.description, p.situation, p.retainItems, p.workCommencedNote,
     (p.tags || []).join(" "), p.startDate, p.endDate, p.workCommenced,
     statusLabel(p.status), projectKindLabel(p.projectKind), modScopeLabel(p.modScope),
-    machineRoomLabel(p.machineRoom), commenceStatus(p) === "waiting" ? "等候開工 work commenced" : "已開工"
+    machineRoomLabel(p.machineRoom), commenceStatus(p) === "waiting" ? "等候開工 work commenced" : "已開工",
+    readinessOf(p).label
   ];
   (p.milestones || []).forEach(function (m) { bits.push(m.name, m.date); });
+  openGapsFor(p.id).forEach(function (g) { bits.push(g.question, g.missing); });
   return bits.join(" ");
 }
+
+function emptyAspectVer() {
+  return { verifiedAt: "", note: "", fingerprint: "" };
+}
+function emptyVerification() {
+  return { dates: emptyAspectVer(), machine: emptyAspectVer(), contract: emptyAspectVer() };
+}
+function emptyDocsMeta() {
+  return { count: 0, hasAny: false, hasContract: false, fingerprint: "none" };
+}
+function normalizeAspectVer(raw) {
+  var v = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return {
+    verifiedAt: isStamp(v.verifiedAt) ? v.verifiedAt : "",
+    note: String(v.note || "").slice(0, 200),
+    fingerprint: String(v.fingerprint || "").slice(0, 4000)
+  };
+}
+function normalizeVerification(raw) {
+  var v = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return {
+    dates: normalizeAspectVer(v.dates),
+    machine: normalizeAspectVer(v.machine),
+    contract: normalizeAspectVer(v.contract)
+  };
+}
+function normalizeDocsMeta(raw) {
+  var d = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  var count = Number(d.count);
+  if (!isFinite(count) || count < 0) count = 0;
+  return {
+    count: Math.min(500, Math.floor(count)),
+    hasAny: d.hasAny === true || d.count > 0,
+    hasContract: d.hasContract === true,
+    fingerprint: String(d.fingerprint || (count ? "present" : "none")).slice(0, 4000)
+  };
+}
+function docsMetaFromFiles(files) {
+  files = (files || []).slice().sort(function (a, b) {
+    return String(a.id || "").localeCompare(String(b.id || ""));
+  });
+  var parts = files.map(function (f) {
+    return [
+      f.id || "", f.name || "", f.docType || "", f.kind || "",
+      f.size || 0, f.textStatus || "", String(f.textCache || "").length,
+      f.linkLabel || ""
+    ].join(":");
+  });
+  return {
+    count: files.length,
+    hasAny: files.length > 0,
+    hasContract: files.some(function (f) {
+      return f.docType === "contract" || /合約|契約|contract/i.test(f.name || "");
+    }),
+    fingerprint: parts.join("|") || "none"
+  };
+}
+function aspectLabel(id) {
+  var found = READY_ASPECTS.filter(function (x) { return x.id === id; })[0];
+  return found ? found.label : id;
+}
+function hasNamedMilestone(p, names) {
+  return (p.milestones || []).some(function (m) {
+    var n = String(m.name || "").trim();
+    return n && names.some(function (want) { return n === want || n.indexOf(want) >= 0; }) && !!m.date;
+  });
+}
+function hasStartSideDate(p) {
+  return !!(p.startDate || p.workCommenced || hasNamedMilestone(p, ["開工"]));
+}
+function hasFinishSideDate(p) {
+  return !!(p.endDate || hasNamedMilestone(p, ["完工", "工完", "驗收"]));
+}
+function aspectFingerprint(p, aspectId) {
+  if (aspectId === "dates") {
+    return JSON.stringify({
+      start: p.startDate || "",
+      end: p.endDate || "",
+      wc: p.workCommenced || "",
+      wcs: p.workCommencedStatus || "",
+      wcn: p.workCommencedNote || "",
+      ms: (p.milestones || []).map(function (m) { return [m.id, m.name, m.date, !!m.done]; })
+    });
+  }
+  if (aspectId === "machine") {
+    return JSON.stringify({
+      kind: p.projectKind || "",
+      scope: p.modScope || "",
+      room: p.machineRoom || "",
+      retain: p.retainItems || "",
+      sit: p.situation || ""
+    });
+  }
+  var meta = p.docsMeta || emptyDocsMeta();
+  return meta.fingerprint || "none";
+}
+function aspectIssues(p, aspectId) {
+  var issues = [];
+  if (!p) return issues;
+  if (aspectId === "dates") {
+    if (!p.workCommencedStatus && !p.workCommenced) {
+      issues.push({ aspect: "dates", key: "workCommencedStatus", label: "開工狀態或開工日" });
+    }
+    if (!hasStartSideDate(p)) {
+      issues.push({ aspect: "dates", key: "startSide", label: "開工或開始日" });
+    }
+    if (!hasFinishSideDate(p)) {
+      issues.push({ aspect: "dates", key: "finishSide", label: "結束、完工或驗收日期" });
+    }
+  } else if (aspectId === "machine") {
+    if (!p.situation) issues.push({ aspect: "machine", key: "situation", label: "目前情況／做到邊" });
+    if (!p.projectKind) issues.push({ aspect: "machine", key: "projectKind", label: "項目類型" });
+    if (p.projectKind === "mod" && !p.modScope) {
+      issues.push({ aspect: "machine", key: "modScope", label: "全改或部分改" });
+    }
+    if (!p.machineRoom) issues.push({ aspect: "machine", key: "machineRoom", label: "機房" });
+    if (!String(p.retainItems || "").trim()) {
+      issues.push({ aspect: "machine", key: "retainItems", label: "保留項目" });
+    }
+  } else if (aspectId === "contract") {
+    var meta = p.docsMeta || emptyDocsMeta();
+    if (!meta.hasAny && meta.count < 1) {
+      issues.push({ aspect: "contract", key: "document", label: "合約或圖則（尚未掛上或記下路徑）" });
+    }
+  }
+  return issues;
+}
+function completenessIssues(p) {
+  var list = [];
+  READY_ASPECTS.forEach(function (a) {
+    aspectIssues(p, a.id).forEach(function (it) { list.push(it); });
+  });
+  return list;
+}
+function aspectState(p, aspectId) {
+  if (aspectIssues(p, aspectId).length) return "missing";
+  var ver = (p.verification && p.verification[aspectId]) || emptyAspectVer();
+  if (!ver.verifiedAt) return "unverified";
+  if (ver.fingerprint !== aspectFingerprint(p, aspectId)) return "stale";
+  return "verified";
+}
+function readinessId(state) {
+  return state === "ready" ? "ready" : state === "missing" ? "missing" : "unverified";
+}
+function readinessOf(p) {
+  var aspects = {};
+  var missing = false;
+  var pending = false;
+  var stale = false;
+  var oldest = "";
+  READY_ASPECTS.forEach(function (a) {
+    var st = aspectState(p, a.id);
+    var ver = (p.verification && p.verification[a.id]) || emptyAspectVer();
+    aspects[a.id] = { id: a.id, label: a.label, state: st, verifiedAt: ver.verifiedAt, note: ver.note };
+    if (st === "missing") missing = true;
+    else if (st === "unverified") pending = true;
+    else if (st === "stale") { pending = true; stale = true; }
+    else if (ver.verifiedAt && (!oldest || ver.verifiedAt < oldest)) oldest = ver.verifiedAt;
+  });
+  var issues = completenessIssues(p);
+  var rec = {
+    aspects: aspects,
+    issues: issues,
+    stale: stale,
+    verifiedAt: oldest,
+    closed: isClosed(p)
+  };
+  if (missing) {
+    rec.id = "missing";
+    rec.label = "尚欠資料";
+    rec.chip = "chip-missing";
+  } else if (pending) {
+    rec.id = "unverified";
+    rec.label = "待驗證";
+    rec.chip = "chip-unverified";
+  } else {
+    rec.id = "ready";
+    rec.label = "可即答";
+    rec.chip = "chip-ready";
+  }
+  return rec;
+}
+function readinessLabel(id) {
+  if (id === "ready") return "可即答";
+  if (id === "missing") return "尚欠資料";
+  if (id === "unverified") return "待驗證";
+  return "";
+}
+function isReadyOpen(p, id) {
+  return !isClosed(p) && readinessOf(p).id === id;
+}
+function verifyAgeDays(p) {
+  var r = readinessOf(p);
+  if (r.id !== "ready" || !r.verifiedAt) return null;
+  var t = Date.parse(r.verifiedAt);
+  if (Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+function isVerifyAging(p) {
+  var age = verifyAgeDays(p);
+  return age != null && age >= STALE_VERIFY_DAYS;
+}
+function cycleReason(p) {
+  var r = readinessOf(p);
+  var gaps = openGapsFor(p.id).length;
+  if (r.id === "missing" && hasOverdueDates(p)) return "尚欠資料，而且有逾期日期";
+  if (r.id === "missing" && hasSoonDates(p)) return "尚欠資料，本週有期限";
+  if (r.id === "unverified" && r.stale) return "資料已改，要重新驗證";
+  if (r.id === "missing" && gaps) return "尚欠資料，並有要補項目";
+  if (r.id === "missing") return "尚欠可即答所需的欄位或文件";
+  if (r.id === "unverified") return "資料已齊，尚未驗證";
+  if (isVerifyAging(p)) return "驗證已超過 " + STALE_VERIFY_DAYS + " 日，建議再確認";
+  if (gaps) return "仍有未完成的要補項目";
+  return "";
+}
+function cycleRank(p) {
+  var r = readinessOf(p);
+  if (r.id === "missing" && hasOverdueDates(p)) return 0;
+  if (r.id === "unverified" && r.stale && hasOverdueDates(p)) return 1;
+  if (r.id === "missing" && hasSoonDates(p)) return 2;
+  if (r.id === "unverified" && r.stale) return 3;
+  if (r.id === "missing") return 4;
+  if (r.id === "unverified") return 5;
+  if (openGapsFor(p.id).length) return 6;
+  if (isVerifyAging(p)) return 7;
+  return 9;
+}
+function isCycleCandidate(p) {
+  if (!p || isClosed(p)) return false;
+  var r = readinessOf(p);
+  if (r.id === "missing" || r.id === "unverified") return true;
+  if (openGapsFor(p.id).length) return true;
+  return isVerifyAging(p);
+}
+function cycleProjects() {
+  return data.projects.filter(isCycleCandidate).sort(function (a, b) {
+    return cycleRank(a) - cycleRank(b) || displayName(a).localeCompare(displayName(b), "zh-Hant");
+  });
+}
+function clearVerification(p, aspectId) {
+  if (!p) return;
+  p.verification = normalizeVerification(p.verification);
+  var ids = aspectId && aspectId !== "all" ? [aspectId] : ["dates", "machine", "contract"];
+  ids.forEach(function (id) {
+    p.verification[id] = emptyAspectVer();
+  });
+}
+function markVerified(p, aspectIds, note, opts) {
+  opts = opts || {};
+  if (!p) return { ok: false, message: "找不到專案。" };
+  p.verification = normalizeVerification(p.verification);
+  var ids = !aspectIds || aspectIds === "all" || (aspectIds && aspectIds.length === 0)
+    ? ["dates", "machine", "contract"]
+    : (Array.isArray(aspectIds) ? aspectIds : [aspectIds]);
+  var blocked = [];
+  ids.forEach(function (id) {
+    aspectIssues(p, id).forEach(function (it) { blocked.push(it); });
+  });
+  if (blocked.length) {
+    return { ok: false, message: "請先補齊：" + blocked.map(function (it) { return it.label; }).join("、") + "。" };
+  }
+  var text = String(note || "").trim().slice(0, 200);
+  var at = opts.at || nowISO();
+  ids.forEach(function (id) {
+    p.verification[id] = { verifiedAt: at, note: text, fingerprint: aspectFingerprint(p, id) };
+  });
+  if (!opts.silent) {
+    if (opts.touch !== false) {
+      p.updatedAt = at;
+      if (p.demo && opts.clearDemo) p.demo = false;
+    }
+  }
+  return { ok: true, message: "已驗證" + (ids.length === 3 ? "全部項目" : "「" + ids.map(aspectLabel).join("、") + "」") + "。" };
+}
+function sanitizeGap(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  var answered = raw.answered === "yes" || raw.answered === "partial" || raw.answered === "no" ? raw.answered : "";
+  if (raw.answered === true) answered = "yes";
+  if (raw.answered === false) answered = "no";
+  var keys = Array.isArray(raw.missingKeys)
+    ? raw.missingKeys.map(function (k) { return String(k || "").slice(0, 40); }).filter(Boolean).slice(0, 20)
+    : [];
+  return {
+    id: ensureId(raw.id, "g"),
+    projectId: raw.projectId ? String(raw.projectId).slice(0, 80) : "",
+    question: String(raw.question || "").slice(0, 2000),
+    missing: String(raw.missing || "").slice(0, 2000),
+    missingKeys: keys,
+    answered: answered,
+    source: raw.source === "ask" || raw.source === "manual" ? raw.source : "manual",
+    status: raw.status === "done" ? "done" : "open",
+    aspect: raw.aspect === "dates" || raw.aspect === "machine" || raw.aspect === "contract" || raw.aspect === "all" ? raw.aspect : "",
+    createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
+    updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
+    doneAt: isStamp(raw.doneAt) ? raw.doneAt : "",
+    demo: !!raw.demo
+  };
+}
+function publicGap(g) {
+  return {
+    id: g.id, projectId: g.projectId || "", question: g.question || "", missing: g.missing || "",
+    missingKeys: g.missingKeys || [], answered: g.answered || "", source: g.source || "manual",
+    status: g.status === "done" ? "done" : "open", aspect: g.aspect || "",
+    createdAt: g.createdAt, updatedAt: g.updatedAt, doneAt: g.doneAt || ""
+  };
+}
+function findGap(id) {
+  return (data.gaps || []).find(function (g) { return g.id === id; }) || null;
+}
+function openGapsFor(projectId) {
+  return (data.gaps || []).filter(function (g) {
+    return g.status !== "done" && (!projectId || g.projectId === projectId);
+  });
+}
+function answeredLabel(id) {
+  if (id === "yes") return "能夠即答";
+  if (id === "partial") return "只能答部分";
+  if (id === "no") return "未能即答";
+  return "未標明";
+}
+function sameGap(a, b) {
+  return a.projectId === b.projectId &&
+    String(a.question || "") === String(b.question || "") &&
+    String(a.missing || "") === String(b.missing || "") &&
+    a.status !== "done";
+}
+function addGapRecord(fields, opts) {
+  opts = opts || {};
+  var g = sanitizeGap(Object.assign({
+    id: uid("g"),
+    createdAt: nowISO(),
+    updatedAt: nowISO(),
+    status: "open",
+    demo: false
+  }, fields || {}));
+  if (!g) return null;
+  data.gaps = data.gaps || [];
+  if (!opts.allowDup) {
+    var exists = data.gaps.some(function (x) { return x.status !== "done" && sameGap(x, g); });
+    if (exists) return { gap: null, dup: true };
+  }
+  data.gaps.unshift(g);
+  return { gap: g, dup: false };
+}
+function markGapDone(id) {
+  var g = findGap(id);
+  if (!g) return false;
+  g.status = "done";
+  g.doneAt = nowISO();
+  g.updatedAt = g.doneAt;
+  if (g.demo) g.demo = false;
+  var p = findProject(g.projectId);
+  if (p) {
+    clearVerification(p, g.aspect || "all");
+    p.updatedAt = g.updatedAt;
+  }
+  persistNow();
+  return true;
+}
+function readinessChipHTML(p) {
+  var r = readinessOf(p);
+  return '<span class="chip ' + r.chip + '">' + esc(r.label) + "</span>";
+}
+function cycleCard(p) {
+  var r = readinessOf(p);
+  var reason = cycleReason(p);
+  var gaps = openGapsFor(p.id);
+  var sit = p.situation ? '<p class="situation-line">' + esc(p.situation) + "</p>" : "";
+  var miss = r.issues.length ? '<p class="due-line due-' + (r.id === "missing" ? "overdue" : "info") + '">尚欠：' + esc(r.issues.map(function (it) { return it.label; }).join("、")) + "</p>" : "";
+  var gapLine = gaps.length ? '<p class="due-line due-soon">要補 ' + gaps.length + " 項</p>" : "";
+  return '<a class="card-link wb-card" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    '<div class="flag-head"><h3>' + esc(displayName(p)) + '</h3><span class="status-chip status-' + statusClass(p.status) + '">' + esc(statusLabel(p.status)) + "</span></div>" +
+    chipsHTML(p) + sit +
+    (reason ? '<p class="due-line due-' + (r.id === "missing" ? "overdue" : r.id === "unverified" ? "info" : "ok") + '">' + esc(reason) + "</p>" : "") +
+    miss + gapLine +
+    "</a>";
+}
+function setProjectDocsMeta(p, files) {
+  if (!p) return false;
+  var meta = docsMetaFromFiles(files);
+  var before = (p.docsMeta && p.docsMeta.fingerprint) || "";
+  p.docsMeta = meta;
+  return before !== meta.fingerprint;
+}
+function refreshDocsMetaFor(ownerType, ownerId) {
+  if (ownerType !== "project") return Promise.resolve();
+  var p = findProject(ownerId);
+  if (!p) return Promise.resolve();
+  return listFiles("project", ownerId).then(function (files) {
+    if (setProjectDocsMeta(p, files || [])) persistNow();
+    refreshReadyChrome(p);
+  }).catch(function () {});
+}
+function refreshAllDocsMeta() {
+  return listAllFiles().then(function (all) {
+    var by = {};
+    (all || []).forEach(function (f) {
+      if (!f || f.ownerType !== "project" || f.id === "selfcheck") return;
+      (by[f.ownerId] = by[f.ownerId] || []).push(f);
+    });
+    var changed = false;
+    data.projects.forEach(function (p) {
+      if (setProjectDocsMeta(p, by[p.id] || [])) changed = true;
+    });
+    if (changed) persistNow();
+  }).catch(function () {});
+}
+function seedDemoDocuments() {
+  var wanted = data.projects.filter(function (p) { return p.demo && p.demoDocName; });
+  if (!wanted.length) return Promise.resolve();
+  var chain = Promise.resolve();
+  wanted.forEach(function (p) {
+    chain = chain.then(function () {
+      return listFiles("project", p.id).then(function (files) {
+        if (files && files.length) return;
+        return putFile({
+          id: uid("f"),
+          ownerType: "project",
+          ownerId: p.id,
+          name: p.demoDocName,
+          mime: "application/octet-stream",
+          size: 0,
+          createdAt: nowISO(),
+          docType: "contract",
+          kind: "link",
+          linkLabel: p.demoDocPath || "示範路徑（虛構，非真實合約）",
+          textCache: p.demoDocText || "",
+          textStatus: p.demoDocText ? "ok" : "none",
+          textReason: "示範用，只記下虛構路徑，沒有真實合約檔。"
+        });
+      });
+    });
+  });
+  return chain.catch(function () {});
+}
+function applyDemoVerification() {
+  data.projects.forEach(function (p) {
+    if (!p.demo || p.demoReadyGoal !== "ready") return;
+    markVerified(p, "all", "示範：已核對欄位與虛構合約路徑。", { silent: true, at: hoursAgo(2) });
+  });
+}
+function finalizeDemoReadiness() {
+  return seedDemoDocuments().then(function () {
+    return refreshAllDocsMeta();
+  }).then(function () {
+    applyDemoVerification();
+    persistNow();
+  }).catch(function () {
+    data.projects.forEach(function (p) {
+      if (!p.demo || !p.demoDocName) return;
+      if (!p.docsMeta || !p.docsMeta.hasAny) {
+        p.docsMeta = {
+          count: 1, hasAny: true, hasContract: true,
+          fingerprint: "demo-link:" + p.id + ":" + p.demoDocName
+        };
+      }
+    });
+    applyDemoVerification();
+    persistNow();
+  });
+}
+function askFollowHTML(ctx) {
+  ctx = ctx || ui.lastAsk || { ran: false, showLog: false };
+  var incomplete = (ctx.items || []).some(function (it) { return it.issues.length; });
+  var lines = [];
+  if (ctx.ran) {
+    (ctx.items || []).forEach(function (it) {
+      var name = displayName(it.project);
+      if (it.issues.length) lines.push(name + "尚欠：" + it.issues.map(function (x) { return x.label; }).join("、"));
+      else lines.push(name + "：即答欄位已齊。");
+    });
+  }
+  var body = lines.length ? '<ul class="hint-list">' + lines.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" : "";
+  var lead;
+  if (!ctx.ran) lead = '<p class="hint">解答後，若回覆尚欠資料，可按「記入要補」。被突擊提問後，隨時可用「今次被問」記入這一問，只留在這台裝置。</p>';
+  else if (incomplete) lead = '<p class="hint">這次回覆還不夠即答。按「記入要補」會在本機記下要補的項目，不會送到外面。</p>';
+  else lead = '<p class="hint">本機即答欄位已齊。若今次實際被問的點還沒記下，仍可用「今次被問」。</p>';
+  var logHidden = ctx.showLog ? "" : " hidden";
+  var projectId = ctx.logProjectId || ctx.projectId || "";
+  var defaultMissing = "";
+  if (incomplete) {
+    defaultMissing = (ctx.items || []).filter(function (it) { return it.issues.length; }).map(function (it) {
+      return displayName(it.project) + "：" + it.issues.map(function (x) { return x.label; }).join("、");
+    }).join("；");
+  }
+  var projField = ctx.locked
+    ? '<input type="hidden" id="ask-log-project" value="' + esc(projectId) + '">'
+    : '<label class="field"><span>針對專案</span><select id="ask-log-project">' +
+      '<option value="">（請選擇）</option>' +
+      data.projects.map(function (p) {
+        return '<option value="' + esc(p.id) + '"' + (p.id === projectId ? " selected" : "") + ">" + esc(displayName(p)) + "</option>";
+      }).join("") + "</select></label>";
+  return '<div id="ask-follow" class="ask-follow">' + lead + body +
+    '<div class="row">' +
+    (ctx.ran && incomplete ? '<button type="button" class="btn" data-action="log-ask-gaps">記入要補</button>' : "") +
+    '<button type="button" class="btn btn-secondary" data-action="toggle-ask-log">今次被問</button></div>' +
+    '<div id="ask-log-form" class="log-form"' + logHidden + ">" +
+    '<label class="field"><span>今次被問什麼</span><textarea id="ask-log-q" maxlength="2000" placeholder="例如：呢單係全改定部分改？有冇機房？">' + esc(ctx.question || "") + "</textarea></label>" +
+    projField +
+    '<label class="field"><span>能否即答</span><select id="ask-log-answered">' +
+    optionList([["partial", "只能答部分"], ["no", "未能即答"], ["yes", "能夠即答"]], ctx.logAnswered || (incomplete ? "partial" : "yes")) +
+    "</select></label>" +
+    '<label class="field"><span>還欠什麼（可留空，工具會帶入尚欠項目）</span><textarea id="ask-log-missing" maxlength="2000" placeholder="例如：未掛合約、未填保留項目">' + esc(ctx.logMissing || defaultMissing) + "</textarea></label>" +
+    '<div class="row"><button type="button" class="btn" data-action="save-ask-log">記入這一問</button></div></div></div>';
+}
+function paintAskFollow() {
+  var host = document.getElementById("ask-follow");
+  if (!host) return;
+  var wrap = document.createElement("div");
+  wrap.innerHTML = askFollowHTML(ui.lastAsk);
+  var next = wrap.firstChild;
+  if (next) host.replaceWith(next);
+}
+function recordAskContext(projects, question, docsByProject) {
+  var dirty = false;
+  (projects || []).forEach(function (p) {
+    if (docsByProject && Object.prototype.hasOwnProperty.call(docsByProject, p.id)) {
+      if (setProjectDocsMeta(p, docsByProject[p.id] || [])) dirty = true;
+    }
+  });
+  if (dirty) persistNow();
+  var items = (projects || []).map(function (p) {
+    return { project: p, issues: completenessIssues(p) };
+  });
+  ui.lastAsk = {
+    ran: true,
+    question: question || "",
+    projectId: projects && projects.length === 1 ? projects[0].id : (ui.askProjectId || ""),
+    logProjectId: projects && projects.length === 1 ? projects[0].id : "",
+    locked: !!(document.getElementById("ask-project") && document.getElementById("ask-project").type === "hidden"),
+    items: items,
+    showLog: ui.lastAsk && ui.lastAsk.showLog,
+    logAnswered: "",
+    logMissing: ""
+  };
+  paintAskFollow();
+}
+function readAskLogForm() {
+  var q = document.getElementById("ask-log-q");
+  var p = document.getElementById("ask-log-project");
+  var a = document.getElementById("ask-log-answered");
+  var m = document.getElementById("ask-log-missing");
+  return {
+    question: q ? q.value : "",
+    projectId: p ? p.value : "",
+    answered: a ? a.value : "",
+    missing: m ? m.value : ""
+  };
+}
+function logAskGaps() {
+  var ctx = ui.lastAsk;
+  if (!ctx || !ctx.ran) { toast("請先按「即時解答」。"); return; }
+  var created = 0;
+  var dups = 0;
+  (ctx.items || []).forEach(function (it) {
+    if (!it.issues.length) return;
+    var result = addGapRecord({
+      projectId: it.project.id,
+      question: ctx.question || "（整理現況）",
+      missing: it.issues.map(function (x) { return x.label; }).join("、"),
+      missingKeys: it.issues.map(function (x) { return x.key; }),
+      answered: "partial",
+      source: "ask",
+      aspect: "",
+      demo: false
+    });
+    if (result && result.dup) dups++;
+    else if (result && result.gap) created++;
+  });
+  persistNow();
+  if (created) toast("已記入 " + created + " 項要補" + (dups ? "（已有重複的沒有再加）" : "") + "。補完後請再驗證。");
+  else if (dups) toast("這些要補項目已經記過，尚未完成。");
+  else toast("沒有新的尚欠項目需要記入。");
+  var route = parseRoute();
+  if (route.name === "project" || route.name === "home") render();
+  else paintAskFollow();
+}
+function saveAskLog() {
+  var form = readAskLogForm();
+  var projectId = form.projectId || (ui.lastAsk && ui.lastAsk.projectId) || "";
+  if (!projectId) { toast("請先選一個專案，再記入這一問。"); return; }
+  if (!findProject(projectId)) { toast("找不到這個專案。"); return; }
+  var question = String(form.question || "").trim();
+  if (!question) { toast("請先寫下今次被問什麼。"); return; }
+  var missing = String(form.missing || "").trim();
+  if (!missing && form.answered !== "yes") {
+    var p = findProject(projectId);
+    var issues = completenessIssues(p);
+    missing = issues.map(function (x) { return x.label; }).join("、");
+  }
+  var result = addGapRecord({
+    projectId: projectId,
+    question: question,
+    missing: missing,
+    answered: form.answered || "",
+    source: "manual",
+    demo: false
+  });
+  persistNow();
+  if (result && result.dup) toast("這一問已經記過，尚未完成。");
+  else toast("已記入今次被問。資料只留在這台裝置。");
+  if (ui.lastAsk) ui.lastAsk.showLog = false;
+  var route = parseRoute();
+  if (route.name === "project" || route.name === "home") render();
+}
+function toggleAskLog() {
+  if (!ui.lastAsk) ui.lastAsk = { ran: false, showLog: true };
+  else ui.lastAsk.showLog = !ui.lastAsk.showLog;
+  if (ui.lastAsk.showLog && ui.lastAsk.ran) {
+    var form = readAskLogForm();
+    if (form.question) ui.lastAsk.question = form.question;
+    if (form.projectId) ui.lastAsk.logProjectId = form.projectId;
+    if (form.answered) ui.lastAsk.logAnswered = form.answered;
+    if (form.missing) ui.lastAsk.logMissing = form.missing;
+  }
+  paintAskFollow();
+  var box = document.getElementById("ask-log-q");
+  if (box && ui.lastAsk.showLog) box.focus();
+}
+function verifyFromUi(aspectId) {
+  var ent = currentEntity();
+  if (!ent || ent.type !== "project") return;
+  var p = findProject(ent.id);
+  if (!p) return;
+  var noteEl = document.getElementById("verify-note");
+  var note = noteEl ? noteEl.value : "";
+  var result = markVerified(p, aspectId || "all", note, { touch: true });
+  if (!result.ok) { toast(result.message); return; }
+  persistNow();
+  toast(result.message);
+  refreshProjectChrome(p);
+  refreshReadyChrome(p);
+  paintBanners();
+}
+function gapsBlockHTML(projectId, openOnly) {
+  var list = (data.gaps || []).filter(function (g) {
+    if (openOnly && g.status === "done") return false;
+    return !projectId || g.projectId === projectId;
+  })
+    .sort(function (a, b) {
+      if ((a.status === "done") !== (b.status === "done")) return a.status === "done" ? 1 : -1;
+      return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+    });
+  if (!list.length) {
+    return '<p class="hint" id="gap-list">還沒有要補項目。即時解答後可按「記入要補」，或在下面記下今次被問。</p>';
+  }
+  var rows = list.slice(0, 40).map(function (g) {
+    var p = findProject(g.projectId);
+    var name = p ? displayName(p) : (g.projectId ? "專案已刪除" : "未指定專案");
+    var done = g.status === "done";
+    return '<div class="gap-row' + (done ? " gap-done" : "") + '">' +
+      '<p><strong>' + (done ? "已補完" : "要補") + " · " + esc(name) + "</strong></p>" +
+      (g.question ? "<p>被問：" + esc(g.question) + "</p>" : "") +
+      (g.missing ? "<p>尚欠：" + esc(g.missing) + "</p>" : "") +
+      '<p class="file-meta">' + esc(answeredLabel(g.answered)) + " · " + esc(formatStamp(g.updatedAt)) +
+      (g.source === "ask" ? " · 由即時解答記入" : " · 今次被問") +
+      (done && g.doneAt ? " · 完成於 " + esc(formatStamp(g.doneAt)) : "") + "</p>" +
+      (done ? "" : '<div class="row"><button type="button" class="btn" data-action="gap-done" data-id="' + esc(g.id) + '">已補完，待再驗證</button>' +
+      (p ? '<a class="btn btn-secondary" href="#/p/' + esc(p.id) + '">打開專案</a>' : "") + "</div>") +
+      "</div>";
+  }).join("");
+  return '<div id="gap-list">' + rows + "</div>";
+}
+function readyBoxHTML(p) {
+  var r = readinessOf(p);
+  var aspectLines = READY_ASPECTS.map(function (a) {
+    var st = r.aspects[a.id];
+    var detail = "";
+    if (st.state === "missing") {
+      detail = "尚欠：" + aspectIssues(p, a.id).map(function (it) { return it.label; }).join("、");
+    } else if (st.state === "stale") {
+      detail = "資料已改，上次驗證 " + (st.verifiedAt ? formatStamp(st.verifiedAt) : "已失效");
+    } else if (st.state === "unverified") {
+      detail = "已填，尚未驗證";
+    } else {
+      detail = "已驗證" + (st.verifiedAt ? " · " + formatStamp(st.verifiedAt) : "") + (st.note ? " · " + st.note : "");
+    }
+    return "<li><strong>" + esc(a.label) + "：</strong>" + esc(detail) + "</li>";
+  }).join("");
+  var closedNote = isClosed(p) ? '<p class="hint">這單已完結，不會出現在工作台的待辦清單，但仍可補料和驗證。</p>' : "";
+  return '<section class="block ready-box" id="ready-box">' +
+    "<h2>驗證與就緒</h2>" +
+    '<p class="hint">持續進步的做法：先填你知道的，被問之前先驗證，答不了就記入要補，補完再驗證一次。</p>' +
+    '<div class="chips">' + readinessChipHTML(p) + "</div>" +
+    closedNote +
+    '<ul class="hint-list">' + aspectLines + "</ul>" +
+    '<label class="field"><span>驗證備註（可選）</span><input type="text" id="verify-note" maxlength="200" placeholder="例如：已對過開工日和機房"></label>' +
+    '<div class="row">' +
+    '<button type="button" class="btn" data-action="verify-all">驗證全部</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="verify-dates">驗證日期</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="verify-machine">驗證機種情況</button>' +
+    '<button type="button" class="btn btn-secondary" data-action="verify-contract">驗證合約重點</button></div>' +
+    "<h3>要補與今次被問</h3>" +
+    gapsBlockHTML(p.id) +
+    "</section>";
+}
+function refreshReadyChrome(p) {
+  if (!p) return;
+  var box = document.getElementById("ready-box");
+  if (box) {
+    var wrap = document.createElement("div");
+    wrap.innerHTML = readyBoxHTML(p);
+    var next = wrap.firstChild;
+    if (next) box.replaceWith(next);
+  }
+  var chips = document.getElementById("live-chips");
+  if (chips) chips.innerHTML = chipsHTML(p);
+}
+
 
 function workbenchCard(p) {
   var overdueN = overdueDateItems(p).length;
@@ -982,16 +1749,23 @@ function askBoxHTML(opts) {
   var epField = data.endpoints.length
     ? '<label class="field"><span>外部 API（只在你按下時才送出）</span><select id="ask-endpoint"><option value="">自動選第一個可用端點</option>' + epOpts + "</select></label>"
     : '<p class="hint">尚未設定外部 API。到「設定 → API 端點」自行填網址和金鑰後，才可以用「問外部 API」。不會預設連到任何廠商。</p>';
+  var followCtx = Object.assign({ ran: false, showLog: false }, ui.lastAsk || {});
+  if (locked && projectId) {
+    followCtx.locked = true;
+    followCtx.projectId = projectId;
+    followCtx.logProjectId = projectId;
+  }
   return '<section class="ask-box" id="ask-box">' +
     "<h2>" + title + "</h2>" +
-    '<p class="hint">突擊被問開工、機房、全改／部分改、保留項目或合約重點時，先按「即時解答」。答案來自這台裝置上的欄位、記事和可讀附件，可一鍵複製。不會自動送到外面。</p>' +
+    '<p class="hint">突擊被問開工、機房、全改／部分改、保留項目或合約重點時，先按「即時解答」。答案來自這台裝置上的欄位、記事和可讀附件，可一鍵複製。不會自動送到外面。若尚欠資料，可記入要補，之後再驗證。</p>' +
     sel +
     '<label class="field"><span>問題（可留空，直接整理現況）</span><textarea id="ask-q" maxlength="2000" placeholder="例如：呢單係全改定部分改？開工未？有冇機房？保留咗啲咩？">' + esc(question) + "</textarea></label>" +
     '<div class="row"><button type="button" class="btn" data-action="ask-local">即時解答</button>' +
     '<button type="button" class="btn btn-secondary" data-action="ask-copy">複製答案</button>' +
     '<button type="button" class="btn btn-secondary" data-action="ask-api">問外部 API</button></div>' +
     epField +
-    '<pre class="answer-box" id="ask-answer">' + esc(answer || "按「即時解答」後，這裡會出現可複製的短回覆。") + "</pre></section>";
+    '<pre class="answer-box" id="ask-answer">' + esc(answer || "按「即時解答」後，這裡會出現可複製的短回覆。") + "</pre>" +
+    askFollowHTML(followCtx) + "</section>";
 }
 function inflateBytes(u8) {
   if (typeof DecompressionStream === "undefined" || typeof Blob === "undefined" || !Blob.prototype.stream) {
@@ -1313,6 +2087,7 @@ function runLocalAsk() {
   return collectDocsForProjects(projects).then(function (docs) {
     var text = buildLocalAnswer(projects, form.question, docs);
     paintAskAnswer(text);
+    recordAskContext(projects, form.question, docs);
     toast("已用本機資料整理回覆。");
     return text;
   }).catch(function (err) {
@@ -1400,6 +2175,7 @@ function runApiAsk() {
   paintAskAnswer("先整理本機資料，再送到「" + (ep.name || ep.url) + "」…");
   return collectDocsForProjects(projects).then(function (docs) {
     var local = buildLocalAnswer(projects, form.question, docs);
+    recordAskContext(projects, form.question, docs);
     var payload = askPayload(projects, form.question, docs, local);
     return requestEndpoint(ep, "ask", payload).then(function (res) {
       var remote = parseAskResponse(res);
@@ -1688,16 +2464,17 @@ function defaultPrefs() {
 }
 function normalizeData(d) {
   if (!d || typeof d !== "object" || Array.isArray(d)) d = {};
-  d.version = 2;
+  d.version = 3;
   if (!Array.isArray(d.projects)) d.projects = [];
   if (!Array.isArray(d.notes)) d.notes = [];
   if (!Array.isArray(d.endpoints)) d.endpoints = [];
+  if (!Array.isArray(d.gaps)) d.gaps = [];
   d.prefs = Object.assign(defaultPrefs(), d.prefs && typeof d.prefs === "object" ? d.prefs : {});
   if (typeof d.demoBanner !== "boolean") d.demoBanner = false;
   if (d.prefs.sortDir !== "desc") d.prefs.sortDir = "asc";
   if (d.prefs.layout !== "timeline") d.prefs.layout = "cards";
   if (["end", "start", "status", "name"].indexOf(d.prefs.sort) < 0) d.prefs.sort = "end";
-  if (["all", "overdue", "soon", "waiting", "nodate", "notstarted"].indexOf(d.prefs.due) < 0) d.prefs.due = "all";
+  if (["all", "overdue", "soon", "waiting", "nodate", "notstarted", "missing", "unverified", "ready"].indexOf(d.prefs.due) < 0) d.prefs.due = "all";
   if (d.prefs.status !== "all" && !STATUSES.some(function (s) { return s.id === d.prefs.status; })) d.prefs.status = "all";
   if (["updated", "created", "title"].indexOf(d.prefs.noteSort) < 0) d.prefs.noteSort = "updated";
   d.projects.forEach(function (p) {
@@ -1739,6 +2516,7 @@ function normalizeData(d) {
     if (!isStamp(e.updatedAt)) e.updatedAt = e.createdAt;
   });
   d.endpoints = d.endpoints.filter(function (e) { return e && typeof e === "object"; });
+  d.gaps = d.gaps.map(sanitizeGap).filter(Boolean).slice(0, 2000);
   if (d.prefs.noteProject !== "all" && d.prefs.noteProject !== "none" && !d.projects.some(function (p) { return p.id === d.prefs.noteProject; })) {
     d.prefs.noteProject = "all";
   }
@@ -1771,6 +2549,10 @@ function buildDemo() {
       projectKind: "ni", modScope: "", machineRoom: "with",
       retainItems: "不適用（新裝）",
       situation: "井道執修進行中",
+      demoReadyGoal: "ready",
+      demoDocName: "市集廣場自動梯新裝-合約摘記（虛構）.txt",
+      demoDocPath: "示範資料夾／虛構合約／市集廣場自動梯新裝.txt",
+      demoDocText: "示範摘記，不是真實契約：保養期 12 個月；有機房；新裝，無保留項目。",
       workCommenced: isoOffset(-20), workCommencedStatus: "done",
       workCommencedNote: "已在現場開工。",
       milestones: [ms("完工", isoOffset(30), false), ms("驗收", isoOffset(40), false)]
@@ -1783,6 +2565,10 @@ function buildDemo() {
       projectKind: "mod", modScope: "full", machineRoom: "without",
       retainItems: "無（全改）",
       situation: "安裝完成，等待驗收排期",
+      demoReadyGoal: "unverified",
+      demoDocName: "翠湖居升降機全改-合約路徑（虛構）.txt",
+      demoDocPath: "示範資料夾／虛構合約／翠湖居升降機全改.txt",
+      demoDocText: "示範摘記，不是真實契約：全改、無機房、無保留項目。",
       workCommenced: isoOffset(-70), workCommencedStatus: "done",
       workCommencedNote: "",
       milestones: [ms("完工", isoOffset(-5), true), ms("驗收", isoOffset(3), false)]
@@ -1804,8 +2590,8 @@ function buildDemo() {
       description: "示範單。貨運梯更換，零件延誤。",
       status: "active", startDate: isoOffset(-60), endDate: isoOffset(-4),
       tags: ["升降機", "新裝"], color: "#8f1d1d", demo: true,
-      projectKind: "ni", modScope: "", machineRoom: "with",
-      retainItems: "井道結構",
+      projectKind: "ni", modScope: "", machineRoom: "",
+      retainItems: "",
       situation: "主機零件未到貨，現場停工待料",
       workCommenced: isoOffset(-35), workCommencedStatus: "done",
       workCommencedNote: "已拆舊機，新機未到。",
@@ -1838,13 +2624,28 @@ function buildDemo() {
     id: uid("e"), name: "內建模擬", url: "local://mock", headerName: "Authorization", apiKey: "",
     authStyle: "raw", pushMethod: "PUT", demo: true, createdAt: nowISO(), updatedAt: nowISO()
   }];
-  return { projects: projects, notes: notes, endpoints: endpoints };
+  var gaps = [{
+    id: uid("g"),
+    projectId: projects[4].id,
+    question: "舊翼貨運梯而家係有機房定無機房？保留咗啲咩？驗收排咗未？",
+    missing: "未填機房、未填保留項目、尚未掛合約或圖則",
+    missingKeys: ["machineRoom", "retainItems", "document"],
+    answered: "no",
+    source: "manual",
+    status: "open",
+    aspect: "",
+    demo: true,
+    createdAt: hoursAgo(8),
+    updatedAt: hoursAgo(8),
+    doneAt: ""
+  }];
+  return { projects: projects, notes: notes, endpoints: endpoints, gaps: gaps };
 }
 
 function seed() {
   var demo = buildDemo();
   return normalizeData({
-    version: 2,
+    version: 3,
     demoBanner: true,
     lastExportAt: "",
     lastBackupName: "",
@@ -1852,6 +2653,7 @@ function seed() {
     projects: demo.projects,
     notes: demo.notes,
     endpoints: demo.endpoints,
+    gaps: demo.gaps || [],
     prefs: defaultPrefs()
   });
 }
@@ -2074,8 +2876,13 @@ function homeHTML() {
   function riskMapper(listFn) {
     return function (p) { return riskCard(p, listFn(p)); };
   }
+  var missingN = projects.filter(function (p) { return isReadyOpen(p, "missing"); }).length;
+  var unverifiedN = projects.filter(function (p) { return isReadyOpen(p, "unverified"); }).length;
+  var readyN = projects.filter(function (p) { return isReadyOpen(p, "ready"); }).length;
+  var cycle = cycleProjects();
+  var homeGaps = openGapsFor("");
   return '<div class="page home-page"><header class="page-head"><h1>工作台</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
-    '<p class="lead">今天 ' + esc(todayLong()) + "。這一頁用來應付突擊提問：每單做到邊、關鍵日期和機種情況都先睇到。</p>" +
+    '<p class="lead">今天 ' + esc(todayLong()) + "。這一頁用來應付突擊提問，也用來持續補料和驗證：先填你知道的，被問之前先驗證；答不了就記入要補，補完再驗證。</p>" +
     askBoxHTML({ locked: false }) +
     '<div class="stats stats-4">' +
     statButton("active", "進行中", activeCount, "") +
@@ -2083,7 +2890,14 @@ function homeHTML() {
     statButton("overdue", "已逾期", overdueP.length, overdueP.length ? "stat-danger" : "") +
     statButton("waiting", "等候開工", waiting.length, waiting.length ? "stat-warn" : "") +
     "</div>" +
+    '<div class="stats stats-3">' +
+    statButton("missing", "尚欠資料", missingN, missingN ? "stat-danger" : "") +
+    statButton("unverified", "待驗證", unverifiedN, unverifiedN ? "stat-info" : "") +
+    statButton("ready", "可即答", readyN, readyN ? "stat-ok" : "") +
+    "</div>" +
     '<div class="home-lists">' +
+    sectionWorkbench("本輪要補／要驗證", cycle, "沒有待辦。已完成和已取消不會出現在這份清單。", null, cycleCard) +
+    (homeGaps.length ? '<section class="block"><div class="section-head"><h2>要補項目</h2><span class="count-pill">' + homeGaps.length + "</span></div>" + gapsBlockHTML("", true) + "</section>" : "") +
     sectionWorkbench("已逾期（結束、開工或其他期限）", overdueP, "沒有逾期日期。已完成和已取消不會算進逾期。", null, riskMapper(overdueDateItems)) +
     sectionWorkbench("本週到期", soonP, "未來七天沒有其他期限。", null, riskMapper(soonDateItems)) +
     sectionWorkbench("等候開工", waiting, "沒有專案在等候開工。", null, riskMapper(function (p) { return [{ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: false }]; })) +
@@ -2091,7 +2905,7 @@ function homeHTML() {
     (done.length ? sectionWorkbench("已完成", done, "", 2) : "") +
     '<section class="block"><div class="section-head"><h2>最近的記事</h2><a class="btn btn-secondary" href="#/notes">全部記事</a></div>' + notesBlock + "</section>" +
     '<section class="block"><div class="section-head"><h2>功能說明</h2><a class="btn btn-secondary" href="#/guide">開啟說明</a></div>' +
-    '<p class="hint">每個按鈕都有對應功能。說明頁列出新增的專案欄位、文件連結，以及如何自行接上外部 API 來問合約內容。</p></section></div></div>';
+    '<p class="hint">每個按鈕都有對應功能。說明頁列出就緒狀態、驗證循環、專案欄位、文件連結，以及如何自行接上外部 API 來問合約內容。</p></section></div></div>';
 }
 
 function dirLabel() {
@@ -2116,6 +2930,9 @@ function filteredProjects() {
     if (due === "nodate" && p.endDate) return false;
     if (due === "notstarted" && !isNotStarted(p)) return false;
     if (due === "waiting" && !isWaitingCommence(p)) return false;
+    if (due === "missing" && (isClosed(p) || readinessOf(p).id !== "missing")) return false;
+    if (due === "unverified" && (isClosed(p) || readinessOf(p).id !== "unverified")) return false;
+    if (due === "ready" && readinessOf(p).id !== "ready") return false;
     if (q) {
       if (projectSearchHay(p).toLowerCase().indexOf(q) < 0) return false;
     }
@@ -2181,7 +2998,7 @@ function optionList(pairs, current) {
 function projectsHTML() {
   var list = filteredProjects();
   var statusPairs = [["all", "全部狀態"]].concat(STATUSES.map(function (s) { return [s.id, s.label]; }));
-  var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["waiting", "等候開工"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
+  var duePairs = [["all", "全部期限"], ["overdue", "已逾期"], ["soon", "七天內（含今天）"], ["waiting", "等候開工"], ["missing", "尚欠資料"], ["unverified", "待驗證"], ["ready", "可即答"], ["nodate", "未設結束日"], ["notstarted", "尚未開始"]];
   var sortPairs = [["end", "結束日"], ["start", "開始日"], ["status", "狀態"], ["name", "名稱"]];
   return '<div class="page"><header class="page-head"><h1>專案</h1><a class="btn" href="#/projects/new">＋ 新增專案</a></header>' +
     '<div class="toolbar">' +
@@ -2302,6 +3119,7 @@ function projectEditor(p) {
     stampsHTML(p) +
     askBoxHTML({ locked: true, projectId: p.id, question: ui.askQuery || "", answer: ui.askAnswer || "" }) +
     filesBlockFor("project") +
+    readyBoxHTML(p) +
     '<section class="block"><div class="section-head"><h2>連結的記事</h2><button type="button" class="btn btn-secondary" data-action="note-for-project">＋ 寫一則記事</button></div>' + linkedHTML + "</section>" +
     '<div class="danger-zone"><button type="button" class="btn btn-danger btn-block" data-action="delete-project">刪除這個專案</button></div></div>';
 }
@@ -2354,7 +3172,7 @@ function endpointCard(ep) {
 }
 function guideHTML() {
   return '<div class="page narrow guide"><header class="page-head"><h1>說明</h1></header>' +
-    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並在被突擊提問時即時整理回覆。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
+    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並以「填好 → 驗證 → 被問 → 記入缺口 → 補料再驗證」的方式，讓回覆愈來愈即答。所有按鈕都已接上功能：按下去就會執行動作，或清楚告訴你做不到的原因。</p>' +
     '<section class="block"><h2>iPhone 打開沒有反應</h2>' +
     '<p>這通常不是按鈕沒有功能，而是 iPhone 在「檔案」或 OneDrive 的預覽裡打開 HTML 時，系統不會執行程式，所以按下去沒有反應。</p>' +
     '<ol><li>在「檔案」找到 <code>project-notes.html</code>。</li><li>點分享（方框加向上箭頭）。</li><li>選擇「用 Safari 開啟」。</li><li>之後可在 Safari 選分享 → 加入主畫面。</li></ol></section>' +
@@ -2369,10 +3187,28 @@ function guideHTML() {
     '<li><strong>離線</strong>：檔案已在裝置上就可以睇和改。要跨裝置看到最新內容，靠 OneDrive 同步那份 JSON，而不是靠一個公開網站保存你的紀錄。</li>' +
     '</ul></section>' +
 
+    '<section class="block"><h2>持續改良與驗證</h2>' +
+    '<p>這個工具的工作方式不是一次填完就不管，而是讓每單愈來愈禁得起突擊提問：</p>' +
+    '<ol>' +
+    '<li><strong>先填你知道的。</strong>項目類型、機房、全改或部分改、保留項目、目前情況、開工狀態和關鍵日期（開工、完工、驗收）隨時可補。</li>' +
+    '<li><strong>被問之前先驗證。</strong>欄位齊了之後，在專案頁把「日期」「機種情況」「合約重點」或全部標成已驗證，可加一句短備註。已完成或已取消的專案不會出現在待辦清單。</li>' +
+    '<li><strong>答不了就記入要補。</strong>「即時解答」後若回覆尚欠資料，按「記入要補」。被突擊提問後，也可用「今次被問」記下問題、能否即答，以及還欠什麼。</li>' +
+    '<li><strong>補完再驗證。</strong>資料改了，或把要補項目標成已補完，該單會回到「待驗證」，確認無誤後再標已驗證，狀態才會變成「可即答」。</li>' +
+    '</ol>' +
+    '<p>建議每天或每週打開工作台：先睇「本輪要補／要驗證」，再處理逾期和本週期限。就緒狀態有三種：</p>' +
+    '<ul>' +
+    '<li><strong>尚欠資料</strong>：即答所需的欄位或合約／圖則還未齊。</li>' +
+    '<li><strong>待驗證</strong>：已經填好，但尚未驗證，或驗證之後資料或附件有改過。</li>' +
+    '<li><strong>可即答</strong>：已齊並且目前仍然有效的驗證。</li>' +
+    '</ul>' +
+    '<p>所有要補紀錄和驗證時間都只留在這台裝置，或你自己匯出／同步的備份裡，不會自動送到這個公開網站，也不會把合約放到網上。</p>' +
+    '</section>' +
+
     '<section class="block"><h2>工作台與導覽</h2><dl>' +
-    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。工作台第一眼顯示每單情況和有風險的日期。手機右上角也可以開啟說明。</dd>' +
+    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。工作台第一眼顯示每單情況、就緒狀態和有風險的日期。手機右上角也可以開啟說明。</dd>' +
     '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。</dd>' +
     '<dt>進行中、本週到期、已逾期、等候開工</dt><dd>帶你到對應列表或篩選結果。已逾期包括結束日和其他未完成期限；已完成或已取消不會算進去。</dd>' +
+    '<dt>尚欠資料、待驗證、可即答</dt><dd>帶你到對應就緒狀態的專案列表。工作台另有「本輪要補／要驗證」，會列出高風險尚欠、資料已改、尚未驗證，以及驗證已超過十四日的項目。</dd>' +
     '<dt>知道了</dt><dd>收起示範資料橫額，示範內容仍在。</dd>' +
     '<dt>清除示範資料</dt><dd>刪除尚未改過的示範專案、記事和端點。你改過的項目會留下。</dd>' +
     '<dt>前往備份／稍後</dt><dd>提醒你把資料存到 OneDrive。稍後只是先收起提示。</dd>' +
@@ -2404,6 +3240,9 @@ function guideHTML() {
     '<dt>連結本機或 OneDrive 檔案</dt><dd>在支援的電腦瀏覽器（通常是 Chrome 或 Edge）可直接連結檔案，之後在這台電腦打開。連結不能寫進 JSON 備份，請另外保留原檔。</dd>' +
     '<dt>即時解答／問呢單</dt><dd>用本機欄位、記事和可讀附件，整理一段可複製的短回覆，回答開工、機房、全改或部份改、保留項目和讀得到的合約重點。</dd>' +
     '<dt>複製答案</dt><dd>把剛剛整理的回覆複製到剪貼簿。</dd>' +
+    '<dt>記入要補</dt><dd>即時解答後，若回覆尚欠欄位或文件，把要補項目記在本機。不會送到外面。</dd>' +
+    '<dt>今次被問</dt><dd>記下今次被問什麼、能否即答、還欠什麼。補完後可標「已補完，待再驗證」。</dd>' +
+    '<dt>驗證全部／驗證日期、機種情況、合約重點</dt><dd>在專案頁把已齊的資料標成已驗證，並留下時間和可選備註。之後若欄位或附件有改，該部分會回到待驗證。</dd>' +
     '<dt>問外部 API</dt><dd>只有你按下時，才把問題、專案欄位、記事和已抽出的文字送到你在設定裡填的端點。不會把檔案二元內容或金鑰寫進請求本體。沒有端點時會說明做法。</dd>' +
     '</dl></section>' +
 
@@ -2448,7 +3287,7 @@ function guideHTML() {
 }
 
 function settingsHTML() {
-  var hasDemo = data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+  var hasDemo = hasDemoData();
   var corruptBtn = "";
   try { if (localStorage.getItem(KEY + ".corrupt")) corruptBtn = '<button type="button" class="btn btn-secondary" data-action="download-corrupt">下載讀不出的原始資料</button>'; } catch (e) {}
   var fileNote = location.protocol === "file:" ? '<p class="error-text">你正在用檔案方式開啟（file://）。專案、記事和備份可用。對外的 http／https API 多半會被瀏覽器封鎖，請用 local://mock 測試連線。</p>' : "";
@@ -2489,7 +3328,7 @@ function settingsHTML() {
     (data.endpoints.length ? data.endpoints.map(endpointCard).join("") : '<p class="empty">還沒有端點。</p>') +
     "</section>" +
     '<details><summary>同步與備份的 JSON 格式</summary>' +
-    '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。項目類型是 ni／mod／other，現代化範圍是 full／partial，機房是 with／without，開工狀態是 waiting／done。日期格式是 YYYY-MM-DD。</p>' +
+    '<p class="hint">拉取與推送都打你填的那一個網址。測試和拉取用 GET，推送用你選的 PUT 或 POST，內容類型是 application/json。狀態只接受 planning、active、paused、done、cancelled。項目類型是 ni／mod／other，現代化範圍是 full／partial，機房是 with／without，開工狀態是 waiting／done。日期格式是 YYYY-MM-DD。備份可含 gaps（要補紀錄）和專案的 verification、docsMeta。</p>' +
     '<p class="hint">推送本體如下。檔案備份另外有 format 為 project-notes，並可含 endpoints 與 files（dataBase64）。</p>' +
     '<pre class="docs">' + esc(JSON_HELP) + "</pre></details>" +
     '<section class="block"><h2>示範資料</h2>' +
@@ -2579,7 +3418,7 @@ function needsExportHint() {
   return Date.now() - t > 7 * 86400000;
 }
 function paintBanners() {
-  var hasDemo = data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+  var hasDemo = hasDemoData();
   document.getElementById("demo-banner").hidden = !(data.demoBanner && hasDemo);
   var warn = document.getElementById("storage-warn");
   var warnText = document.getElementById("storage-warn-text");
@@ -2642,6 +3481,7 @@ function refreshProjectChrome(p) {
   if (upd) upd.textContent = formatStamp(p.updatedAt);
   paintCounts();
   markSaved();
+  refreshReadyChrome(p);
 }
 function refreshNoteChrome(n) {
   var h = document.getElementById("editor-name-heading");
@@ -2797,6 +3637,7 @@ function createProject() {
     createdAt: nowISO(), updatedAt: nowISO(), demo: false
   };
   Object.keys(extras).forEach(function (k) { p[k] = extras[k]; });
+  applyProjectExtras(p);
   data.projects.unshift(p);
   persistNow();
   return p;
@@ -2861,6 +3702,13 @@ function loadFileList(ownerType, ownerId) {
     if (!files.length) { host2.textContent = "還沒有附件。"; return; }
     files.sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
     host2.innerHTML = files.map(fileRow).join("");
+    if (ownerType === "project") {
+      var pMeta = findProject(ownerId);
+      if (pMeta && setProjectDocsMeta(pMeta, files)) {
+        persistNow();
+        refreshReadyChrome(pMeta);
+      }
+    }
   }).catch(function (e) {
     var host2 = document.getElementById("files");
     if (!host2 || token !== fileLoadToken) return;
@@ -2944,6 +3792,8 @@ function publicProject(p) {
     retainItems: p.retainItems || "", situation: p.situation || "",
     workCommenced: p.workCommenced || "", workCommencedStatus: p.workCommencedStatus || "",
     workCommencedNote: p.workCommencedNote || "", milestones: normalizeMilestones(p.milestones),
+    docsMeta: normalizeDocsMeta(p.docsMeta),
+    verification: normalizeVerification(p.verification),
     createdAt: p.createdAt, updatedAt: p.updatedAt
   };
 }
@@ -2953,11 +3803,12 @@ function publicNote(n) {
 }
 function syncPayload() {
   return {
-    version: 2,
+    version: 3,
     source: "project-notes",
     exportedAt: nowISO(),
     projects: data.projects.map(publicProject),
-    notes: data.notes.map(publicNote)
+    notes: data.notes.map(publicNote),
+    gaps: (data.gaps || []).map(publicGap)
   };
 }
 function sanitizeProject(raw) {
@@ -2980,6 +3831,8 @@ function sanitizeProject(raw) {
     workCommencedStatus: raw.workCommencedStatus,
     workCommencedNote: raw.workCommencedNote,
     milestones: raw.milestones,
+    docsMeta: raw.docsMeta,
+    verification: raw.verification,
     createdAt: isStamp(raw.createdAt) ? raw.createdAt : nowISO(),
     updatedAt: isStamp(raw.updatedAt) ? raw.updatedAt : nowISO(),
     demo: false
@@ -3032,7 +3885,7 @@ function mergeEndpoints(local, incoming) {
   return Array.from(map.values());
 }
 function applyCollections(body, mode) {
-  var stats = { projects: 0, notes: 0, endpoints: 0 };
+  var stats = { projects: 0, notes: 0, endpoints: 0, gaps: 0 };
   if (Array.isArray(body.projects)) {
     var projects = body.projects.slice(0, 2000).map(sanitizeProject).filter(Boolean);
     stats.projects = projects.length;
@@ -3048,6 +3901,11 @@ function applyCollections(body, mode) {
     stats.endpoints = endpoints.length;
     if (mode === "replace") data.endpoints = endpoints;
     else data.endpoints = mergeEndpoints(data.endpoints, endpoints);
+  }
+  if (Array.isArray(body.gaps)) {
+    var gaps = body.gaps.slice(0, 2000).map(sanitizeGap).filter(Boolean);
+    stats.gaps = gaps.length;
+    data.gaps = mode === "replace" ? gaps : mergeById(data.gaps || [], gaps);
   }
   data = normalizeData(data);
   persistNow();
@@ -3148,7 +4006,7 @@ function readMock() {
 }
 function defaultMock() {
   return {
-    version: 2,
+    version: 3,
     source: "project-notes",
     exportedAt: nowISO(),
     projects: [{
@@ -3159,7 +4017,8 @@ function defaultMock() {
     notes: [{
       id: "mock_note", title: "模擬端點回傳的記事", body: "拉取後應能在記事列表看到這則。",
       projectId: "mock_project", createdAt: nowISO(), updatedAt: nowISO()
-    }]
+    }],
+    gaps: []
   };
 }
 function mockRequest(op, payload) {
@@ -3171,7 +4030,7 @@ function mockRequest(op, payload) {
     return { ok: true, status: 200, detail: "已從內建模擬取得 JSON。", json: body };
   }
   if (op === "push") {
-    var stored = { version: 2, source: "project-notes", exportedAt: payload.exportedAt, projects: payload.projects, notes: payload.notes };
+    var stored = { version: 3, source: "project-notes", exportedAt: payload.exportedAt, projects: payload.projects, notes: payload.notes, gaps: payload.gaps || [] };
     try { localStorage.setItem(MOCK_KEY, JSON.stringify(stored)); }
     catch (e) { return { ok: false, status: 0, detail: "內建模擬寫不進本地儲存。" }; }
     return { ok: true, status: 200, detail: "已推送到內建模擬。資料仍在這台瀏覽器，可用「拉取」取回。\n" + JSON.stringify({ ok: true, projects: stored.projects.length, notes: stored.notes.length }, null, 2), json: stored };
@@ -3273,6 +4132,7 @@ function assertDateLogic() {
   if (!hasOverdueDates(openMs) || isOverdue(openMs)) throw new Error("未完成的期限逾期應標出，但結束日未過則不是結束逾期");
   var oldShape = applyProjectExtras({ name: "舊資料" });
   if (oldShape.projectKind !== "" || !Array.isArray(oldShape.milestones)) throw new Error("舊專案遷移不對");
+  if (!oldShape.verification || !oldShape.docsMeta) throw new Error("舊專案未補上驗證欄位");
 }
 
 function runSelfCheck() {
@@ -3316,6 +4176,39 @@ function runSelfCheck() {
       var ans = buildLocalAnswer([sample], "有冇機房？", {});
       if (ans.indexOf("無機房") < 0 || ans.indexOf("部分改") < 0 || ans.indexOf("等候開工") < 0) throw new Error("本機解答缺少關鍵欄位");
       add(true, "本機即時解答", "能根據機房、範圍和開工狀態整理回覆");
+      var migrated = normalizeData({
+        version: 2,
+        projects: [{ id: "p_old", name: "舊備份專案", status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" }],
+        notes: []
+      });
+      if (migrated.version !== 3 || !Array.isArray(migrated.gaps)) throw new Error("舊備份未升到第 3 版");
+      if (!migrated.projects[0].verification || !migrated.projects[0].docsMeta) throw new Error("舊專案未補驗證欄位");
+      var missingP = applyProjectExtras({ status: "active", name: "欠料" });
+      if (readinessOf(missingP).id !== "missing") throw new Error("欠料專案應為尚欠資料");
+      var completeP = applyProjectExtras({
+        name: "齊料", status: "active", projectKind: "mod", modScope: "full",
+        machineRoom: "with", retainItems: "無", situation: "進行中",
+        workCommencedStatus: "done", workCommenced: isoOffset(-2),
+        startDate: isoOffset(-10), endDate: isoOffset(10),
+        docsMeta: { count: 1, hasAny: true, hasContract: true, fingerprint: "f1" }
+      });
+      if (readinessOf(completeP).id !== "unverified") throw new Error("已齊未驗證應為待驗證");
+      var marked = markVerified(completeP, "all", "檢查", { silent: true, at: nowISO() });
+      if (!marked.ok || readinessOf(completeP).id !== "ready") throw new Error("驗證後應為可即答");
+      completeP.machineRoom = "without";
+      applyProjectExtras(completeP);
+      if (readinessOf(completeP).id !== "unverified") throw new Error("改機房後應回到待驗證");
+      completeP.machineRoom = "with";
+      applyProjectExtras(completeP);
+      if (readinessOf(completeP).id !== "ready") throw new Error("改回原值後應恢復可即答");
+      var closed = applyProjectExtras({
+        name: "完結", status: "done", projectKind: "ni", machineRoom: "with",
+        retainItems: "井道", situation: "已交付",
+        workCommencedStatus: "done", workCommenced: isoOffset(-20),
+        startDate: isoOffset(-30), endDate: isoOffset(-1)
+      });
+      if (isCycleCandidate(closed) || isReadyOpen(closed, "missing")) throw new Error("已完成不應進入待辦清單");
+      add(true, "就緒與驗證", "尚欠、待驗證、可即答和舊備份遷移都正確");
     } catch (e) { add(false, "同步 JSON 或即時解答", e.message); }
     try {
       var res = mockRequest("test");
@@ -3409,7 +4302,7 @@ function openProjectsFilter(due, status) {
   go("#/projects");
 }
 function hasDemoData() {
-  return data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; });
+  return data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; }) || (data.gaps || []).some(function (g) { return g.demo; });
 }
 function clearDemo() {
   var removedProjects = data.projects.filter(function (p) { return p.demo; }).map(function (p) { return p.id; });
@@ -3417,6 +4310,7 @@ function clearDemo() {
   data.projects = data.projects.filter(function (p) { return !p.demo; });
   data.notes = data.notes.filter(function (n) { return !n.demo; });
   data.endpoints = data.endpoints.filter(function (e) { return !e.demo; });
+  data.gaps = (data.gaps || []).filter(function (g) { return !g.demo; });
   data.demoBanner = false;
   persistNow();
   var chain = Promise.resolve();
@@ -3441,11 +4335,12 @@ function loadDemo() {
   var demo = buildDemo();
   data.projects = data.projects.concat(demo.projects);
   data.notes = data.notes.concat(demo.notes);
+  data.gaps = (data.gaps || []).concat(demo.gaps || []);
   if (!data.endpoints.some(function (e) { return String(e.url).trim() === "local://mock"; })) data.endpoints.push(demo.endpoints[0]);
   data.demoBanner = true;
   persistNow();
   toast("已載入示範資料。");
-  render();
+  finalizeDemoReadiness().then(function () { render(); }).catch(function () { render(); });
 }
 
 function exportOptions() {
@@ -3519,6 +4414,7 @@ function contentHash() {
   var s = JSON.stringify({
     projects: data.projects,
     notes: data.notes,
+    gaps: data.gaps || [],
     endpoints: data.endpoints.map(function (ep) {
       return { id: ep.id, name: ep.name, url: ep.url, headerName: ep.headerName, authStyle: ep.authStyle, pushMethod: ep.pushMethod, apiKey: ep.apiKey || "", createdAt: ep.createdAt, updatedAt: ep.updatedAt };
     })
@@ -3569,7 +4465,9 @@ function applyBackupQuietly(parsed, choice) {
     if (isStamp(parsed.exportedAt)) data.lastExportAt = parsed.exportedAt;
     persistNow();
     ui.skipCloudSave = false;
-    return { stats: stats, fileStats: fileStats };
+    return refreshAllDocsMeta().then(function () {
+      return { stats: stats, fileStats: fileStats };
+    });
   }).catch(function (err) {
     ui.skipCloudSave = false;
     throw err;
@@ -3730,10 +4628,11 @@ function buildBackupPayload() {
   return filePromise.then(function (files) {
     var payload = {
       format: "project-notes",
-      version: 2,
+      version: 3,
       exportedAt: nowISO(),
       projects: data.projects.map(publicProject),
       notes: data.notes.map(publicNote),
+      gaps: (data.gaps || []).map(publicGap),
       endpoints: data.endpoints.map(function (ep) {
         return {
           id: ep.id, name: ep.name, url: ep.url, headerName: ep.headerName,
@@ -3872,7 +4771,7 @@ function importFromFile(file) {
       toast("認不出備份格式。需要 projects 或 notes 陣列。");
       return;
     }
-    if (!Array.isArray(parsed.projects) && !Array.isArray(parsed.notes) && !Array.isArray(parsed.endpoints) && !Array.isArray(parsed.files)) {
+    if (!Array.isArray(parsed.projects) && !Array.isArray(parsed.notes) && !Array.isArray(parsed.endpoints) && !Array.isArray(parsed.files) && !Array.isArray(parsed.gaps)) {
       toast("認不出備份格式。需要 projects 或 notes 陣列。");
       return;
     }
@@ -3880,9 +4779,10 @@ function importFromFile(file) {
     var nc = Array.isArray(parsed.notes) ? parsed.notes.length : 0;
     var ec = Array.isArray(parsed.endpoints) ? parsed.endpoints.length : 0;
     var fc = Array.isArray(parsed.files) ? parsed.files.length : 0;
+    var gc = Array.isArray(parsed.gaps) ? parsed.gaps.length : 0;
     return chooseDialog({
       title: "匯入備份",
-      body: "檔案裡有 " + pc + " 個專案、" + nc + " 則記事、" + ec + " 個端點、" + fc + " 個附件。\n合併會以相同 id 覆蓋，並保留本地其餘資料。沒有金鑰的端點不會清掉已存金鑰。\n取代會換掉檔案裡有提供的那些清單。",
+      body: "檔案裡有 " + pc + " 個專案、" + nc + " 則記事、" + ec + " 個端點、" + fc + " 個附件、" + gc + " 項要補紀錄。\n合併會以相同 id 覆蓋，並保留本地其餘資料。沒有金鑰的端點不會清掉已存金鑰。\n取代會換掉檔案裡有提供的那些清單。",
       choices: [
         { id: "cancel", label: "取消" },
         { id: "merge", label: "合併" },
@@ -3897,9 +4797,8 @@ function importFromFile(file) {
         if (isStamp(parsed.exportedAt)) data.lastExportAt = parsed.exportedAt;
         persistNow();
         ui.skipCloudSave = false;
-        toast("已匯入。專案 " + stats.projects + "、記事 " + stats.notes + "、端點 " + stats.endpoints + "、附件 " + fileStats.imported + (fileStats.skipped ? "，略過附件 " + fileStats.skipped : "") + "。");
-        render();
-        return true;
+        toast("已匯入。專案 " + stats.projects + "、記事 " + stats.notes + "、端點 " + stats.endpoints + "、要補 " + (stats.gaps || 0) + "、附件 " + fileStats.imported + (fileStats.skipped ? "，略過附件 " + fileStats.skipped : "") + "。");
+        return refreshAllDocsMeta().then(function () { render(); return true; });
       }).catch(function (err) { ui.skipCloudSave = false; throw err; });
     });
   }).catch(function (e) {
@@ -3978,6 +4877,9 @@ function runAction(action, btn) {
     else if (kind === "soon") openProjectsFilter("soon", "all");
     else if (kind === "overdue") openProjectsFilter("overdue", "all");
     else if (kind === "waiting") openProjectsFilter("waiting", "all");
+    else if (kind === "missing") openProjectsFilter("missing", "all");
+    else if (kind === "unverified") openProjectsFilter("unverified", "all");
+    else if (kind === "ready") openProjectsFilter("ready", "all");
     return;
   }
   if (action === "toggle-dir") {
@@ -4057,6 +4959,24 @@ function runAction(action, btn) {
   if (action === "ask-local") return runLocalAsk();
   if (action === "ask-api") return runApiAsk();
   if (action === "ask-copy") return copyAskAnswer();
+  if (action === "log-ask-gaps") { logAskGaps(); return; }
+  if (action === "toggle-ask-log") { toggleAskLog(); return; }
+  if (action === "save-ask-log") { saveAskLog(); return; }
+  if (action === "verify-all") { verifyFromUi("all"); return; }
+  if (action === "verify-dates") { verifyFromUi("dates"); return; }
+  if (action === "verify-machine") { verifyFromUi("machine"); return; }
+  if (action === "verify-contract") { verifyFromUi("contract"); return; }
+  if (action === "gap-done") {
+    if (!markGapDone(btn.dataset.id)) { toast("找不到這項要補紀錄。"); return; }
+    toast("已標成補完。請再驗證這一單。");
+    var routeG = parseRoute();
+    if (routeG.name === "project") {
+      var pg = findProject(routeG.id);
+      if (pg) { refreshProjectChrome(pg); refreshReadyChrome(pg); }
+      else render();
+    } else render();
+    return;
+  }
   if (action === "delete-file") {
     return chooseDialog({
       title: "移除附件",
@@ -4378,6 +5298,10 @@ function init() {
     onRoute();
     ui.ready = true;
     if (ui.toastOnStart) toast(ui.toastOnStart);
+    finalizeDemoReadiness().then(function () {
+      var routeNow = parseRoute();
+      if (routeNow.name === "home" || routeNow.name === "projects" || routeNow.name === "project") render();
+    }).catch(function () {});
     refreshCloud();
   } catch (err) {
     showBootError(err);
