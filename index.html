@@ -7,7 +7,7 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#17364a">
-  <meta name="description" content="專案工作台與記事。可離線使用，並把備份同步到自己的 OneDrive。不需要安裝。">
+  <meta name="description" content="以便利貼看板記錄專案。可離線使用，並把備份同步到自己的 OneDrive。不需要安裝。">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -338,7 +338,7 @@
     @media (max-width: 860px) {
       .stats.stats-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       body.kbd-open .action-dock { display: none !important; }
-      body.kbd-open.has-dock .column { padding-bottom: calc(var(--tab-h) + 12px + var(--safe-b)); }
+      body.kbd-open.has-dock .column { padding-bottom: calc(12px + var(--safe-b)) !important; }
     }
     @media (max-width: 380px) {
       .dates { grid-template-columns: 1fr; }
@@ -522,6 +522,120 @@
     .boot-help p, .boot-help li { font-size: 18px; line-height: 1.55; }
     .boot-help ol { padding-left: 1.3em; }
     .boot-help code { font-weight: 800; }
+  
+    /* v5 sticky board */
+    :root { --bg: #ece6d8; --paper: #fff6cf; --tape: rgba(255,255,255,.7); }
+    body { background: var(--bg); }
+    .app, .app { display: block !important; background: var(--bg); }
+    .sidebar, .tabbar { display: none !important; }
+    .mobile-top, .mobile-top.app-top { display: flex !important; }
+    .app-brand {
+      display: flex; flex-direction: column; min-width: 0; color: white; text-decoration: none;
+    }
+    .app-brand strong { font-size: 18px; font-weight: 800; }
+    .mobile-top-actions {
+      flex-direction: row !important; align-items: center !important; gap: 8px !important;
+    }
+    .top-add {
+      min-width: 44px; min-height: 44px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; text-decoration: none; font-weight: 800; font-size: 26px; line-height: 1;
+      border: 2px solid rgba(255,255,255,.45); border-radius: 12px;
+    }
+    .help-link { padding: 8px 10px; }
+    .column, body.has-dock .column { padding-bottom: 0; }
+    body.has-dock .column { padding-bottom: calc(var(--dock-h) + 12px + var(--safe-b)) !important; }
+    .action-dock {
+      bottom: max(0px, var(--safe-b)) !important;
+    }
+    body.has-dock .action-dock { display: flex !important; }
+    @media (min-width: 861px) {
+      .app { display: block !important; }
+      .sidebar { display: none !important; }
+      .mobile-top { display: flex !important; }
+      .action-dock, body.has-dock .action-dock { display: flex !important; }
+      .column, body.has-dock .column { padding-bottom: calc(var(--dock-h) + 12px + var(--safe-b)) !important; }
+      body:not(.has-dock) .column { padding-bottom: 0 !important; }
+      #ask-box, #ready-box {
+        scroll-margin-top: calc(12px + var(--mobile-header) + var(--safe-t));
+        scroll-margin-bottom: calc(12px + var(--dock-h) + var(--safe-b));
+      }
+    }
+    .board-page { max-width: 1100px; }
+    .board-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+      margin: 4px 0 10px; flex-wrap: wrap;
+    }
+    .board-head p { margin: 0; color: var(--ink-2); font-weight: 700; font-size: 15px; }
+    .board-filters { margin: 0 0 14px; padding: 0; border: 0; background: transparent; }
+    .board-filters > summary {
+      display: inline-flex; align-items: center; min-height: 44px; width: auto;
+      padding: 0 2px; cursor: pointer; font-weight: 800; color: var(--navy);
+    }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; }
+    .filter-pills button {
+      min-height: 44px; padding: 8px 12px; border-radius: 999px; font-weight: 800;
+      border: 2px solid var(--navy); background: transparent; color: var(--navy);
+    }
+    .filter-pills button[aria-pressed="true"] { background: var(--navy); color: white; }
+    .sticky-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+      gap: 12px;
+      padding-bottom: 8px;
+    }
+    @media (min-width: 700px) {
+      .sticky-board { grid-template-columns: repeat(auto-fill, minmax(184px, 1fr)); gap: 16px; }
+    }
+    .sticky-note {
+      position: relative;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 150px; padding: 18px 14px 12px;
+      background: #fff6cf;
+      background: color-mix(in srgb, var(--accent, #c9a227) 16%, #fff8d6);
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 2px;
+      box-shadow: 0 1px 1px rgba(18,24,32,.05), 0 10px 18px rgba(18,24,32,.1);
+      overflow: hidden;
+    }
+    .sticky-note::before {
+      content: "";
+      position: absolute; top: 6px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+      width: 42px; height: 10px; border-radius: 1px;
+      background: var(--tape);
+      box-shadow: 0 1px 2px rgba(18,24,32,.12);
+    }
+    .sticky-note h3 {
+      margin: 0; font-size: 17px; line-height: 1.3; font-weight: 800;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    }
+    .sticky-note p {
+      margin: 10px 0 0; font-size: 14px; line-height: 1.35; font-weight: 700;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+      color: var(--ink-2);
+    }
+    .sticky-kind { margin: 0 0 6px !important; font-size: 12px !important; letter-spacing: .04em; text-transform: none; color: var(--navy) !important; }
+    .sticky-note.sticky-memo { background: #fff3a0; --accent: #e0c200; }
+    .sticky-note.is-closed { background: #efe9dc; opacity: .78; }
+    .sticky-note.is-overdue { background: #f8e4d8; background: color-mix(in srgb, #8f1d1d 9%, #fff3e6); }
+    .sticky-note.is-ready { background: #e7f3e6; background: color-mix(in srgb, #084028 10%, #f4f7e8); }
+    .sticky-add {
+      background: transparent; box-shadow: none;
+      border: 2px dashed #8a7a4a; color: var(--navy);
+      justify-content: center; align-items: center; gap: 4px; padding: 14px;
+    }
+    .sticky-add::before { display: none; }
+    .sticky-add strong { font-size: 28px; line-height: 1; }
+    .sticky-add span { font-weight: 800; font-size: 15px; }
+    .sticky-add.sticky-add-note { border-color: #b7a22a; }
+    @media (max-width: 860px) {
+      .sticky-note { min-height: 132px; padding: 16px 12px 10px; }
+      .banner { margin-top: 8px; padding: 10px 12px; }
+    }
+    .board-empty { margin: 8px 0 0; font-weight: 700; }
+    a.back { margin-bottom: 8px; }
+
   </style>
 </head>
 <body>
@@ -542,19 +656,21 @@
     <aside class="sidebar">
       <div class="brand">專案記事<small id="sync-status">未連結 OneDrive，只存在這台瀏覽器</small></div>
       <div class="side-today" id="today-label"></div>
-      <a class="nav-link" href="#/home" data-nav="home">工作台</a>
+      <a class="nav-link" href="#/home" data-nav="home">看板</a>
       <a class="nav-link" href="#/projects" data-nav="projects"><span>專案</span><span class="nav-count" data-overdue-count hidden></span></a>
       <a class="nav-link" href="#/notes" data-nav="notes">記事</a>
       <a class="nav-link" href="#/settings" data-nav="settings">設定</a>
       <a class="nav-link" href="#/guide" data-nav="guide">說明</a>
     </aside>
     <div class="column">
-      <header class="mobile-top">
-        <div class="mobile-top-title">
+      <header class="mobile-top app-top">
+        <a class="app-brand" href="#/home">
           <strong>專案記事</strong>
           <span id="sync-status-mobile" class="sync-chip">未連結 OneDrive</span>
-        </div>
+        </a>
         <div class="mobile-top-actions">
+          <a class="top-add" href="#/projects/new" title="新增專案" aria-label="新增專案">＋</a>
+          <a class="help-link" href="#/settings" data-nav="settings">設定</a>
           <a class="help-link" href="#/guide" data-nav="guide">說明</a>
         </div>
       </header>
@@ -582,7 +698,7 @@
   <nav id="tabbar" class="tabbar" aria-label="主要" hidden>
     <a href="#/home" data-nav="home">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M7 10.5V20h10v-9.5"/></svg>
-      <span>工作台</span>
+      <span>看板</span>
     </a>
     <a href="#/projects" data-nav="projects">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
@@ -612,7 +728,7 @@
 
 var KEY = "ky-project-notes-v1";
 var MOCK_KEY = "ky-project-notes-mock-v1";
-var APP_VERSION = 4;
+var APP_VERSION = 5;
 var COLORS = ["#17364a", "#1d3f8f", "#084028", "#8a4b08", "#8f1d1d", "#3f3a6b", "#24556e", "#3d4a3e"];
 var WEEK = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 var STATUSES = [
@@ -750,7 +866,8 @@ var ui = {
   askOpen: false,
   homeMore: false,
   editorOpen: false,
-  scrollTo: ""
+  scrollTo: "",
+  boardFilter: "open"
 };
 
 function esc(s) {
@@ -1743,7 +1860,7 @@ function readyBoxHTML(p) {
     }
     return "<li><strong>" + esc(a.label) + "：</strong>" + esc(detail) + "</li>";
   }).join("");
-  var closedNote = isClosed(p) ? '<p class="hint">這單已完結，不會出現在工作台的待辦清單，但仍可補料和驗證。</p>' : "";
+  var closedNote = isClosed(p) ? '<p class="hint">這單已完結，不會出現在看板的待辦清單，但仍可補料和驗證。</p>' : "";
   var gapN = openGapsFor(p.id).length;
   return '<section class="block ready-box" id="ready-box">' +
     "<h2>驗證與就緒</h2>" +
@@ -2104,7 +2221,7 @@ function pickProjectsForQuestion(question, explicitId) {
   return data.projects.filter(function (p) { return !isClosed(p); }).slice(0, 8);
 }
 function buildLocalAnswer(projects, question, docsByProject) {
-  if (!projects.length) return "找不到對應專案。請先選一個專案，或在工作台新增。";
+  if (!projects.length) return "找不到對應專案。請先選一個專案，或在看板新增。";
   var q = String(question || "").trim();
   var blocks = projects.map(function (p) {
     var notes = data.notes.filter(function (n) { return n.projectId === p.id; })
@@ -2937,67 +3054,106 @@ function sectionProjects(title, list, emptyText, limit) {
 function statButton(kind, label, count, cls) {
   return '<button type="button" class="stat ' + cls + '" data-action="stat" data-kind="' + kind + '"><b>' + count + "</b><span>" + esc(label) + "</span></button>";
 }
+function stickyStatusLine(p) {
+  if (!p) return "尚無詳情";
+  if (p.status === "done") return "已完成";
+  if (p.status === "cancelled") return "已取消";
+  var overdue = overdueDateItems(p);
+  if (overdue.length) {
+    var d = overdue[0];
+    return "逾期：" + (d.name || "期限") + (d.date ? " " + formatLong(d.date) : "");
+  }
+  var ready = readinessOf(p);
+  if (ready.id === "missing") return "尚欠資料";
+  if (ready.id === "unverified") return "待驗證";
+  var soon = soonDateItems(p);
+  if (soon.length) {
+    var s = soon[0];
+    return (s.name || "期限") + (s.date ? " " + formatLong(s.date) : "") + "（本週）";
+  }
+  if (isWaitingCommence(p)) return "等候開工";
+  if (p.situation) return p.situation;
+  if (ready.id === "ready") return "可即答";
+  return "尚無詳情";
+}
+function projectStickyHTML(p) {
+  var ready = readinessOf(p);
+  var overdue = hasOverdueDates(p);
+  var cls = "sticky-note";
+  if (isClosed(p)) cls += " is-closed";
+  else if (overdue) cls += " is-overdue";
+  else if (ready.id === "ready") cls += " is-ready";
+  return '<a class="' + cls + '" href="#/p/' + esc(p.id) + '" style="--accent:' + safeColor(p.color) + '">' +
+    "<h3>" + esc(displayName(p)) + "</h3>" +
+    "<p>" + esc(stickyStatusLine(p)) + "</p></a>";
+}
+function noteStickyHTML(n) {
+  var line = excerpt(String(n.body || "").replace(/\s+/g, " "), 42);
+  if (!line) line = n.projectId && findProject(n.projectId) ? "連結：" + displayName(findProject(n.projectId)) : "空白記事";
+  return '<a class="sticky-note sticky-memo" href="#/n/' + esc(n.id) + '">' +
+    '<p class="sticky-kind">記事</p>' +
+    "<h3>" + esc(displayNoteTitle(n)) + "</h3>" +
+    "<p>" + esc(line) + "</p></a>";
+}
+function boardProjectMatch(p, filter) {
+  if (filter === "notes") return false;
+  if (filter === "open") return !isClosed(p);
+  if (filter === "all") return true;
+  if (filter === "missing") return isReadyOpen(p, "missing");
+  if (filter === "unverified") return isReadyOpen(p, "unverified");
+  if (filter === "ready") return isReadyOpen(p, "ready");
+  if (filter === "risk") return !isClosed(p) && (hasOverdueDates(p) || hasSoonDates(p) || isWaitingCommence(p) || isCycleCandidate(p));
+  return !isClosed(p);
+}
+function boardSortKey(p) {
+  if (isClosed(p)) return "8:" + displayName(p);
+  if (hasOverdueDates(p)) return "0:" + displayName(p);
+  if (isReadyOpen(p, "missing")) return "1:" + displayName(p);
+  if (isReadyOpen(p, "unverified")) return "2:" + displayName(p);
+  if (hasSoonDates(p) || isWaitingCommence(p)) return "3:" + displayName(p);
+  return "4:" + displayName(p);
+}
+function looseNotes() {
+  return data.notes.filter(function (n) {
+    return !n.projectId || !findProject(n.projectId);
+  }).sort(function (a, b) {
+    return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+  });
+}
+function boardHTML() {
+  var filter = ui.boardFilter || "open";
+  var filters = [
+    ["open", "未完結"],
+    ["risk", "要處理"],
+    ["missing", "尚欠資料"],
+    ["unverified", "待驗證"],
+    ["ready", "可即答"],
+    ["notes", "記事"],
+    ["all", "全部"]
+  ];
+  var pills = filters.map(function (pair) {
+    var on = filter === pair[0];
+    return '<button type="button" data-action="board-filter" data-filter="' + pair[0] + '" aria-pressed="' + (on ? "true" : "false") + '">' + pair[1] + "</button>";
+  }).join("");
+  var projects = data.projects.filter(function (p) { return boardProjectMatch(p, filter); })
+    .sort(function (a, b) { return boardSortKey(a).localeCompare(boardSortKey(b), "zh-Hant"); });
+  var notes = (filter === "notes" || filter === "open" || filter === "all") ? looseNotes() : [];
+  var cards = projects.map(projectStickyHTML).join("") + notes.map(noteStickyHTML).join("");
+  var empty = "";
+  if (!projects.length && !notes.length) {
+    empty = '<p class="board-empty">還沒有便利貼。按＋或下面的空格，新增一張專案。</p>';
+  }
+  return '<div class="page board-page">' +
+    '<div class="board-head"><p>' + esc(todayLong()) + "</p></div>" +
+    '<details class="board-filters fold tight"' + (filter !== "open" ? " open" : "") + "><summary>篩選</summary>" +
+    '<div class="filter-pills">' + pills + "</div></details>" +
+    '<div class="sticky-board">' +
+    '<a class="sticky-note sticky-add" href="#/projects/new"><strong>＋</strong><span>新增專案</span></a>' +
+    '<a class="sticky-note sticky-add sticky-add-note" href="#/notes/new"><strong>＋</strong><span>新增記事</span></a>' +
+    cards + "</div>" + empty + "</div>";
+}
 function homeHTML() {
-  var projects = data.projects;
-  var overdueP = projects.filter(hasOverdueDates).sort(function (a, b) {
-    var ad = overdueDateItems(a)[0];
-    var bd = overdueDateItems(b)[0];
-    return cmpDateDir(ad && ad.date, bd && bd.date, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
-  });
-  var soonP = projects.filter(function (p) { return hasSoonDates(p) && !hasOverdueDates(p); }).sort(function (a, b) {
-    var ad = soonDateItems(a)[0];
-    var bd = soonDateItems(b)[0];
-    return cmpDateDir(ad && ad.date, bd && bd.date, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
-  });
-  var waiting = projects.filter(isWaitingCommence).sort(function (a, b) {
-    return cmpDateDir(a.workCommenced, b.workCommenced, 1) || displayName(a).localeCompare(displayName(b), "zh-Hant");
-  });
-  var shown = {};
-  overdueP.concat(soonP, waiting).forEach(function (p) { shown[p.id] = true; });
-  var rest = projects.filter(function (p) { return !isClosed(p) && !shown[p.id]; }).sort(byEnd);
-  var done = projects.filter(function (p) { return p.status === "done"; }).sort(function (a, b) { return cmpDateDir(a.endDate, b.endDate, -1); });
-  var activeCount = projects.filter(function (p) { return p.status === "active"; }).length;
-  var recent = data.notes.slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }).slice(0, 4);
-  var notesBlock = recent.length ? '<div class="stack">' + recent.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有記事。</p>';
-  function riskMapper(listFn) {
-    return function (p) { return riskCard(p, listFn(p)); };
-  }
-  var missingN = projects.filter(function (p) { return isReadyOpen(p, "missing"); }).length;
-  var unverifiedN = projects.filter(function (p) { return isReadyOpen(p, "unverified"); }).length;
-  var readyN = projects.filter(function (p) { return isReadyOpen(p, "ready"); }).length;
-  var cycle = cycleProjects();
-  var homeGaps = openGapsFor("");
-  function jumpRow(kind, label, count, cls) {
-    return '<button type="button" class="jump-row ' + (cls || "") + '" data-action="stat" data-kind="' + kind + '"><span>' + esc(label) + "</span><b>" + count + "</b></button>";
-  }
-  var moreLists = (ui.homeMore ? "" : " hidden");
-  return '<div class="page home-page">' +
-    '<header class="page-head compact"><div><h1>工作台</h1><p class="lead">今天 ' + esc(todayLong()) + "。</p></div>" +
-    '<a class="btn desk-only" href="#/projects/new">＋ 新增專案</a></header>' +
-    '<div class="stats stats-3">' +
-    statButton("missing", "尚欠資料", missingN, missingN ? "stat-danger" : "") +
-    statButton("unverified", "待驗證", unverifiedN, unverifiedN ? "stat-info" : "") +
-    statButton("ready", "可即答", readyN, readyN ? "stat-ok" : "") +
-    "</div>" +
-    '<div class="jump-list">' +
-    jumpRow("overdue", "已逾期", overdueP.length, overdueP.length ? "stat-danger" : "") +
-    jumpRow("soon", "本週到期", projects.filter(hasSoonDates).length, projects.filter(hasSoonDates).length ? "stat-warn" : "") +
-    jumpRow("waiting", "等候開工", waiting.length, waiting.length ? "stat-warn" : "") +
-    "</div>" +
-    '<div class="home-lists">' +
-    sectionWorkbench("本輪要補／要驗證", cycle, "沒有待辦。已完成和已取消不會出現在這份清單。", null, cycleCard) +
-    (homeGaps.length ? '<p class="hint">有 ' + homeGaps.length + " 項要補。打開專案後可標成已補完。</p>" : "") +
-    '<button type="button" class="btn btn-secondary btn-block" data-action="toggle-home-more" style="margin-top:12px">' + (ui.homeMore ? "收起其他清單" : "其他清單（逾期、本週、記事）") + "</button>" +
-    '<div id="home-more"' + moreLists + ">" +
-    sectionWorkbench("已逾期（結束、開工或其他期限）", overdueP, "沒有逾期日期。已完成和已取消不會算進逾期。", 4, riskMapper(overdueDateItems)) +
-    sectionWorkbench("本週到期", soonP, "未來七天沒有其他期限。", 4, riskMapper(soonDateItems)) +
-    sectionWorkbench("等候開工", waiting, "沒有專案在等候開工。", 4, riskMapper(function (p) { return [{ key: "commence", name: "開工", date: p.workCommenced || "", info: commenceInfo(p), done: false }]; })) +
-    (rest.length ? sectionWorkbench("其他未完成", rest, "", 4) : "") +
-    (done.length ? sectionWorkbench("已完成", done, "", 2) : "") +
-    '<section class="block"><div class="section-head"><h2>最近的記事</h2><a class="btn btn-secondary" href="#/notes">全部記事</a></div>' + notesBlock + "</section>" +
-    "</div></div>" +
-    askBoxHTML({ locked: false }) +
-    "</div>";
+  return boardHTML();
 }
 
 function dirLabel() {
@@ -3182,7 +3338,7 @@ function projectEditor(p) {
   var linkedHTML = linked.length ? '<div class="stack">' + linked.map(noteCard).join("") + "</div>" : '<p class="empty">還沒有連結到這個專案的記事。</p>';
   var modHidden = p.projectKind === "mod" ? "" : " hidden";
   return '<div class="page narrow" data-entity="project" data-entity-id="' + esc(p.id) + '">' +
-    '<a class="back" href="#/projects">← 返回專案</a>' +
+    '<a class="back" href="#/home">← 返回看板</a>' +
     '<div class="accent-bar" id="accent-bar" style="background:' + safeColor(p.color) + '"></div>' +
     '<h1 id="editor-name-heading">' + esc(displayName(p)) + "</h1>" +
     '<p class="save-state" id="save-state">已自動儲存 · ' + esc(formatStamp(p.updatedAt)) + "</p>" +
@@ -3231,7 +3387,7 @@ function noteProjectDatesHTML(n) {
 function noteEditor(n) {
   var af = ui.autofocus && ui.autofocusId === n.id ? " data-autofocus" : "";
   return '<div class="page narrow" data-entity="note" data-entity-id="' + esc(n.id) + '">' +
-    '<a class="back" href="#/notes">← 返回記事</a>' +
+    '<a class="back" href="#/home">← 返回看板</a>' +
     '<p style="font-weight:800;margin:8px 0 0">記事</p>' +
     '<h1 id="editor-name-heading">' + esc(displayNoteTitle(n)) + "</h1>" +
     '<p class="save-state" id="save-state">上次更新 ' + esc(formatStamp(n.updatedAt)) + " · 變更會自動存在這台裝置</p>" +
@@ -3270,10 +3426,10 @@ function endpointCard(ep) {
 }
 function guideHTML() {
   return '<div class="page narrow guide"><header class="page-head"><h1>說明</h1></header>' +
-    '<p class="lead">這是個人用的專案工作台。用來記錄每單做到邊、關鍵日期和機種情況，並以「填好 → 驗證 → 被問 → 記入缺口 → 補料再驗證」的方式，讓回覆愈來愈即答。</p>' +
+    '<p class="lead">這是個人用的專案記事。首頁是便利貼看板：每張只顯示名稱和一句現況，點開才看詳情。用來記錄每單做到邊、關鍵日期和機種情況，並以「填好 → 驗證 → 被問 → 記入缺口 → 補料再驗證」的方式，讓回覆愈來愈即答。</p>' +
     '<details class="block fold" open><summary>手機怎麼用</summary>' +
-    '<p>iPhone 頂部標題和底部「工作台／專案／記事／設定」會固定在畫面，不用上落搵導覽。工作台預設只顯示就緒數字、「已逾期／本週／等候開工」入口，以及「本輪要補／要驗證」。即時解答和新增按鈕固定在底欄上方。要睇逾期完整清單或其他項目，再按「其他清單」。</p>' +
-    '<p>專案頁先顯示現況、驗證和即時解答；詳細欄位、合約文件和記事收在可展開的區塊，不用先滾過一長串表格。</p>' +
+    '<p>打開就是一塊便利貼看板。每張專案只顯示名稱和一句最有用的現況（尚欠資料、待驗證、可即答，或下一個期限）。點開那張便利貼才看詳情。未連結專案的記事也會以便利貼出現在看板上。</p>' +
+    '<p>頂部固定「專案記事」、新增、設定和說明。打開專案後，用「返回看板」回到這面牆；即時解答和驗證固定在畫面底部，詳細欄位、合約和記事收在可展開的區塊。</p>' +
     '<p>請用 Safari 打開，不要停在「檔案」或 OneDrive 的預覽畫面。</p></details>' +
     '<details class="block fold" open><summary>iPhone 打開沒有反應</summary>' +
     '<p>這通常不是按鈕沒有功能，而是 iPhone 在「檔案」或 OneDrive 的預覽裡打開 HTML 時，系統不會執行程式，所以按下去沒有反應。</p>' +
@@ -3297,7 +3453,7 @@ function guideHTML() {
     '<li><strong>答不了就記入要補。</strong>「即時解答」後若回覆尚欠資料，按「記入要補」。被突擊提問後，也可用「今次被問」記下問題、能否即答，以及還欠什麼。</li>' +
     '<li><strong>補完再驗證。</strong>資料改了，或把要補項目標成已補完，該單會回到「待驗證」，確認無誤後再標已驗證，狀態才會變成「可即答」。</li>' +
     '</ol>' +
-    '<p>建議每天或每週打開工作台：先睇「本輪要補／要驗證」，再處理逾期和本週期限。就緒狀態有三種：</p>' +
+    '<p>建議每天或每週打開看板，需要時在「篩選」選「要處理」，先睇尚欠、待驗證和有期限風險的便利貼。就緒狀態有三種：</p>' +
     '<ul>' +
     '<li><strong>尚欠資料</strong>：即答所需的欄位或合約／圖則還未齊。</li>' +
     '<li><strong>待驗證</strong>：已經填好，但尚未驗證，或驗證之後資料或附件有改過。</li>' +
@@ -3306,33 +3462,31 @@ function guideHTML() {
     '<p>所有要補紀錄和驗證時間都只留在這台裝置，或你自己匯出／同步的備份裡，不會自動送到這個公開網站，也不會把合約放到網上。</p>' +
     '</details>' +
 
-    '<details class="block fold"><summary>工作台與導覽</summary><dl>' +
-    '<dt>工作台、專案、記事、設定、說明</dt><dd>切換主要頁面。手機頂部標題和底部標籤會固定在畫面，即時解答、驗證和新增固定在底欄上方，不用上落搵。工作台第一眼顯示就緒數字、日期入口和本輪要補／要驗證；完整清單按「其他清單」才展開。電腦用左側欄。手機右上角也可以開啟說明。</dd>' +
-    '<dt>＋ 新增專案／＋ 新增記事</dt><dd>立刻建立一筆空的資料並打開編輯頁，輸入時會自動儲存。手機可按底欄上方的按鈕新增。</dd>' +
-    '<dt>進行中、本週到期、已逾期、等候開工</dt><dd>工作台以一列入口顯示數量，點進去就到對應列表。已逾期包括結束日和其他未完成期限；已完成或已取消不會算進去。</dd>' +
-    '<dt>尚欠資料、待驗證、可即答</dt><dd>帶你到對應就緒狀態的專案列表。工作台另有「本輪要補／要驗證」，會列出高風險尚欠、資料已改、尚未驗證，以及驗證已超過十四日的項目。</dd>' +
+    '<details class="block fold"><summary>看板與導覽</summary><dl>' +
+    '<dt>便利貼看板</dt><dd>打開工具就會見到看板。每張便利貼只有標題和一句現況。點開專案便利貼後可驗證、即時解答、記入要補、查看日期和機種情況、掛合約和記事。按「返回看板」關閉詳情。</dd>' +
+    '<dt>設定、說明</dt><dd>在頂部右側，不佔看板。同步狀態顯示在標題下面。</dd>' +
+    '<dt>＋ 新增專案／＋ 新增記事</dt><dd>頂部加號或看板上的虛線便利貼，會立刻建立一筆空的資料並打開詳情，輸入時會自動儲存。</dd>' +
+    '<dt>篩選</dt><dd>預設顯示未完結的專案，以及未連結專案的記事。需要時可篩「要處理」（尚欠、待驗證或期限有風險）、「尚欠資料」「待驗證」「可即答」「記事」或「全部」（含已完成）。</dd>' +
     '<dt>知道了</dt><dd>收起示範資料橫額，示範內容仍在。</dd>' +
     '<dt>清除示範資料</dt><dd>刪除尚未改過的示範專案、記事和端點。你改過的項目會留下。</dd>' +
     '<dt>前往備份／稍後</dt><dd>提醒你把資料存到 OneDrive。稍後只是先收起提示。</dd>' +
     '</dl></details>' +
 
     '<details class="block fold"><summary>專案與記事</summary><dl>' +
-    '<dt>搜尋、狀態、期限、排序、升序／降序</dt><dd>搜尋列一直可見。其他篩選在手機收在「篩選與排序」裡，點開才顯示，避免一長排條件佔滿畫面。</dd>' +
-    '<dt>卡片／時間軸</dt><dd>切換專案版面。時間軸仍然用大字顯示開始日、結束日和剩餘天數。</dd>' +
-    '<dt>重設篩選</dt><dd>恢復預設的列表條件。</dd>' +
-    '<dt>顏色圓點</dt><dd>設定專案顏色，方便在列表辨認。</dd>' +
+    '<dt>篩選便利貼</dt><dd>看板頂部的「篩選」可依進行中、要處理、尚欠資料、待驗證、可即答、記事或全部來縮小畫面。</dd>' +
+    '<dt>顏色圓點</dt><dd>在專案詳情裡設定顏色，便利貼會帶一點該色，方便辨認。</dd>' +
     '<dt>為這個專案新增記事</dt><dd>開一則已連結該專案的記事，記事上會顯示該專案的日期。</dd>' +
     '<dt>選擇檔案／下載／刪除附件</dt><dd>附件存在這台瀏覽器，之後可以下載。匯出備份時可一併帶走。</dd>' +
     '<dt>刪除專案／刪除記事</dt><dd>刪除前會先確認。刪專案時會移除該專案附件，並解除記事連結，記事本身會保留。</dd>' +
     '</dl></details>' +
 
     '<details class="block fold"><summary>專案欄位（機種與日期）</summary><dl>' +
-    '<dt>目前情況／做到邊</dt><dd>短句顯示在工作台卡片上，方便被問到時先睇現況。</dd>' +
+    '<dt>目前情況／做到邊</dt><dd>短句。沒有逾期或待辦時，會成為便利貼上那一句現況。</dd>' +
     '<dt>項目類型</dt><dd>新裝、現代化或其他。可不填。</dd>' +
     '<dt>現代化範圍</dt><dd>只有類型是現代化時才顯示：全改或部分改。</dd>' +
     '<dt>機房</dt><dd>有機房或無機房。</dd>' +
     '<dt>保留項目</dt><dd>自由填寫這一單保留了什麼。</dd>' +
-    '<dt>開工（Work commenced）</dt><dd>開工日、等候開工或已開工，以及短備註。等候中的專案會集中出現在工作台。</dd>' +
+    '<dt>開工（Work commenced）</dt><dd>開工日、等候開工或已開工，以及短備註。等候中的專案可在「篩選 → 要處理」裡看到。</dd>' +
     '<dt>其他期限</dt><dd>除開始、結束和開工外，可新增完工、驗收或自訂日期。完成的期限或已完結專案不會標成逾期。</dd>' +
     '</dl></details>' +
 
@@ -3452,27 +3606,25 @@ function parseRoute() {
 }
 function routeKey(route) { return route.name + ":" + (route.id || ""); }
 function viewHTML(route) {
-  if (route.name === "home") return homeHTML();
-  if (route.name === "projects") return projectsHTML();
-  if (route.name === "notes") return notesHTML();
+  if (route.name === "home" || route.name === "projects" || route.name === "notes") return boardHTML();
   if (route.name === "settings") return settingsHTML();
   if (route.name === "guide") return guideHTML();
   if (route.name === "project") {
     var p = findProject(route.id);
-    return p ? projectEditor(p) : missingHTML("找不到這個專案", "#/projects", "返回專案列表");
+    return p ? projectEditor(p) : missingHTML("找不到這個專案", "#/home", "返回看板");
   }
   if (route.name === "note") {
     var n = findNote(route.id);
-    return n ? noteEditor(n) : missingHTML("找不到這則記事", "#/notes", "返回記事列表");
+    return n ? noteEditor(n) : missingHTML("找不到這則記事", "#/home", "返回看板");
   }
-  return homeHTML();
+  return boardHTML();
 }
 function titleFor(route) {
-  if (route.name === "projects" || route.name === "project") return "專案";
-  if (route.name === "notes" || route.name === "note") return "記事";
+  if (route.name === "project") return "專案";
+  if (route.name === "note") return "記事";
   if (route.name === "settings") return "設定";
   if (route.name === "guide") return "說明";
-  return "工作台";
+  return "看板";
 }
 
 function scrollToId(id) {
@@ -3491,16 +3643,9 @@ function paintActionDock(route) {
   var dock = document.getElementById("action-dock");
   if (!dock) return;
   var html = "";
-  if (route.name === "home") {
-    html = '<button type="button" class="btn" data-action="open-ask">即時解答</button>' +
-      '<a class="btn btn-secondary" href="#/projects/new">＋ 新增</a>';
-  } else if (route.name === "projects") {
-    html = '<a class="btn" href="#/projects/new">＋ 新增專案</a>';
-  } else if (route.name === "project") {
+  if (route.name === "project") {
     html = '<button type="button" class="btn" data-action="open-ask">即時解答</button>' +
       '<button type="button" class="btn btn-secondary" data-action="goto-verify">驗證</button>';
-  } else if (route.name === "notes") {
-    html = '<a class="btn" href="#/notes/new">＋ 新增記事</a>';
   }
   dock.innerHTML = html;
   dock.hidden = !html;
@@ -3511,6 +3656,7 @@ function render() {
   var key = routeKey(route);
   var skipScroll = key === ui.lastRouteKey;
   if (!skipScroll && route.name !== "project") ui.editorOpen = false;
+  if (!skipScroll && route.name === "notes") ui.boardFilter = "notes";
   ui.lastRouteKey = key;
   ui.shownDay = todayISO();
   document.getElementById("main").innerHTML = viewHTML(route);
@@ -4450,8 +4596,12 @@ function afterRender(route) {
 function openProjectsFilter(due, status) {
   data.prefs.due = due || "all";
   data.prefs.status = status || "all";
+  if (due === "missing" || due === "unverified" || due === "ready") ui.boardFilter = due;
+  else if (due === "overdue" || due === "soon" || due === "waiting") ui.boardFilter = "risk";
+  else if (status === "done" || status === "cancelled") ui.boardFilter = "all";
+  else ui.boardFilter = "open";
   persistNow();
-  go("#/projects");
+  go("#/home");
 }
 function hasDemoData() {
   return data.projects.some(function (p) { return p.demo; }) || data.notes.some(function (n) { return n.demo; }) || data.endpoints.some(function (e) { return e.demo; }) || (data.gaps || []).some(function (g) { return g.demo; });
@@ -5106,6 +5256,11 @@ function runAction(action, btn) {
     var entR = currentEntity();
     if (!entR || entR.type !== "project") return;
     removeMilestone(entR.id, btn.dataset.id);
+    return;
+  }
+  if (action === "board-filter") {
+    ui.boardFilter = btn && btn.dataset.filter ? btn.dataset.filter : "open";
+    render();
     return;
   }
   if (action === "open-ask") { openAskPanel(); return; }
